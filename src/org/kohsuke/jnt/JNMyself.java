@@ -1,14 +1,14 @@
 package org.kohsuke.jnt;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.xml.sax.SAXException;
 
 /**
  * The current logged-in user in java&#x2E;net.
@@ -23,31 +23,31 @@ public class JNMyself extends JNUser {
      */
     private Set myProjects;
     
-    protected JNMyself(JavaNet net,String userName) throws ProcessingException {
+    protected JNMyself(JavaNet net,String userName) {
         super(net,userName);
     }
     
     private void parseStartPage() throws ProcessingException {
         if( myProjects!=null )
             return;     // already parsed
-        
-        try {
-            // obtain current user information
-            Document dom = Util.getDom4j(wc.getResponse("https://www.dev.java.net/servlets/StartPage"));
-            
-            // parse my projects
-            Set myProjects = new HashSet(); 
-            List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
-            for( int i=0; i<projects.size(); i++) {
-                Element e = (Element)projects.get(i);
-                myProjects.add(net.getProject(e.getText()));
+
+        new Scraper("failed to parse the personal info page") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                // obtain current user information
+                Document dom = Util.getDom4j(wc.getResponse("https://www.dev.java.net/servlets/StartPage"));
+
+                // parse my projects
+                Set myProjects = new HashSet();
+                List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
+                for( int i=0; i<projects.size(); i++) {
+                    Element e = (Element)projects.get(i);
+                    myProjects.add(net.getProject(e.getText()));
+                }
+                JNMyself.this.myProjects = Collections.unmodifiableSet(myProjects);
+
+                return null;
             }
-            this.myProjects = Collections.unmodifiableSet(myProjects);
-        } catch( IOException e ) {
-            throw new ProcessingException("unable to parse 'My start page'",e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("unable to parse 'My start page'",e);
-        }
+        }.run();
     }
     
     /**

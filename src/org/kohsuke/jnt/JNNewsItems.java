@@ -1,17 +1,15 @@
 /*
- * $Id: JNNewsItems.java 211 2004-12-16 02:06:51Z kohsuke $
+ * $Id: JNNewsItems.java 262 2004-12-17 15:56:59Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
 
-import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -30,7 +28,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 211 $
+ * @version $Revision: 262 $
  */
 public final class JNNewsItems {
 
@@ -88,62 +86,62 @@ public final class JNNewsItems {
      *                 occurs during the form submission
      */
     public void createNewsItem(
-        Calendar date,
-        String headline,
-        String body,
-        String imageUrl,
-        String articleUrl)
+        final Calendar date,
+        final String headline,
+        final String body,
+        final String imageUrl,
+        final String articleUrl)
         throws ProcessingException {
 
-        try {
-            // move to the submission page
-            String url = project.getURL()+"/servlets/ProjectNewsAdd";
-            WebResponse resp = wc.getResponse(url);
-            
-            WebForm form = resp.getFormWithName(FORM_NAME);
-            SubmitButton submitButton =
-                form.getSubmitButton(FORM_BUTTON, "Add new announcement");
-            if(submitButton==null)
-                throw new ProcessingException();
+        new Scraper("Unable to submit news "+headline) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                // move to the submission page
+                String url = project.getURL()+"/servlets/ProjectNewsAdd";
+                WebResponse resp = wc.getResponse(url);
 
-            if (headline == null)
-                throw new ProcessingException("null headline");
-            form.setParameter(FORM_HEADLINE, headline);
+                WebForm form = resp.getFormWithName(FORM_NAME);
+                SubmitButton submitButton =
+                    form.getSubmitButton(FORM_BUTTON, "Add new announcement");
+                if(submitButton==null)
+                    throw new ProcessingException();
 
-            if (date != null) {
-                // TODO: error check that (date >= today) && (date <= 12/31/04)
-                form.setParameter(
-                    FORM_YEAR,
-                    String.valueOf(date.get(Calendar.YEAR)));
-                // the month field is set as an int even though the drop down
-                // menu contains month names
-                form.setParameter(
-                    FORM_MONTH,
-                    String.valueOf(date.get(Calendar.MONTH) + 1));
-                form.setParameter(
-                    FORM_DAY,
-                    String.valueOf(date.get(Calendar.DAY_OF_MONTH)));
+                if (headline == null)
+                    throw new ProcessingException("null headline");
+                form.setParameter(FORM_HEADLINE, headline);
+
+                if (date != null) {
+                    // TODO: error check that (date >= today) && (date <= 12/31/04)
+                    form.setParameter(
+                        FORM_YEAR,
+                        String.valueOf(date.get(Calendar.YEAR)));
+                    // the month field is set as an int even though the drop down
+                    // menu contains month names
+                    form.setParameter(
+                        FORM_MONTH,
+                        String.valueOf(date.get(Calendar.MONTH) + 1));
+                    form.setParameter(
+                        FORM_DAY,
+                        String.valueOf(date.get(Calendar.DAY_OF_MONTH)));
+                }
+
+                if (body != null) {
+                    form.setParameter(FORM_BODY, body);
+                }
+
+                if (imageUrl != null) {
+                    form.setParameter(FORM_IMAGEURL, imageUrl);
+                }
+
+                if (articleUrl != null) {
+                    form.setParameter(FORM_ARTICLEURL, articleUrl);
+                }
+
+                // submit the news item
+                form.submit(submitButton);
+
+                return null;
             }
-
-            if (body != null) {
-                form.setParameter(FORM_BODY, body);
-            }
-
-            if (imageUrl != null) {
-                form.setParameter(FORM_IMAGEURL, imageUrl);
-            }
-
-            if (articleUrl != null) {
-                form.setParameter(FORM_ARTICLEURL, articleUrl);
-            }
-
-            // submit the news item
-            form.submit(submitButton);
-        } catch (IOException ioe) {
-            throw new ProcessingException(ioe);
-        } catch (SAXException se) {
-            throw new ProcessingException(se);
-        }
+        }.run();
 
         // purge the news item list. we just added one, so we need to reload
         newsItems = null;
@@ -168,7 +166,7 @@ public final class JNNewsItems {
      * Gets all announcements in this project as a {@link List} of {@link JNNewsItem}s.
      *
      * <p>
-     * The returned list is sorted in the order of date; the last announcement is the first entry.
+     * The returned list is sorted in the order of date; the latest announcement is the first entry.
      *
      * @return
      *      can be empty but never be null. Read-only.
@@ -186,53 +184,46 @@ public final class JNNewsItems {
         // load all information that is on the membership pages
         newsItems = new ArrayList();
 
-        try {
-            WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsList");
-            Document dom = Util.getDom4j(response);
+        new Scraper("Unable to parse the announcement list") {
+            protected Object scrape() throws IOException, SAXException, ParseException {
+                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsList");
+                Document dom = Util.getDom4j(response);
 
-            Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");
+                Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");
 
-            if (table== null) {
-                // theres no news table.
-                return;
-            }
+                if (table== null) {
+                    // theres no news table.
+                    return null;
+                }
 
-            List rows = table.selectNodes("TR");
+                List rows = table.selectNodes("TR");
 
-            // we start from row 1, since row 0 is the header row.
+                // we start from row 1, since row 0 is the header row.
 
 
-            for (int r=1; r<rows.size(); r++) {
-                Element row = (Element) rows.get(r);
-                String date =  ((Element)row.elements("TD").get(0)).getTextTrim();
+                for (int r=1; r<rows.size(); r++) {
+                    Element row = (Element) rows.get(r);
+                    String date =  ((Element)row.elements("TD").get(0)).getTextTrim();
 
-                Element link = (Element) row.selectSingleNode("TD[2]/A");
-                String summary = link.getText();
-                String href = link.attributeValue("href");
-                int idx = href.lastIndexOf('=')+1;
+                    Element link = (Element) row.selectSingleNode("TD[2]/A");
+                    String summary = link.getText();
+                    String href = link.attributeValue("href");
+                    int idx = href.lastIndexOf('=')+1;
 
-                newsItems.add(new JNNewsItem(project, Integer.parseInt(href.substring(idx)),
-                    dateFormat.parse(date), summary));
-            }
+                    newsItems.add(new JNNewsItem(project, Integer.parseInt(href.substring(idx)),
+                        dateFormat.parse(date), summary));
+                }
 
-            // this code may be needed for pagination in the future...
+                // this code may be needed for pagination in the future...
 //        WebLink nextPage = response.getLinkWith("Next");
 //
 //        if (nextPage != null) {
 //            // load next page
 //            parseNewsPageInfo(nextPage.click());
 //        }
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        } catch (ParseException e) {
-            throw new ProcessingException(e);
-        }
+                return null;
+            }
+        }.run();
     }
 
     /**

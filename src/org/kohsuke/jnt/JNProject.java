@@ -1,6 +1,5 @@
 package org.kohsuke.jnt;
 
-import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.TableCell;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
@@ -8,7 +7,6 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -102,52 +100,48 @@ public final class JNProject {
     private void parseProjectInfo() throws ProcessingException {
         if(topLevelName!=null)
             return; // already parsed.
-        
-        try {
-            Document dom = Util.getDom4j(wc.getResponse(getURL()+'/'));
 
-            List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
-            if(as.size()==0)
-                throw new ProcessingException("failed to parse "+getURL()+'/');
+        new Scraper("unable to parse the project page") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                Document dom = Util.getDom4j(wc.getResponse(getURL()+'/'));
 
-            if(as.size()>2) {
-                topLevelName = ((Element)as.get(1)).getTextTrim();
-                parentProject = ((Element)as.get(as.size()-2)).getTextTrim();
-            } else {
-                topLevelName = projectName;
-                parentProject = null;
+                List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
+                if(as.size()==0)
+                    throw new ProcessingException("failed to parse "+getURL()+'/');
+
+                if(as.size()>2) {
+                    topLevelName = ((Element)as.get(1)).getTextTrim();
+                    parentProject = ((Element)as.get(as.size()-2)).getTextTrim();
+                } else {
+                    topLevelName = projectName;
+                    parentProject = null;
+                }
+
+                if( dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
+                    isCommunity=Boolean.TRUE;
+                else
+                    isCommunity=Boolean.FALSE;
+
+                // parse summary
+                summmary = dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[TH/text()='Summary']/TD").getText();
+
+                // parse owners
+                Set owners = new HashSet();
+                List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
+                for( int i=0; i<os.size(); i++ )
+                    owners.add( net.getUser( ((Element)os.get(i)).getTextTrim() ) );
+                JNProject.this.owners = Collections.unmodifiableSet(owners);
+
+                // parse sub-projects
+                Set subProjects = new HashSet();
+                List sp = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
+                for( int i=0; i<sp.size(); i++ )
+                    subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
+                JNProject.this.subProjects = Collections.unmodifiableSet(subProjects);
+
+                return null;
             }
-
-            if( dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
-                isCommunity=Boolean.TRUE;
-            else
-                isCommunity=Boolean.FALSE;
-
-            // parse summary
-            summmary = dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[TH/text()='Summary']/TD").getText();
-
-            // parse owners
-            Set owners = new HashSet();
-            List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
-            for( int i=0; i<os.size(); i++ )
-                owners.add( net.getUser( ((Element)os.get(i)).getTextTrim() ) );
-            this.owners = Collections.unmodifiableSet(owners);
-
-            // parse sub-projects
-            Set subProjects = new HashSet();
-            List sp = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
-            for( int i=0; i<sp.size(); i++ )
-                subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
-            this.subProjects = Collections.unmodifiableSet(subProjects);
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+        }.run();
     }
 
     /**
@@ -184,7 +178,32 @@ public final class JNProject {
         if( parentProject==null )   return null;
         return net.getProject(parentProject); 
     }
-    
+
+    /**
+     * Moves this project under the specified project.
+     *
+     * <p>
+     * This is a priviledged operation.
+     */
+    public void setParent(final JNProject newParent) throws ProcessingException {
+        if(newParent==null)
+            throw new IllegalArgumentException();
+
+        new Scraper("Failed to reparent the project") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = wc.getResponse(getURL()+"/servlets/ProjectEdit");
+
+                WebForm form = response.getFormWithName("ProjectEditForm");
+
+                form.setParameter("parent", Util.getOptionValueFor(form,"parent",newParent.getName()));
+
+                form.submit();
+
+                return null;
+            }
+        }.run();
+    }
+
     /**
      * Gets the community project to which this project
      * directly/indirectly belongs.

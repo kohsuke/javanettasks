@@ -3,19 +3,18 @@
  */
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.cookies.CookieProperties;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.xml.sax.SAXException;
-
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebForm;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.cookies.CookieProperties;
 
 /**
  * Root of java&#x2E;net.
@@ -65,28 +64,27 @@ public class JavaNet {
     /**
      * Logs in to the java.net. This method has to be called first.
      */
-    private void login( String userName, String password ) throws ProcessingException {
-        try {
-            WebResponse r = wc.getResponse("https://www.dev.java.net/servlets/TLogin");
-            WebForm form = r.getFormWithName("loginform");
-        
-            form.setParameter("loginID",userName);
-            form.setParameter("password",password);
-            form.submit(form.getSubmitButton("Login"));
+    private void login( final String userName, final String password ) throws ProcessingException {
+        new Scraper("unable to log in as user "+userName) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse r = wc.getResponse("https://www.dev.java.net/servlets/TLogin");
+                WebForm form = r.getFormWithName("loginform");
 
-            // check if the login was successful
-            if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)
-                throw new ProcessingException("authentication failed. invalid username/password");
-            
-            // create a special myself object.
-            myself = new JNMyself(this,userName);
-            users.put(userName,myself);
-            
-        } catch( IOException e ) {
-            throw new ProcessingException("unable to log in for user "+userName+" : "+e.getMessage(),e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("unable to log in for user "+userName+" : "+e.getMessage(),e);
-        }
+                form.setParameter("loginID",userName);
+                form.setParameter("password",password);
+                form.submit(form.getSubmitButton("Login"));
+
+                // check if the login was successful
+                if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)
+                    throw new ProcessingException("authentication failed. invalid username/password");
+
+                // create a special myself object.
+                myself = new JNMyself(JavaNet.this,userName);
+                users.put(userName,myself);
+
+                return null;
+            }
+        }.run();
     }
     
     
@@ -164,7 +162,7 @@ public class JavaNet {
      * <p>
      * Don't use this method unless you know what you are doing.
      */
-    public static JavaNet connect( WebConversation conversation ) throws ProcessingException {
+    public static JavaNet connect( WebConversation conversation ) {
         return new JavaNet(conversation);
     }
 
