@@ -27,6 +27,7 @@ public class JavaNet {
     
     private final Map projects = new HashMap();
     private final Map users = new HashMap();
+    private final Map roles = new HashMap();
 
     /**
      * A special {@link JNUser} object that represents the current user.
@@ -155,6 +156,10 @@ public class JavaNet {
 	
     /**
      * Obtains a {@link JNProject} object from its name.
+     *
+     * <p>
+     * A successful completion of this method does not
+     * guarantee that the project actually exists.
      */
     public JNProject getProject(String projectName) throws ProcessingException {
         JNProject p = (JNProject)projects.get(projectName);
@@ -178,6 +183,13 @@ public class JavaNet {
 
     /**
      * Obtains a {@link JNUser} object from an user name.
+     *
+     * <p>
+     * A successful completion of this method does not
+     * guarantee that the user exists.
+     *
+     * @return
+     *      always return a non-null object.
      */
     public JNUser getUser(String userName) throws ProcessingException {
         JNUser u = (JNUser)users.get(userName);
@@ -186,5 +198,21 @@ public class JavaNet {
             users.put(userName,u);
         }
         return u;
+    }
+
+    /**
+     * Obtains a {@link JNRole} object from a role name.
+     *
+     * <p>
+     * A successful completion of this method does not
+     * guarantee that the role actually exists.
+     */
+    public JNRole getRole(String roleName) throws ProcessingException {
+        JNRole r = (JNRole)roles.get(roleName);
+        if(r==null) {
+            r = new JNRole(this,roleName);
+            users.put(roleName,r);
+        }
+        return r;
     }
 }

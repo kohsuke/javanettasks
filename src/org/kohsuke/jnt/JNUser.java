@@ -8,7 +8,7 @@ import com.meterware.httpunit.WebConversation;
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class JNUser {
+public class JNUser implements Comparable {
     protected final JavaNet net;
 
     protected final WebConversation wc;
@@ -37,5 +37,21 @@ public class JNUser {
      */
     public final String getEmailAddress() {
         return name+"@dev.java.net";
+    }
+
+    public int compareTo(Object o) {
+        JNUser that = (JNUser)o;
+        return this.name.compareTo(that.name);
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if(!(obj instanceof JNUser))
+            return false;
+        JNUser that = (JNUser)obj;
+        return this.name.equals(that.name);        
     }
 }

@@ -1,34 +1,191 @@
 package org.kohsuke.jnt;
 
-import java.io.IOException;
-
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-import org.dom4j.Document;
-
 import com.meterware.httpunit.HTMLSegment;
+import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.TableCell;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Membership of a project.
  * 
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
+ * @author Bruno Souza
  */
 public class JNMembership {
     
     private final JNProject project;
     private final WebConversation wc;
-    
+
+    /**
+     * Lazily created. {@link JNUser} to sets of {@link JNRole}s in this project.
+     * @see #getMembers()
+     */
+    private Map members;
+
+    /**
+     * Lazily created.
+     * {@link JNRole} to sets of {@link JNUser}s that hae that role in this project.
+     */
+    private TreeMap roles;
+
     protected JNMembership(JNProject project) {
         this.wc = project.wc;
         this.project = project;
     }
+
+    private void parseMembershipInfo() throws ProcessingException {
+        // load all information that is on the membership pages
+
+        members = new TreeMap();
+        roles = new TreeMap();
+
+        try {
+            WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
+
+            while(true) {
+                WebTable users = response.getTableStartingWithPrefix("User");
+
+                if (users == null) {
+                    // there's no member table.
+                    // TODO: isn't that an error?
+                    return;
+                }
+
+                users.purgeEmptyCells();
+
+                int numRows = users.getRowCount();
+
+                // we start from row 1, since row 0 is the header row.
+                // and we ignore the last row, since it is the submit button
+
+                // TODO: treat 2 special cases
+                //       1) when the user has no permission on the page.
+                //          In this case, the submit button does not shows. The code
+                //          will work, but will not count one user in each page.
+                //       2) in java-net project, theres a "User Group" section on
+                //          the top of this table. This will work, but will give
+                //          incorrect results, since it will count the "User" header
+                //          and the groups as members.
+
+                for (int r = 1; r < numRows-1; r++) {
+                    JNUser user = project.net.getUser(users.getCellAsText(r,0).trim());
+
+                    // when there are more then one role for a single user, the
+                    // roleList are separated by commas. This is new layout
+                    String cell = users.getCellAsText(r, 2);
+                    StringTokenizer roleList = new StringTokenizer(cell,"\n");
+                    Set ra = new TreeSet();
+                    while(roleList.hasMoreTokens()) {
+                        String roleName = roleList.nextToken().trim();
+                        if(roleName.length()==0)    continue;
+                        JNRole role = project.net.getRole(roleName);
+                        ra.add(role);
+
+                        Set l = (Set)roles.get(role);
+                        if(l==null) {
+                            roles.put(role,l=new TreeSet());
+                        }
+                        l.add(user);
+                    }
+
+                    members.put(user,ra);
+                }
+
+                WebLink nextPage = response.getLinkWith("Next");
+                if(nextPage==null)
+                    return; // done
+
+                // continue to parse the next page
+                response = nextPage.click();
+            }
+        } catch( SAXException e ) {
+            throw new ProcessingException(e);
+        } catch( IOException e ) {
+            throw new ProcessingException(e);
+        } catch( DOMException e ) {
+            throw new ProcessingException(e);
+        } catch(HttpException e) {
+            throw new ProcessingException(e);
+        }
+    }
+
+    /**
+     * Gets all the members of this project as a {@link Set} of {@link JNUser}s.
+     *
+     * @return
+     *      the set can be empty, but always non-null. The set is read-only.
+     */
+    public Set getMembers() throws ProcessingException {
+        if(members==null)
+            parseMembershipInfo();
+        return Collections.unmodifiableSet(members.keySet());
+    }
+
+    /**
+     * Gets all the roles used in this project as a {@link Set} of {@link JNRole}s.
+     *
+     * @return
+     *      the set can be empty, but always non-null. The set is read-only.
+     */
+    public Set getRoles() throws ProcessingException {
+        if(roles==null)
+            parseMembershipInfo();
+        return Collections.unmodifiableSet(roles.keySet());
+    }
+
+    /**
+     * Gets the {@link JNRole}s that a given user has in this project.
+     *
+     * <p>
+     * This method returns a copy of the information, and changing
+     * the values on the array will not grant/revoke roles.
+     *
+     * @return
+     *      always return a read-only non-null (but possibly empty) set.
+     */
+    public Set getRolesOf(JNUser user) throws ProcessingException {
+        if(members==null)
+            parseMembershipInfo();
+        Set r = (Set)members.get(user);
+        if(r==null)
+            return Collections.EMPTY_SET;
+
+        return Collections.unmodifiableSet(r);
+    }
+
+    /**
+     * Gets the {@link JNUser}s who has a specified role in this project.
+     *
+     * @return
+     *      always return a read-only non-null (but possibly empty) set.
+     */
+    public Set getUserOf(JNRole role) throws ProcessingException {
+        if(roles==null)
+            parseMembershipInfo();
+        Set s = (Set)roles.get(role);
+        if(s==null)
+            return Collections.EMPTY_SET;
+
+        return Collections.unmodifiableSet(s);
+    }
+
 
     /**
      * Grants the specified role request.
