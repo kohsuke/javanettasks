@@ -26,8 +26,14 @@
 		<li>
 			<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
     </li><li>
-      <a href="apidocs/index.html">Javadoc</a>
-		</li><li>
+      Using java.net tasks
+    </li><ul>
+      <li>
+        <a href="apidocs/index.html">Javadoc</a>
+      </li><li>
+        <a href="groovy.html">Scripting java.net tasks with Groovy</a>
+      </li>
+    </ul><li>
       Ant Tasks
 		</li><ul>
 			<li>
