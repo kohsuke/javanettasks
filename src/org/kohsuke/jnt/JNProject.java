@@ -13,6 +13,7 @@ import org.dom4j.Element;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
+import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.WebConversation;
 
 /**
@@ -95,6 +96,7 @@ public final class JNProject {
         
         try {
             Document dom = Util.getDom4j(wc.getResponse(getURL()+"/"));
+            
             List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
             if(as.size()==0)
                 throw new ProcessingException("failed to parse "+getURL()+"/");
@@ -122,6 +124,8 @@ public final class JNProject {
         } catch( IOException e ) {
             throw new ProcessingException(e);
         } catch( DOMException e ) {
+            throw new ProcessingException(e);
+        } catch(HttpInternalErrorException e) {
             throw new ProcessingException(e);
         }
     }
