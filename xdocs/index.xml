@@ -25,7 +25,10 @@
 	<ul>
 		<li>
 			<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
-		</li><li>Ant Tasks
+    </li><li>
+      <a href="apidocs/index.html">Javadoc</a>
+		</li><li>
+      Ant Tasks
 		</li><ul>
 			<li>
 				<a href="install.html">Installation</a> and <a href="config.html">Account info set up</a>
