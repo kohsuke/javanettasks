@@ -47,7 +47,7 @@ public final class JNProject {
     /**
      * News item section.s
      */
-    private JNNewsItems newsItems = new JNNewsItems(this);
+    private JNNewsItems newsItems;
     
     /**
      * Parent project name.
@@ -248,7 +248,7 @@ public final class JNProject {
 
     
     /**
-     * @return "http://PROJECTNAME.dev.java.net/"
+     * @return "http://PROJECTNAME.dev.java.net"
      */
     protected String getURL() {
         return "https://"+projectName+".dev.java.net";
@@ -277,6 +277,8 @@ public final class JNProject {
      * Obtains the object that represents the news item section.
      */
     public JNNewsItems getNewsItems() {
+        if(newsItems==null)
+            newsItems = new JNNewsItems(this);
         return newsItems;
     }
 

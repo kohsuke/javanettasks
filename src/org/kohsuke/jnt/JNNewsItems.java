@@ -1,19 +1,27 @@
 /*
- * $Id: JNNewsItems.java 172 2004-11-30 00:48:18Z kohsuke $
+ * $Id: JNNewsItems.java 205 2004-12-15 04:32:05Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.List;
-
-import org.xml.sax.SAXException;
-
+import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * java&#x2E;net project news item section.
@@ -21,7 +29,8 @@ import com.meterware.httpunit.WebResponse;
  * TODO: add support for advanced news item options
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 172 $
+ * @author Bruno Souza
+ * @version $Revision: 205 $
  */
 public final class JNNewsItems {
 
@@ -30,6 +39,12 @@ public final class JNNewsItems {
 
     // web conversation objects used to interact with the news item form
     private final WebConversation wc;
+
+    /**
+     * List of {@link JNNewsItem}s.
+     * Lazily parsed.
+     */
+    private List newsItems;
 
     // constants for the form field names
     private static final String FORM_NAME = "ProjectNewsAddForm";
@@ -41,8 +56,6 @@ public final class JNNewsItems {
     private static final String FORM_IMAGEURL = "imageUrl";
     private static final String FORM_ARTICLEURL = "articleUrl";
     private static final String FORM_BUTTON = "Button";
-    private static final String FORM_SUBMIT = "Add news item";
-    private static final String FORM_ADVANCED = "Advanced options";
 
     protected JNNewsItems(JNProject project) {
         this.wc = project.wc;
@@ -85,13 +98,13 @@ public final class JNNewsItems {
         try {
             // move to the submission page
             String url = project.getURL()+"/servlets/ProjectNewsAdd";
-            if (!wc.getCurrentPage().getURL().toExternalForm().equals(url))
-                wc.getResponse(url);
-            WebResponse resp = wc.getCurrentPage();
+            WebResponse resp = wc.getResponse(url);
             
             WebForm form = resp.getFormWithName(FORM_NAME);
             SubmitButton submitButton =
-                form.getSubmitButton(FORM_BUTTON, FORM_SUBMIT);
+                form.getSubmitButton(FORM_BUTTON, "Add new announcement");
+            if(submitButton==null)
+                throw new IllegalStateException();
 
             if (headline == null)
                 throw new ProcessingException("null headline");
@@ -132,6 +145,8 @@ public final class JNNewsItems {
             throw new ProcessingException(se);
         }
 
+        // purge the news item list. we just added one, so we need to reload
+        newsItems = null;
     }
 
     /**
@@ -148,10 +163,82 @@ public final class JNNewsItems {
         createNewsItem(null, headline, null, null, null);
     }
     
+
     /**
-     * Returns all the news items. 
+     * Gets all announcements in this project as a {@link List} of {@link JNNewsItem}s.
+     *
+     * <p>
+     * The returned list is sorted in the order of date; the last announcement is the first entry.
+     *
+     * @return
+     *      can be empty but never be null. Read-only.
      */
-    public List getNewsItems() {
-        throw new UnsupportedOperationException();
+    public List getNewsItems() throws ProcessingException {
+        if (newsItems == null)
+            loadNewsInfo();
+        return Collections.unmodifiableList(newsItems);
+    }
+
+
+    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.ENGLISH);
+
+    private void loadNewsInfo() throws ProcessingException {
+        // load all information that is on the membership pages
+        newsItems = new ArrayList();
+
+        try {
+            WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsList");
+            Document dom = Util.getDom4j(response);
+
+            Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");
+
+            if (table== null) {
+                // theres no news table.
+                return;
+            }
+
+            List rows = table.selectNodes("TR");
+
+            // we start from row 1, since row 0 is the header row.
+
+
+            for (int r=1; r<rows.size(); r++) {
+                Element row = (Element) rows.get(r);
+                String date =  ((Element)row.elements("TD").get(0)).getTextTrim();
+
+                Element link = (Element) row.selectSingleNode("TD[2]/A");
+                String summary = link.getText();
+                String href = link.attributeValue("href");
+                int idx = href.lastIndexOf('=')+1;
+
+                newsItems.add(new JNNewsItem(project, Integer.parseInt(href.substring(idx)),
+                    dateFormat.parse(date), summary));
+            }
+
+            // this code may be needed for pagination in the future...
+//        WebLink nextPage = response.getLinkWith("Next");
+//
+//        if (nextPage != null) {
+//            // load next page
+//            parseNewsPageInfo(nextPage.click());
+//        }
+        } catch( SAXException e ) {
+            throw new ProcessingException(e);
+        } catch( IOException e ) {
+            throw new ProcessingException(e);
+        } catch( DOMException e ) {
+            throw new ProcessingException(e);
+        } catch(HttpException e) {
+            throw new ProcessingException(e);
+        } catch (ParseException e) {
+            throw new ProcessingException(e);
+        }
+    }
+
+    /**
+     * Resest the list of news items and force reloading.
+     */
+    void resetNewsItems() {
+        newsItems = null;
     }
 }
