@@ -47,7 +47,9 @@
 			<li>
 				<a href="config.html">Setting up your account info</a>
 			</li><li>
-				<a href="tools/roleRequestProcessor.html">role request processor</a>
+        <a href="tools/processRole.html">role request processor</a>
+        </li><li>
+        <a href="tools/grantRoleForBugReporter.html">BugReporter request processor</a>
 			</li>
 		</ul>
 	</ul>
