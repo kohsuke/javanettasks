@@ -53,7 +53,7 @@ public class JNMyself {
             // parse my projects
             Set myProjects = new HashSet(); 
             List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
-            for( int i=1; i<projects.size(); i++) {
+            for( int i=0; i<projects.size(); i++) {
                 Element e = (Element)projects.get(i);
                 myProjects.add(net.getProject(e.getText()));
             }
