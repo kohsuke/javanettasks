@@ -23,7 +23,7 @@ import com.meterware.httpunit.cookies.CookieProperties;
  * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class JavaNet {
-    protected final WebConversation wc = new WebConversation();
+    protected final WebConversation wc;
     
     private final Map projects = new HashMap();
     private final Map users = new HashMap();
@@ -35,13 +35,18 @@ public class JavaNet {
     private JNMyself myself;
     
     private JavaNet() {
+        this(new WebConversation());
+    }
+
+    private JavaNet(WebConversation wc) {
+        this.wc = wc;
         // java.net security certificate cause a problem. So avoid it by disabling certificate validation.
         SSLTrustAllManager.install();
-        
-        // we need this to work around the broken cookies in java.net 
+
+        // we need this to work around the broken cookies in java.net
         CookieProperties.setDomainMatchingStrict(false);
     }
-    
+
     private void setProxyServer( String hostName, int port ) {
         wc.setProxyServer(hostName,port);
         System.setProperty( "https.proxyHost", hostName );
@@ -153,7 +158,16 @@ public class JavaNet {
         session.setProxyServer(proxyServer,proxyPort);
         return session;
     }
-	
+
+    /**
+     * Connects to java&#x2E;net by using a {@link WebConversation} instance that has already logged in.
+     * <p>
+     * Don't use this method unless you know what you are doing.
+     */
+    public static JavaNet connect( WebConversation conversation ) throws ProcessingException {
+        return new JavaNet(conversation);
+    }
+
     /**
      * Obtains a {@link JNProject} object from its name.
      *
