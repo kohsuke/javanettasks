@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<document>
+<body>
+
+<section name="Installation">
+	<p>
+		There are two ways to use these tasks from your build script.
+	</p>
+
+	<subsection name="Install to $ANT_HOME/lib">
+		<p>
+			If you copy the <code>javaNetTasks.jar</code> (along with all the supporting libraries) to the lib directory of your Ant installation, you can just write as follows in your <code>build.xml</code>:
+		</p>
+<source><![CDATA[
+<taskdef resource="org/kohsuke/javanettasks.properties" />
+]]></source>
+	</subsection>
+	
+	<subsection name="Otherwise...">
+		<p>
+			Your <code>build.xml</code> needs to tell Ant where it can find all the jar files. This can be done like this:
+		</p>
+<source><![CDATA[
+<taskdef resource="org/kohsuke/javanettasks.properties">
+  <classpath>
+    <fileset dir="tools/javaNetTasks/**/*.jar" />
+  </classpath>
+</taskdef>
+]]></source>
+	</subsection>
+</section>
+</body>
+</document>

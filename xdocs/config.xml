@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<document>
+<body>
+
+<section name="Account Info">
+	<p>
+		Most of the Ant tasks and tools require your user name and password to work correctly. Since specifying this information each time you invoke a tool/ant task is tedious and insecure, you can write that information in <tt>~/.java.net</tt> like this:
+	</p>
+<source>
+userName=kohsuke
+password=mypassword
+proxyServer=proxy.acme.com
+proxyPort=8080
+</source>
+	<p>
+		<tt>proxyServer</tt> and <tt>proxyPort</tt> are optional (but you have to have both if you want to use a proxy.) All the tools and Ant tasks will try to read this file.
+	</p><p>
+		On Windows, try running a tool without this file and see the error message to find out where you should place this file.
+	</p><p>
+		Make sure to set the permission to 600 to protect your information.
+	</p>
+</section>
+</body>
+</document>
