@@ -30,6 +30,11 @@ public class JNMailingListsTest extends TestCaseBase {
     public void test2() throws ProcessingException {
         JNProject project = con.getProject("javanettasks-test");
         JNMailingLists lists = project.getMailingLists();
+
+        // make sure there's no left over from the previous test
+        if(lists.get("unittest")!=null)
+            lists.get("unittest").delete();
+
         JNMailingList l = lists.create("unittest","test mailing list","kohsuke@dev.java.net","prefix",true,true,ListType.MODERATED,
                     Collections.singletonList("kk@kohsuke.org"),
                     Collections.singletonList("kohsuke@dev.java.net"));
