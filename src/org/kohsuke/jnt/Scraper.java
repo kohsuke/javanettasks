@@ -1,12 +1,9 @@
 package org.kohsuke.jnt;
 
 import org.xml.sax.SAXException;
-import org.w3c.dom.DOMException;
 
 import java.io.IOException;
 import java.text.ParseException;
-
-import com.meterware.httpunit.HttpException;
 
 /**
  * Used internally to confine the HTML scraping code
@@ -30,13 +27,11 @@ abstract class Scraper<T> {
     public final T run() throws ProcessingException {
         try {
             return scrape();
+        } catch( RuntimeException e ) {
+            throw new ProcessingException(errorSummary+e.getMessage(),e);
         } catch( SAXException e ) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
         } catch( IOException e ) {
-            throw new ProcessingException(errorSummary+e.getMessage(),e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(errorSummary+e.getMessage(),e);
-        } catch(HttpException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
         } catch (ParseException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
