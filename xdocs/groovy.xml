@@ -20,6 +20,8 @@ for( p : con.getMyself().getMyProjects() )
 </source>
 	<p>
 		By doing <code>chmod u+x script.groovy</code>, you can execute this file just like a shell script.
+	</p><p>
+    The similar approach should work with any scripting languages for Java, such as BeanShell.
 	</p>
 </section>
 </body>
