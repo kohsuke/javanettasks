@@ -1,11 +1,12 @@
 /*
- * $Id: JNNewsItem.java 77 2003-12-18 16:53:55Z kohsuke $
+ * $Id: JNNewsItems.java 79 2003-12-18 17:16:53Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 import org.xml.sax.SAXException;
 
@@ -15,30 +16,20 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * java&#x2#;net project news item.
+ * java&#x2#;net project news item section.
  * 
  * TODO: add support for advanced news item options
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 77 $
+ * @version $Revision: 79 $
  */
-public class JNNewsItem {
+public final class JNNewsItems {
 
     // parent project reference
     private final JNProject project;
 
     // web conversation objects used to interact with the news item form
     private final WebConversation wc;
-
-    // url for this news item
-    private final String url;
-
-    // data for the form
-    private Calendar date;
-    private String headline;
-    private String body;
-    private String imageUrl;
-    private String articleUrl;
 
     // constants for the form field names
     private static final String FORM_NAME = "ProjectNewsAddForm";
@@ -53,10 +44,9 @@ public class JNNewsItem {
     private static final String FORM_SUBMIT = "Add news item";
     private static final String FORM_ADVANCED = "Advanced options";
 
-    protected JNNewsItem(JNProject project, String url) {
+    protected JNNewsItems(JNProject project) {
         this.wc = project.wc;
         this.project = project;
-        this.url = url;
         //System.out.println("1: " + url);
     }
 
@@ -84,7 +74,7 @@ public class JNNewsItem {
      *                 if anything is wrong with the parameter data or an error
      *                 occurs during the form submission
      */
-    public void submitNewsItemData(
+    public void createNewsItem(
         Calendar date,
         String headline,
         String body,
@@ -93,9 +83,12 @@ public class JNNewsItem {
         throws ProcessingException {
 
         try {
-            setCurrentPage();
-
+            // move to the submission page
+            String url = project.getURL()+"/servlets/ProjectNewsAdd";
+            if (!wc.getCurrentPage().getURL().toExternalForm().equals(url))
+                wc.getResponse(url);
             WebResponse resp = wc.getCurrentPage();
+            
             WebForm form = resp.getFormWithName(FORM_NAME);
             SubmitButton submitButton =
                 form.getSubmitButton(FORM_BUTTON, FORM_SUBMIT);
@@ -151,17 +144,14 @@ public class JNNewsItem {
      * @param headline
      *                the headline
      */
-    public void submitNewItemData(String headline) throws ProcessingException {
-        submitNewsItemData(null, headline, null, null, null);
+    public void createNewsItem(String headline) throws ProcessingException {
+        createNewsItem(null, headline, null, null, null);
     }
-
+    
     /**
-     * Moves to the URL of the news item if necessary
+     * Returns all the news items. 
      */
-    private void setCurrentPage() throws IOException, SAXException {
-        if (wc.getCurrentPage().getURL().toExternalForm().equals(url))
-            return;
-        wc.getResponse(url);
+    public List getNewsItems() {
+        throw new UnsupportedOperationException();
     }
-
 }

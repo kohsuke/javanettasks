@@ -1,5 +1,5 @@
 /*
- * $Id: NewsItemTask.java 77 2003-12-18 16:53:55Z kohsuke $
+ * $Id: NewsItemTask.java 79 2003-12-18 17:16:53Z kohsuke $
  *  
  */
 package org.kohsuke.jnt.ant;
@@ -18,7 +18,7 @@ import org.kohsuke.jnt.ProcessingException;
  * Ant task for adding a news item to a java&#x2#;net project.
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 77 $
+ * @version $Revision: 79 $
  */
 public class NewsItemTask extends AbstractJavaNetTaskForProject {
 
@@ -76,7 +76,7 @@ public class NewsItemTask extends AbstractJavaNetTaskForProject {
         logHeader();
         
         // submit the news item
-        project.createNewsItem().submitNewsItemData(
+        project.getNewsItems().createNewsItem(
             date,
             headline,
             body,

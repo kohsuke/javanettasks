@@ -29,6 +29,11 @@ public final class JNProject {
      * URL (as String) to {@link JNFileFolder} map.
      */
     private final Map folders = new HashMap();
+
+    /**
+     * News item section.s
+     */
+    private JNNewsItems newsItems = new JNNewsItems(this);
     
     
     protected JNProject(JavaNet net, String name) throws IOException, SAXException {
@@ -83,10 +88,10 @@ public final class JNProject {
     }
     
     /**
-     * Create an empty news item for this project.
+     * Obtains the object that represents the news item section.
      */
-    public JNNewsItem createNewsItem() {
-        return new JNNewsItem(this, getURL()+"/servlets/ProjectNewsAdd");
+    public JNNewsItems getNewsItems() {
+        return newsItems;
     }
 
 }
