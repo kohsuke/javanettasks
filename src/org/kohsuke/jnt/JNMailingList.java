@@ -377,8 +377,8 @@ public final class JNMailingList {
         // we are going to change this
         subscribers[mode.index] = null;
 
-        Integer result = (Integer) new Scraper("Unable to mass-subscribe") {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
+        Integer result = new Scraper<Integer>("Unable to mass-subscribe") {
+            protected Integer scrape() throws IOException, SAXException, ProcessingException {
                 WebForm form = getListMemberForm(mode);
 
                 form.setParameter("subscribeList",Util.toList(addresses,' '));

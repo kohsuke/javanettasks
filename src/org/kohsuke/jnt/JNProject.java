@@ -11,9 +11,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,11 +39,6 @@ public final class JNProject implements Comparable {
     private JNMembership membership;
     private JNForums forums;
     private JNMailingLists mailingLists;
-
-    /**
-     * URL (as String) to {@link JNFileFolder} map.
-     */
-    private final Map folders = new HashMap();
 
     /**
      * News item section.s
@@ -325,7 +318,7 @@ public final class JNProject implements Comparable {
      */
     public JNFileFolder getRootFolder() {
         if(rootFolder==null)
-            rootFolder = new JNFileFolder(this,null,0);
+            rootFolder = new JNFileFolder(this,null,projectName,0);
         return rootFolder;
     }
 

@@ -77,8 +77,8 @@ public final class JNForums {
      *      represents the forum that was created.
      */
     public JNForum createForum(final String name,final String description) throws ProcessingException {
-        return (JNForum)new Scraper("Failed to create forum "+name) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
+        return new Scraper<JNForum>("Failed to create forum "+name) {
+            protected JNForum scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectForumAdd");
 
                 WebForm form = Util.getFormWithAction(response,"/servlets/ProjectForumAdd");

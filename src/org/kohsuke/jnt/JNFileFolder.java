@@ -39,6 +39,8 @@ public final class JNFileFolder {
 
     private final int id;
 
+    private final String name;
+
     /**
      * Lazily parsed subfolders. From {@link String} to {@link JNFileFolder}.
      */
@@ -54,10 +56,11 @@ public final class JNFileFolder {
      */
     private final JNFileFolder parent;
 
-    protected JNFileFolder(JNProject project, JNFileFolder parent, int id) {
+    protected JNFileFolder(JNProject project, JNFileFolder parent, String name, int id) {
         this.wc = project.wc;
         this.project = project;
         this.parent = parent;
+        this.name = name;
         this.id = id;
         this.url = project.getURL()+"/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
     }
@@ -109,7 +112,7 @@ public final class JNFileFolder {
 
                     int id = Integer.parseInt( href.substring(sidx+"?folderID=".length(),eidx) );
 
-                    subFolders.put(name,new JNFileFolder(project,JNFileFolder.this,id));
+                    subFolders.put(name,new JNFileFolder(project,JNFileFolder.this,name,id));
                 }
 
                 // find the current folder
@@ -135,6 +138,18 @@ public final class JNFileFolder {
      */
     public JNFileFolder getParent() {
         return parent;
+    }
+
+    /**
+     * Gets the name of this folder.
+     * <p>
+     * For the root folder, this method returns the name of the project.
+     *
+     * @return
+     *      always non-null valid string.
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -237,7 +252,53 @@ public final class JNFileFolder {
             }
         }.run();
     }
-    
+
+    /**
+     * Creates a new sub-folder in this folder.
+     * <p>
+     * This is an admin only operation
+     *
+     * @return
+     *      newly created folder.
+     */
+    public JNFileFolder createFolder(final String name, final String description) throws ProcessingException {
+        return new Scraper<JNFileFolder>("failed to create a new folder "+name+" in "+name) {
+            protected JNFileFolder scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
+
+                WebForm form = response.getFormWithName("ProjectFolderAddForm");
+                form.setParameter("name",name);
+                form.setParameter("description",description);
+                response = form.submit();
+
+                // make sure there's no error
+                if(response.getText().indexOf("Validation error")!=-1)
+                    throw new ProcessingException("failed to create a folder");
+
+                subFolders = null;
+                return getSubFolder(name);
+            }
+        }.run();
+    }
+
+    /**
+     * Removes this folder.
+     */
+    public void delete() throws ProcessingException {
+        new Scraper("error deleting folder "+name) {
+            protected Object scrape() throws IOException, SAXException {
+                WebResponse r = wc.getResponse(
+                    project.getURL()+"/servlets/ProjectFolderDelete?folderID="+id);
+
+                r = r.getFormWithName("ProjectFolderDeleteForm").submit();
+
+                parent.reset();
+                return null;
+            }
+        }.run();
+    }
+
+
     /**
      * Checks if the specified file exists in the folder.
      *
@@ -268,5 +329,13 @@ public final class JNFileFolder {
         if( wc.getCurrentPage().getURL().toExternalForm().equals(url) )
             return;
         wc.getResponse(url);
+    }
+
+    /**
+     * Forces a reparse.
+     */
+    /*package*/ void reset() {
+        subFolders = null;
+        files = null;
     }
 }

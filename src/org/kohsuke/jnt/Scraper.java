@@ -14,7 +14,7 @@ import com.meterware.httpunit.HttpException;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class Scraper {
+abstract class Scraper<T> {
 
     private final String errorSummary;
 
@@ -27,7 +27,7 @@ abstract class Scraper {
         this.errorSummary = operationName;
     }
 
-    public final Object run() throws ProcessingException {
+    public final T run() throws ProcessingException {
         try {
             return scrape();
         } catch( SAXException e ) {
@@ -46,5 +46,5 @@ abstract class Scraper {
     /**
      * Runs the scraping and returns a value.
      */
-    protected abstract Object scrape() throws IOException, SAXException, ProcessingException, ParseException ;
+    protected abstract T scrape() throws IOException, SAXException, ProcessingException, ParseException ;
 }

@@ -68,8 +68,19 @@ public class JNFileFolderTest extends TestCaseBase {
     }
 
     /**
-     * Upload and delete
+     * Create and delete a folder
      */
     public void test2() throws ProcessingException {
+        JNProject project = con.getProject("javanettasks-test");
+        JNFileFolder root = project.getRootFolder();
+
+        JNFileFolder sub = root.createFolder("unittest2","no description");
+        assertNotNull(sub);
+
+        assertEquals(root.getSubFolder("unittest2"),sub);
+
+        sub.delete();
+
+        assertNull(root.getSubFolder("unittest2"));
     }
 }

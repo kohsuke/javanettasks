@@ -163,6 +163,7 @@ public final class JNFile {
 
                 r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
 
+                folder.reset();
                 return null;
             }
         }.run();
