@@ -1,11 +1,6 @@
 /*
- * $Id: JNNewsItem.java 53 2003-12-17 01:29:18Z ryan_shoemaker $
+ * $Id: JNNewsItem.java 56 2003-12-17 05:40:20Z ryan_shoemaker $
  * 
- * Copyright 2003 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc. Use
- * is subject to license terms.
- *  
  */
 package org.kohsuke.jnt;
 
@@ -26,7 +21,7 @@ import com.meterware.httpunit.WebResponse;
  * TODO: add support for advanced news item options
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 53 $
+ * @version $Revision: 56 $
  */
 public class JNNewsItem {
 
@@ -63,7 +58,7 @@ public class JNNewsItem {
         this.wc = project.wc;
         this.project = project;
         this.url = url;
-        System.out.println("1: " + url);
+        //System.out.println("1: " + url);
     }
 
     /**
@@ -102,7 +97,6 @@ public class JNNewsItem {
             setCurrentPage();
 
             WebResponse resp = wc.getCurrentPage();
-            System.out.println("4: " + resp.getURL());
             WebForm form = resp.getFormWithName(FORM_NAME);
             SubmitButton submitButton =
                 form.getSubmitButton(FORM_BUTTON, FORM_SUBMIT);
@@ -138,6 +132,7 @@ public class JNNewsItem {
                 form.setParameter(FORM_ARTICLEURL, articleUrl);
             }
 
+            // submit the news item
             form.submit(submitButton);
         } catch (IOException ioe) {
             throw new ProcessingException(ioe);
@@ -165,11 +160,9 @@ public class JNNewsItem {
      * Moves to the URL of the news item if necessary
      */
     private void setCurrentPage() throws IOException, SAXException {
-        System.out.println("2: " + wc.getCurrentPage().getURL() + ", " + url);
         if (wc.getCurrentPage().getURL().toExternalForm().equals(url))
             return;
         wc.getResponse(url);
-        System.out.println("3: " + wc.getCurrentPage().getURL());
     }
 
 }
