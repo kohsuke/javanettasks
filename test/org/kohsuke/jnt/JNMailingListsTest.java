@@ -38,9 +38,9 @@ public class JNMailingListsTest extends TestCaseBase {
 
         assertEquals(2,l.getSubscribers(NORMAL).size());
         l.massSubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
-        assertEquals(2,l.getSubscribers(NORMAL).size());
-        l.massUnsubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
         assertEquals(4,l.getSubscribers(NORMAL).size());
+        l.massUnsubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
+        assertEquals(2,l.getSubscribers(NORMAL).size());
 
         l.delete();
     }
