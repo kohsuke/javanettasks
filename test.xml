@@ -1,0 +1,33 @@
+<project name="test java.net tasks" default="all">
+  <!--
+    test java.net tasks. Use your ~/.java.net for the connection settings.
+  -->
+  <taskdef resource="org/kohsuke/javanettasks.properties">
+    <classpath>
+      <pathelement path="target/classes" />
+      <fileset dir="target/javanettasks-1.0.2-SNAPSHOT/bin" includes="**/*.jar" />
+    </classpath>
+  </taskdef>
+  
+  <target name="all"
+    description="test everything"
+    depends="test.upload,test.delete">
+  </target>
+  
+  <target name="test.upload">
+    <echo file="test.txt">testing upload</echo>
+    <javaNetUpload
+      projectName="javanettasks-test"
+      toFile="/xyz/test.txt"
+      fromFile="test.txt"
+      fileDescription="description"
+      overwrite="yes"
+      fileStatus="Stable" />
+  </target>
+  
+  <target name="test.delete">
+    <javaNetDelete
+      projectName="javanettasks-test"
+      file="/xyz/test.txt" />
+  </target>
+</project>
