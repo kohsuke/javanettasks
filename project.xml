@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>java.net tasks</name>
   <id>javanettasks</id>
-  <currentVersion>1.0</currentVersion>
+  <currentVersion>1.0.1</currentVersion>
   
   <organization>
     <name>Kohsuke Kawaguchi</name>
@@ -64,7 +64,7 @@
 
     <dependency>
       <id>httpunit</id>
-      <version>1.5.3</version>
+      <version>1.5.4</version>
     </dependency>
 
     <dependency>

@@ -1,0 +1,59 @@
+<project xmlns:j="jelly:core" xmlns:u="jelly:util">
+  
+  <!-- define a tag that generates -->
+  <define:taglib uri="manifest-builder" xmlns:define="jelly:define">
+    <define:tag name="build-dep-manifest">
+      <j:set var="classpath" value=""/>
+      <j:forEach var="dep" items="${pom.dependencies}">
+        <j:set var="classpath" value="${classpath} lib/${dep.artifact}"/>
+      </j:forEach>
+      
+      <!-- check if the user specified manifest file is available -->
+      <available property="maven.jar.manifest.available2" file="${maven.jar.manifest}"/>
+      <j:if test="${maven.jar.manifest.available2}">
+        <j:set var="maven.jar.manifest" value="${maven.build.dir}/MANIFEST.MF"/>
+        <property name="maven.jar.manifest" value="${maven.jar.manifest}"/>
+      </j:if>
+      
+      <manifest file="${maven.jar.manifest}" mode="update">
+        <attribute name="Class-Path" value="${classpath}"/>
+      </manifest>
+    </define:tag>
+  </define:taglib>
+  
+  
+  
+  
+  <postGoal name="dist:prepare-bin-filesystem">
+    <!-- copy additional files into the distribution zip/tgz -->
+    <deploy:copy-deps xmlns:deploy="deploy"
+      todir="${maven.dist.bin.archive.dir}/${maven.final.name}/lib"
+    />
+  </postGoal>
+  
+  <preGoal name="jar:jar">
+    <build-dep-manifest xmlns="manifest-builder" />
+  </preGoal>
+  
+  <goal name="release">
+    <attainGoal name="dist" />
+    
+    <taskdef resource="org/kohsuke/javanettasks.properties">
+      <classpath>
+        <pathelement path="target/classes" />
+        <fileset dir="${maven.dist.bin.archive.dir}/${maven.final.name}/lib" includes="**/*.jar" />
+      </classpath>
+    </taskdef>
+    
+    <tstamp>
+      <format property="DATE" pattern="yyyy.MM.dd" locale="en"/>
+    </tstamp>
+    
+    <javaNetUpload
+      projectName="javanettasks"
+      toFile="/releases/${DATE} release"
+      fromFile="target/distributions/${pom.artifactId}-${pom.currentVersion}.zip"
+      fileStatus="Stable"
+    />
+  </goal>
+</project>

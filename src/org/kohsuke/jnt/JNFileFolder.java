@@ -75,8 +75,9 @@ public class JNFileFolder {
             WebResponse r = wc.getCurrentPage();
             
             WebLink addFileLink = r.getLinkWith("Add a file");
-            if(addFileLink==null)
-                throw new ProcessingException("Unable to find `add a file` link. Does this account have a permission to post a file?");
+            if(addFileLink==null) {
+                throw new ProcessingException("Unable to find 'add a file' link. Does this account have a permission to post a file?");
+            }
             r = addFileLink.click();
             
             WebForm form = r.getFormWithName("ProjectDocumentAddForm");

@@ -13,6 +13,7 @@ import org.xml.sax.SAXException;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.cookies.CookieProperties;
 
 /**
  * Root of java&#2E;net.
@@ -26,6 +27,9 @@ public class JavaNet {
     private JavaNet() {
         // java.net security certificate cause a problem. So avoid it by disabling certificate validation.
         SSLTrustAllManager.install();
+        
+        // we need this to work around the broken cookies in java.net 
+        CookieProperties.setDomainMatchingStrict(false);
     }
     
     private void setProxyServer( String hostName, int port ) {
@@ -45,7 +49,7 @@ public class JavaNet {
             form.setParameter("loginID",userName);
             form.setParameter("password",password);
             form.submit(form.getSubmitButton("Login"));
-            
+
             // check if the login was successful
             if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)
                 throw new ProcessingException("authentication failed. invalid username/password");
