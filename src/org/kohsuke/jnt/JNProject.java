@@ -81,5 +81,12 @@ public final class JNProject {
         JNFileFolder top = getFolderFromURL(getURL()+"/servlets/ProjectDocumentList");
         return top.getSubFolder(folderPathName);
     }
+    
+    /**
+     * Create an empty news item for this project.
+     */
+    public JNNewsItem createNewsItem() {
+        return new JNNewsItem(this, getURL()+"/servlets/ProjectNewsAdd");
+    }
 
 }
