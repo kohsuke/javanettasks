@@ -33,6 +33,11 @@ public class Main {
 
         if(args.length>0) {
             if(args[0].equals("uploadFile")) {
+                if(args.length!=6) {
+                    System.out.println("Usage: uploadFile <projectName> <filePath on server> <description> <status> <source file>");
+                    return 1;
+                }
+
                 String projectName = args[1];
                 String folderPath = args[2];
                 String description = args[3];
@@ -50,6 +55,8 @@ public class Main {
                 folderPath = folderPath.substring(0,idx);
 
                 JNFileFolder folder = connection.getProject(projectName).getFolder(folderPath);
+                if(folder==null)
+                    throw new IllegalArgumentException("No such folder "+folderPath);
                 JNFile file = folder.getFiles().get(fileName);
 
                 if( file!=null ) {
@@ -153,6 +160,8 @@ public class Main {
         usage(
                 "<command> ....\n" +
                 "where commands are:\n" +
+                "  uploadFile\n" +
+                "      upload a file to java.net\n" +
                 "  processRole\n" +
                 "      process 'new role requested' e-mails\n" +
                 "  grantRoleForBugReporter\n" +
