@@ -1,0 +1,64 @@
+<document><body>
+
+<section name="What's this?">
+<p>
+	java.net sends a notification to the project owner whenever someone requests a new role, and you are supposed to process each one of them by using the java.net web interface.
+	
+	Oftentimes, you are happy to accept anyone as Observers, so this work quickly becomes tedious and boring.
+</p><p>
+	This tool automates this process. It reads such an e-mail and approve/decline/defer the request based on your policy file.
+</p>
+</section>
+<section name="How to use">
+<p>
+	Run the program as follows:
+</p><pre>
+$ java -jar javaNetTasks.jar processRole [policyFile] &lt; [email]
+</pre>
+<p>
+	See below for the syntax of the policy file.
+</p><p>
+	This tool is really useful in conjunction with procmail. You add the following  piece to your recipe:
+</p>
+<pre>
+:0 c
+* ^Subject: New role requested
+* ^From: webmaster@dev.java.net
+| java -jar /path/to/your/javaNetTasks.jar processRole /path/to/your/policyFile
+</pre>
+<p>
+	With this set up, as soon as someone requests a role, his request will be processed immediately.
+</p>
+</section>
+
+<section name="Policy file">
+<p>
+	A policy file is a simple text file that describes how you'd like to process role requests. Each line describes a condition and the action taken when the condition matches. For example, you write:
+</p>
+<pre>
+# a comment line
+myproject:*:Observer:APPROVE
+*:*:Project Owner:DECLINE reason.txt
+</pre>
+<p>
+	This example reads: <i>if anyone requests an observer role in myproject, approve him. But anyone requesting the project owner role in any of my project gets declined with the message specified in <tt>reason.txt</tt></i>
+</p><p>
+	Each line is separated by ':'. First three parts describe a condition, and the last part describes the action. The first part is the project name, or '*' to match to any project. The second part is the user name who requested a role. Again specify '*' to match anyone. The third part is the requested role. This can be also '*' to match any role. Everything is case sensitive.
+</p><p>
+	The last part specifies the action. It can be:
+</p><ol>
+	<li><b>"APPROVE"</b> to approve the request.</li>
+	<li><b>"DECLINE file"</b> to decline the request. The contents of the specified file shall describe the reason (which will be sent to the person who requested a role.)</li>
+	<li><b>"DEFER"</b> to do nothing, which means you'll have to process it manually</li>
+</ol>
+<p>
+	Conditions are cheked in the order specified in the policy file.
+	If no condition matches, no action will be taken.
+</p>
+<hr/>
+<div align="right" style="font-size: smaller">
+$Id: processRole.xml 84 2003-12-18 22:54:45Z kohsuke $
+</div>
+</section>
+</body>
+</document>

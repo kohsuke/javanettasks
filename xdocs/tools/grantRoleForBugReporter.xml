@@ -1,0 +1,33 @@
+<document><body>
+
+<section name="What's this?">
+<p>
+	In java.net, a person with the observer role can post a bug report but he cannot add comments / attachments to a bug. While managing a project, I noticed that this causes a lot of confusion among bug submitters.
+</p><p>
+	This tool eases the pain by automatically granting a certain role to everyone who submits a bug. Typically, this role will have the "modify issues" permission.
+</p>
+</section>
+<section name="How to use">
+<p>
+	Run the program as follows:
+</p><pre>
+$ java -jar javaNetTasks.jar grantRoleForBugReporter [projectName] [roleName] &lt; email
+</pre>
+<p>
+	This tool is really useful in conjunction with procmail. You add the following  piece to your recipe:
+</p>
+<pre>
+:0 c
+* ^Subject: \[Issue [0-9]+\] New .*
+* ^To: issues@jaxb.dev.java.net
+| java -jar ....
+</pre>
+<p>
+	With this set up, as soon as someone posts a new bug, he gets the new role immediately.
+</p>
+<div align="right" style="font-size: smaller">
+$Id: grantRoleForBugReporter.xml 84 2003-12-18 22:54:45Z kohsuke $
+</div>
+</section>
+</body>
+</document>

@@ -18,6 +18,10 @@
         <item name="javaNetDelete"         href="/ref/delete.html"/>
         <item name="javaNewItem"           href="/ref/news.html"/>
       </item>
+      <item name="tools">
+        <item name="processRole"             href="/tools/processRole.html"/>
+        <item name="grantRoleForBugReporter" href="/tools/grantRoleForBugReporter.html"/>
+      </item>
     </menu>
   </body>
 </project>
