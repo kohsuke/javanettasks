@@ -89,8 +89,10 @@ public class Main {
             
             if(args[0].equals("projectInfo")) {
                 JNProject proj = connection.getProject(args[1]);
-                System.out.println( proj.getParent().getName() );
-                System.out.println( proj.getOwnerCommunity().getName() );
+                System.out.println( "parent is "+proj.getParent().getName() );
+                JNProject com = proj.getOwnerCommunity();
+                System.out.println( com!=null?("belong to "+com.getName()+" community"):"no parent community" );
+                System.out.println( proj.isCommunity()?"a community":"not a community" );
                 for (Iterator itr = proj.getOwners().iterator(); itr.hasNext(); ) {
                     JNUser u = (JNUser) itr.next();
                     System.out.println(u.getName());
