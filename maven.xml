@@ -45,13 +45,10 @@
       </classpath>
     </taskdef>
     
-    <tstamp>
-      <format property="DATE" pattern="yyyy.MM.dd" locale="en"/>
-    </tstamp>
-    
     <javaNetUpload
       projectName="javanettasks"
-      toFile="/releases/${DATE} release"
+      overwrite="yes"
+      toFile="/releases/${pom.artifactId}-${pom.currentVersion}.zip"
       fromFile="target/distributions/${pom.artifactId}-${pom.currentVersion}.zip"
       fileStatus="Stable"
     />
