@@ -61,7 +61,9 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
             throw new BuildException("file status is not valid");
         if( fromFile==null )
             throw new BuildException("source file is not specified");
-        
+        if( !fromFile.canRead() )
+            throw new BuildException(fromFile+" cannot be read");
+            
         log("moving to the target folder",Project.MSG_VERBOSE);
         JNFileFolder folder = cmd.getFolder(getTargetFolder());
         
