@@ -10,7 +10,7 @@ if [ $? != 0 ]; then
 fi
 
 cd target/docs
-cvs "-d:pserver:kohsuke@cvs.dev.java.net:/cvs" -z3 import -W "*.png -k 'b'" -W "*.gif -k 'b'" -m "deploying the new web contents" javanettasks/www/maven site-deployment t`date +%Y%m%d-%H%M%S`
+cvs "-d:pserver:kohsuke@cvs.dev.java.net:/cvs" -z3 import -ko -W "*.png -k 'b'" -W "*.gif -k 'b'" -m "deploying the new web contents" javanettasks/www/maven site-deployment t`date +%Y%m%d-%H%M%S`
 cd ../..
 cd ../www
 date >> update.html
