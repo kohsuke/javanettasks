@@ -1,11 +1,10 @@
 /*
- * $Id: JNNewsItem.java 56 2003-12-17 05:40:20Z ryan_shoemaker $
+ * $Id: JNNewsItem.java 77 2003-12-18 16:53:55Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Calendar;
 
 import org.xml.sax.SAXException;
@@ -21,7 +20,7 @@ import com.meterware.httpunit.WebResponse;
  * TODO: add support for advanced news item options
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 56 $
+ * @version $Revision: 77 $
  */
 public class JNNewsItem {
 

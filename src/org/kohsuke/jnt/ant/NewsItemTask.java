@@ -1,10 +1,9 @@
 /*
- * $Id: NewsItemTask.java 56 2003-12-17 05:40:20Z ryan_shoemaker $
+ * $Id: NewsItemTask.java 77 2003-12-18 16:53:55Z kohsuke $
  *  
  */
 package org.kohsuke.jnt.ant;
 
-import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,7 +11,6 @@ import java.util.Date;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.kohsuke.jnt.JNNewsItem;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.ProcessingException;
 
@@ -20,7 +18,7 @@ import org.kohsuke.jnt.ProcessingException;
  * Ant task for adding a news item to a java&#x2#;net project.
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 56 $
+ * @version $Revision: 77 $
  */
 public class NewsItemTask extends AbstractJavaNetTaskForProject {
 
