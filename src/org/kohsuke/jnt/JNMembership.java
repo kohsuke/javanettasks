@@ -98,7 +98,7 @@ public class JNMembership {
             
             form.setParameter("disapprovalReason",reason);
             
-            form.submit(form.getSubmitButton("Submit"));
+            form.submit(form.getSubmitButton("Button","Submit"));
             
         } catch( IOException e ) {
             throw new ProcessingException("error granting role "+userName,e);
