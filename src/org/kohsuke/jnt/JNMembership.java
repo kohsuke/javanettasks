@@ -29,11 +29,10 @@ public class JNMembership {
         this.project = project;
     }
 
-    
     /**
      * Grants the specified role request.
      */
-    public void grantRole( String userName, String roleName ) throws ProcessingException {
+    public void grantRole( JNUser user, String roleName ) throws ProcessingException {
         try {
             WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberAdd");
             WebForm form = r.getFormWithName("ProjectMemberAddForm");
@@ -41,7 +40,7 @@ public class JNMembership {
             if(form==null)
                 throw new IllegalStateException("form not found in "+r.getURL());
                 
-            form.setParameter("massAdd",userName);
+            form.setParameter("massAdd",user.getName());
             form.setParameter("roles", Util.getOptionValueFor(form,"roles",roleName) );
             
             SubmitButton submitButton = form.getSubmitButton("Button");
@@ -52,12 +51,36 @@ public class JNMembership {
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful
             
-            throw new ProcessingException("failed to grant role to "+userName);
+            throw new ProcessingException("failed to grant role to "+user.getName());
         } catch( IOException e ) {
-            throw new ProcessingException("failed to grant role to "+userName,e);
+            throw new ProcessingException("failed to grant role to "+user.getName(),e);
         } catch( SAXException e ) {
-            throw new ProcessingException("failed to grant role to "+userName,e);
+            throw new ProcessingException("failed to grant role to "+user.getName(),e);
         }
+    }
+    
+    
+    /**
+     * Grants the specified role request.
+     * 
+     * @deprecated
+     * @see #grantRole(JNUser, String)
+     */
+    public void grantRole( String userName, String roleName ) throws ProcessingException {
+        grantRole( project.net.getUser(userName), roleName );
+    }
+
+    /**
+     * Declines the specified role request.
+     * 
+     * The role request has to be pending. In other words, this method is not
+     * for revoking a role from an user.
+     * 
+     * @deprecated
+     * @see #declineRole(JNUser, String, String)
+     */
+    public void declineRole( String userName, String roleName, String reason ) throws ProcessingException {
+        declineRole( project.net.getUser(userName), roleName, reason );
     }
     
     /**
@@ -66,7 +89,7 @@ public class JNMembership {
      * The role request has to be pending. In other words, this method is not
      * for revoking a role from an user.
      */
-    public void declineRole( String userName, String roleName, String reason ) throws ProcessingException {
+    public void declineRole( JNUser user, String roleName, String reason ) throws ProcessingException {
         try {
             WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
             WebForm form = r.getFormWithName("ProjectMemberListPendingForm");
@@ -80,7 +103,7 @@ public class JNMembership {
             
             boolean foundRequest = false;
             for( int i=1; i<t.getRowCount(); i++ ) {
-                if( !t.getCellAsText(i,0).trim().equals(userName) ) continue;
+                if( !t.getCellAsText(i,0).trim().equals(user.getName()) ) continue;
                 if( !t.getCellAsText(i,2).trim().equals(roleName) ) continue;
                 
                  TableCell opCell = t.getTableCell(i,3);
@@ -94,16 +117,16 @@ public class JNMembership {
                  break;
             }
             if(!foundRequest)
-                throw new ProcessingException("request was not found on the web "+userName);
+                throw new ProcessingException("request was not found on the web "+user.getName());
             
             form.setParameter("disapprovalReason",reason);
             
             form.submit(form.getSubmitButton("Button","Submit"));
             
         } catch( IOException e ) {
-            throw new ProcessingException("error granting role "+userName,e);
+            throw new ProcessingException("error revoking role from "+user.getName(),e);
         } catch( SAXException e ) {
-            throw new ProcessingException("error granting role "+userName,e);
+            throw new ProcessingException("error revoking role from "+user.getName(),e);
         }
     }
     

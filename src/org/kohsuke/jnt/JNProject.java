@@ -32,7 +32,7 @@ public final class JNProject {
     
     protected final WebConversation wc;
 
-    private final JavaNet net;
+    final JavaNet net;
     
     //
     // lazily created
