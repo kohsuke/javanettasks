@@ -1,0 +1,88 @@
+<document>
+<body>
+<section name="JavaNetUpload">
+	<p>
+		This task uploads a file to the file sharing section of java.net.
+	</p>
+	<section name="Parameter Attributes">
+		<table border="1">
+			<thead>
+				<tr>
+					<td>Attribute</td>
+					<td>Description</td>
+					<td>Required</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>projectName</td>
+					<td>
+						The name of the project to which a file is uploaded.
+						(e.g., "javanettasks")
+					</td>
+					<td>Yes</td>
+				</tr>
+				<tr>
+					<td>userName</td>
+					<td>
+						The account name. Uploading a file requires an account with a proper permission.
+						(e.g., "kohsuke")
+					</td>
+					<td>No</td>
+				</tr>
+				<tr>
+					<td>password</td>
+					<td>
+						The password of the account.
+					</td>
+					<td>No</td>
+				</tr>
+				
+				<tr>
+					<td>toFile</td>
+					<td>
+						The full path name of the file that receives data. It uses a Unix-like path name (e.g., "/folder1/subFolder/target.zip"). The task does not create directories and therefore they need to be there before the task runs. 
+					</td>
+					<td>Yes</td>
+				</tr>
+				<tr>
+					<td>fromFile</td>
+					<td>
+						The local file to be sent to the server. (e.g., "dist/javanettasks.zip")
+					</td>
+					<td>Yes</td>
+				</tr>
+				<tr>
+					<td>fileDescription</td>
+					<td>
+						This text will appear under the uploaded file. Useful to explain about the file to users. (e.g, "05/03/2003 nightly build. Maybe broken. use with care".)
+					</td>
+					<td>Yes</td>
+				</tr>
+				<tr>
+					<td>overwrite</td>
+					<td>
+						"yes" or "no". The default is "no" and this causes the build to fail if the file specified by the toFile attribute is already present on the server. Setting this value to "yes" will cause that file to be deleted, then the new file is uploaded.
+					</td>
+					<td>No</td>
+				</tr>
+				<tr>
+					<td>fileStatus</td>
+					<td>
+						Set the status indicator of the file. This value will be shown right next to the link to the file. Possible values are "Draft", "Reviewed", "Baselined", "Stable", "Archival", and "Obsolete". Defaults to "Draft".
+					</td>
+					<td>No</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+	<section name="Nested Parameter Elements">
+		<p>
+			none.
+		</p>
+	</section>
+	<div align="right" style="font-size: smaller">
+	$Id: upload.xml 57 2003-12-17 06:06:11Z kohsuke $
+	</div>
+</section>
+</body></document>
