@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 205 2004-12-15 04:32:05Z kohsuke $
+ * $Id: JNNewsItems.java 211 2004-12-16 02:06:51Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -30,7 +30,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 205 $
+ * @version $Revision: 211 $
  */
 public final class JNNewsItems {
 
@@ -104,7 +104,7 @@ public final class JNNewsItems {
             SubmitButton submitButton =
                 form.getSubmitButton(FORM_BUTTON, "Add new announcement");
             if(submitButton==null)
-                throw new IllegalStateException();
+                throw new ProcessingException();
 
             if (headline == null)
                 throw new ProcessingException("null headline");

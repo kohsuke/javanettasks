@@ -71,10 +71,10 @@ public final class JNNewsItem {
             WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
             WebForm form = response.getFormWithName("projectnewsdeleteform");
             if(form==null)
-                throw new IllegalStateException("missing form");
+                throw new ProcessingException("missing form");
             SubmitButton submit = form.getSubmitButton("Button","Confirm delete");
             if(submit==null)
-                throw new IllegalStateException("no submit button");
+                throw new ProcessingException("no submit button");
             form.submit(submit);
         } catch( SAXException e ) {
             throw new ProcessingException(e);

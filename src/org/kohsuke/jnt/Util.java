@@ -11,6 +11,9 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * Utility code.
  * 
@@ -63,5 +66,18 @@ class Util {
      */
     static Document getDom4j( WebResponse wr ) throws SAXException {
         return new DOMReader().read(wr.getDOM());
+    }
+
+    /**
+     * Format all strings in the collection by using the specified separator.
+     */
+    static String toList(Collection addresses, char separator) {
+        StringBuffer buf = new StringBuffer();
+        for (Iterator itr = addresses.iterator(); itr.hasNext();) {
+            String address = (String) itr.next();
+            if(buf.length()>0)  buf.append(separator);
+            buf.append(address);
+        }
+        return buf.toString();
     }
 }
