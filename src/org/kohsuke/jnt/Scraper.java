@@ -24,7 +24,7 @@ abstract class Scraper<T> {
      *      Used for error messages.
      */
     protected Scraper(String operationName) {
-        this.errorSummary = operationName;
+        this.errorSummary = operationName+' ';
     }
 
     public final T run() throws ProcessingException {
