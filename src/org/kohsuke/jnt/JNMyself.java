@@ -38,11 +38,21 @@ public class JNMyself extends JNUser {
 
                 // parse my projects
                 Set<JNProject> myProjects = new HashSet<JNProject>();
-                List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
-                for( int i=0; i<projects.size(); i++) {
-                    Element e = (Element)projects.get(i);
-                    myProjects.add(net.getProject(e.getText()));
+                while(true) {// repeat while we have next pages
+
+                    List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
+                    for( int i=0; i<projects.size(); i++) {
+                        Element e = (Element)projects.get(i);
+                        myProjects.add(net.getProject(e.getText()));
+                    }
+
+                    Element nextLink = (Element)dom.selectSingleNode("//DIV[@id='startpage']//P[@class='paginate']/A[text()='Next']");
+                    if(nextLink==null)
+                        break;
+
+                    dom = Util.getDom4j(wc.getResponse(nextLink.attributeValue("href")));
                 }
+
                 JNMyself.this.myProjects = Collections.unmodifiableSet(myProjects);
 
                 return null;
