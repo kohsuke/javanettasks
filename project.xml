@@ -42,7 +42,7 @@
   
     <mailingList>
       <name>discussion list</name>
-      <subscribe    >dev-subscribe@javanettasks.dev.java.net</subscribe>
+      <subscribe>dev-subscribe@javanettasks.dev.java.net</subscribe>
       <unsubscribe>dev-unsubscribe@javanettasks.dev.java.net</unsubscribe>
       <archive>https://javanettasks.dev.java.net/servlets/SummarizeList?listName=dev</archive>
     </mailingList>
@@ -55,11 +55,13 @@
       <name>Kohsuke Kawaguchi</name>
       <id>kohsuke</id>
       <email>kk@kohsuke.org</email>
+      <organization>Sun Microsystems, Inc.</organization>
     </developer>
     <developer>
       <name>Ryan Shoemaker</name>
       <id>ryan_shoemaker</id>
       <email>ryan_shoemaker@java.net</email>
+      <organization>Sun Microsystems, Inc.</organization>
     </developer>
   </developers>
   
