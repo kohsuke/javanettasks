@@ -3,17 +3,15 @@
  */
 package org.kohsuke.jnt.ant;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.kohsuke.jnt.FileStatus;
+import org.kohsuke.jnt.JNFile;
 import org.kohsuke.jnt.JNFileFolder;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.ProcessingException;
-import org.kohsuke.jnt.JNFile;
-import org.kohsuke.jnt.FileStatus;
+
+import java.io.File;
 
 /**
  * Uploads a file to a java.net file sharing section. 
@@ -59,8 +57,6 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
         // mandatory attributes check
         if( toFileName==null )
             throw new BuildException("target folder is not specified");
-        if( fileStatus!=null && !validStatuses.contains(fileStatus) )
-            throw new BuildException("file status is not valid");
         if( fromFile==null )
             throw new BuildException("source file is not specified");
         if( !fromFile.canRead() )
@@ -97,16 +93,5 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
         int idx = toFileName.lastIndexOf('/');
         if(idx==-1)     return toFileName;
         else            return toFileName.substring(idx+1);
-    }
-    
-    
-    private static final Set validStatuses = new HashSet();
-    static {
-        validStatuses.add("Draft");
-        validStatuses.add("Reviewed");
-        validStatuses.add("Baselined");
-        validStatuses.add("Stable");
-        validStatuses.add("Archival");
-        validStatuses.add("Obsolete");
     }
 }
