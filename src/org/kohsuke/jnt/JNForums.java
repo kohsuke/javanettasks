@@ -135,8 +135,11 @@ public final class JNForums {
                     int idx = href.lastIndexOf('=')+1;
 
                     String messageCount =  ((Element)row.elements("TD").get(1)).getTextTrim();
+                    // if it has '(New 5)', trim it out
                     int firstSpace = messageCount.indexOf(' ');
-                    int n = Integer.parseInt(messageCount.substring(0,firstSpace).trim());
+                    if(firstSpace!=-1)
+                        messageCount = messageCount.substring(0,firstSpace);
+                    int n = Integer.parseInt(messageCount.trim());
 
                     String description = ((Element)row.elements("TD").get(2)).getTextTrim();
 
