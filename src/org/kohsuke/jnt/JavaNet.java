@@ -39,6 +39,15 @@ public class JavaNet {
     }
     
     /**
+     * Obtains the session being used.
+     * 
+     * If you need to use the underlying HTTPUnit directly, use this method.
+     */
+    public final WebConversation getConversation() {
+        return wc;
+    }
+    
+    /**
      * Logs in to the java.net. This method has to be called first.
      */
     private void login( String userName, String password ) throws ProcessingException {
@@ -54,9 +63,9 @@ public class JavaNet {
             if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)
                 throw new ProcessingException("authentication failed. invalid username/password");
         } catch( IOException e ) {
-            throw new ProcessingException("unable to log in for user "+userName,e);
+            throw new ProcessingException("unable to log in for user "+userName+" : "+e.getMessage(),e);
         } catch( SAXException e ) {
-            throw new ProcessingException("unable to log in for user "+userName,e);
+            throw new ProcessingException("unable to log in for user "+userName+" : "+e.getMessage(),e);
         }
     }
     
