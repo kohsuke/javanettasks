@@ -80,7 +80,9 @@ public final class JNProject {
      * Lazily retrieved by the {@link #parseProjectInfo()}method. 
      */
     private Set owners;
-    
+
+    private Set subProjects;
+
     protected JNProject(JavaNet net, String name) {
         this.net = net;
         this.wc = net.wc;
@@ -95,12 +97,12 @@ public final class JNProject {
             return; // already parsed.
         
         try {
-            Document dom = Util.getDom4j(wc.getResponse(getURL()+"/"));
-            
+            Document dom = Util.getDom4j(wc.getResponse(getURL()+'/'));
+
             List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
             if(as.size()==0)
-                throw new ProcessingException("failed to parse "+getURL()+"/");
-            
+                throw new ProcessingException("failed to parse "+getURL()+'/');
+
             if(as.size()>2) {
                 topLevelName = ((Element)as.get(1)).getTextTrim();
                 parentProject = ((Element)as.get(as.size()-2)).getTextTrim();
@@ -108,17 +110,25 @@ public final class JNProject {
                 topLevelName = projectName;
                 parentProject = null;
             }
-            
+
             if( dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
                 isCommunity=Boolean.TRUE;
             else
                 isCommunity=Boolean.FALSE;
-                
+
+            // parse owners
             Set owners = new HashSet();
             List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
             for( int i=0; i<os.size(); i++ )
                 owners.add( net.getUser( ((Element)os.get(i)).getTextTrim() ) );
             this.owners = Collections.unmodifiableSet(owners);
+
+            // parse sub-projects
+            Set subProjects = new HashSet();
+            List sp = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
+            for( int i=0; i<sp.size(); i++ )
+                subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
+            this.subProjects = Collections.unmodifiableSet(subProjects);
         } catch( SAXException e ) {
             throw new ProcessingException(e);
         } catch( IOException e ) {
@@ -189,12 +199,44 @@ public final class JNProject {
      * @return
      *      always return non-null set. If the project doesn't have
      *      any owner, it returns an empty set. The set is read-only.
+     *
+     * @see #getOwners()
      */
     public Set getOwners() throws ProcessingException {
         parseProjectInfo();
         return owners;
     }
-    
+
+    /**
+     * Returns the e-mail alias connected to all the current owners
+     * of this project.
+     *
+     * <p>
+     * This alias is maintained by java.net. It is always "owner@PROJECT.dev.java.net"
+     *
+     * @see #getOwners()
+     */
+    public String getOwnerAlias() {
+        return "owner@"+projectName+".dev.java.net";
+    }
+
+    /**
+     * Returns a set of {@link JNProject} objects that represent the sub-projects
+     * of this project.
+     *
+     * <p>
+     * Note that depending on the permission of the current account used
+     * to log in to the system, you might not be able to see all the sub-projects
+     *
+     * @return
+     *      always return non-null set. If the project doesn't have
+     *      any sub-project, it returns an empty set. The set is read-only.
+     */
+    public Set getSubProjects() throws ProcessingException {
+        parseProjectInfo();
+        return subProjects;
+    }
+
     /**
      * Accesses the membership section of the project.
      */

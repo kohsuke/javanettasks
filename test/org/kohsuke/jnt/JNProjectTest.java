@@ -23,4 +23,9 @@ public class JNProjectTest extends TestCaseBase {
         mems.grantRole(con.getUser("kohsuke_agent"),"Observer");
         mems.revokeRole(con.getUser("kohsuke_agent"),"Observer");
     }
+
+    public void test3() throws ProcessingException {
+        assertTrue(
+            con.getProject("javanettasks").getSubProjects().contains(con.getProject("javanettasks-test")));
+    }
 }
