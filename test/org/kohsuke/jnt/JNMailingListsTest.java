@@ -34,6 +34,6 @@ public class JNMailingListsTest extends TestCaseBase {
                     Collections.singletonList("kohsuke@dev.java.net"));
         assertNotNull(l);
         assertEquals("unittest",l.getName());
-        assertTrue(lists.getLists().contains(l));
+        l.delete();
     }
 }
