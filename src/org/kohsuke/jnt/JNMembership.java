@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import org.dom4j.Document;
 
 import com.meterware.httpunit.HTMLSegment;
 import com.meterware.httpunit.SubmitButton;
@@ -68,6 +69,43 @@ public class JNMembership {
      */
     public void grantRole( String userName, String roleName ) throws ProcessingException {
         grantRole( project.net.getUser(userName), roleName );
+    }
+
+
+    /**
+     * Revokes the specified role from the user.
+     */
+    public void revokeRole( JNUser user, String roleName ) throws ProcessingException {
+        try {
+            WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
+            WebForm form = r.getFormWithName("ProjectMemberListForm");
+
+            if(form==null)
+                throw new IllegalStateException("form not found in "+r.getURL());
+
+            char nbsp = 160;
+
+            // starts-with is necesasry because someone fails to handle &nbsp; correctly
+            String propName  = (String)Util.getDom4j(r).selectObject(
+                "string(//FORM[@name='ProjectMemberListForm']//TR[normalize-space(TD[1])='"+user.getName()+"']/TD[3]/text()[normalize-space(.)='"+roleName+nbsp+nbsp+"']/preceding-sibling::INPUT[1]/@name)");
+            if(propName==null)
+                throw new ProcessingException("Unable to find the user "+user.getName()+" or the role "+roleName);
+            form.toggleCheckbox(propName);
+
+            SubmitButton submitButton = form.getSubmitButton("Button");
+            if(submitButton==null)
+                throw new IllegalStateException("no submit button");
+            r = form.submit(submitButton);
+
+            if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
+                return; // successful
+
+            throw new ProcessingException("failed to revoke role from "+user.getName());
+        } catch( IOException e ) {
+            throw new ProcessingException("failed to revoke role from "+user.getName(),e);
+        } catch( SAXException e ) {
+            throw new ProcessingException("failed to revoke role from "+user.getName(),e);
+        }
     }
 
     /**
