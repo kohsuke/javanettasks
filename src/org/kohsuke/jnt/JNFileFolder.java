@@ -1,23 +1,23 @@
 package org.kohsuke.jnt;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Collections;
-import java.text.ParseException;
-
-import org.xml.sax.SAXException;
-import org.dom4j.Document;
-import org.dom4j.Element;
-
 import com.meterware.httpunit.UploadFileSpec;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 /**
  * folder in the java&#x2E;net file sharing section.
@@ -242,7 +242,9 @@ public final class JNFileFolder {
 
                 form.setParameter("type","file");
                 form.setParameter("file",new UploadFileSpec[]{
-                    new UploadFileSpec(fileToUpload)});
+                    new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
+                    // this version somehow posts the full file name to the server, which often confuses it.
+                    // new UploadFileSpec(fileToUpload)});
                 r = form.submit();
 
                 if( r.getImageWithAltText("Alert notification")!=null )
@@ -257,6 +259,30 @@ public final class JNFileFolder {
                 return file;
             }
         }.run();
+    }
+
+    private static final String[] MIME_TYPE_TABLE = new String[] {
+        "application/x-zip-compressed", ".zip", null
+    };
+
+    private static final String guessContentType(File f) {
+        String name = f.getName().toLowerCase();
+
+        String type = null;
+        for( String s : MIME_TYPE_TABLE ) {
+            if(type==null) {
+                type = s;
+                continue;
+            }
+            if(s==null) {
+                type = null;
+                continue;
+            }
+            if(name.endsWith(s))
+                return type;
+        }
+
+        return "text/plain";
     }
 
     /**
