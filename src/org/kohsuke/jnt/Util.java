@@ -30,7 +30,7 @@ class Util {
     static String getOptionValueFor( WebForm form, String parameter, String displayString ) {
         String[] options = form.getOptions(parameter);
         for (int i = 0; i < options.length; i++) {
-            if( options[i].equals(displayString) ) {
+            if( options[i].replace((char)0xA0,' ').equals(displayString) ) {
                 return form.getOptionValues(parameter)[i];
             }
         }
