@@ -1,60 +1,63 @@
-<document><body>
-<section name="JavaNetDelete">
+<document>
+<properties>
+	<title>javaNetDelete task</title>
+</properties>
+<body>
+<section name="Description">
 	<p>
 		This task elets a file to the file sharing section of java.net. Just like the delete task, The task will <em>not</em> cause the build to fail even if the specified file is not present.
 	</p>
-
-	<section name="Parameter Attributes">
-		<table border="1">
-			<thead>
-				<tr>
-					<td>Attribute</td>
-					<td>Description</td>
-					<td>Required</td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>projectName</td>
-					<td>
-						The name of the project to which a file is uploaded.
-						(e.g., "javanettasks")
-					</td>
-					<td>Yes</td>
-				</tr>
-				<tr>
-					<td>userName</td>
-					<td>
-						The account name. Deleting a file requires an account with a proper permission.
-						(e.g., "kohsuke")
-					</td>
-					<td>No</td>
-				</tr>
-				<tr>
-					<td>password</td>
-					<td>
-						The password of the account.
-					</td>
-					<td>No</td>
-				</tr>
-				
-				<tr>
-					<td>file</td>
-					<td>
-						The full path name of the file to be deleted. It uses a Unix-like path name (e.g., "/folder1/subFolder/target.zip").
-					</td>
-					<td>Yes</td>
-				</tr>
-			</tbody>
-		</table>
-	</section>
-	<section name="Nested Parameter Elements">
-		<p>
-			none.
-		</p>
-	</section>
+</section>
+<section name="Parameter Attributes">
+	<table border="1">
+		<thead>
+			<tr>
+				<td>Attribute</td>
+				<td>Description</td>
+				<td>Required</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>projectName</td>
+				<td>
+					The name of the project to which a file is uploaded.
+					(e.g., "javanettasks")
+				</td>
+				<td>Yes</td>
+			</tr>
+			<tr>
+				<td>userName</td>
+				<td>
+					The account name. Deleting a file requires an account with a proper permission.
+					(e.g., "kohsuke")
+				</td>
+				<td>No</td>
+			</tr>
+			<tr>
+				<td>password</td>
+				<td>
+					The password of the account.
+				</td>
+				<td>No</td>
+			</tr>
+			
+			<tr>
+				<td>file</td>
+				<td>
+					The full path name of the file to be deleted. It uses a Unix-like path name (e.g., "/folder1/subFolder/target.zip").
+				</td>
+				<td>Yes</td>
+			</tr>
+		</tbody>
+	</table>
+</section>
+<section name="Nested Parameter Elements">
+	<p>
+		none.
+	</p>
 	<div align="right" style="font-size: smaller">
-		$Id: delete.xml 57 2003-12-17 06:06:11Z kohsuke $
+		$Id: delete.xml 59 2003-12-17 06:20:07Z kohsuke $
 	</div>
 </section>
 </body></document>
