@@ -1,5 +1,41 @@
 <html>
 <body>
-The library that exposes programatic manipulation of java.net
+The library that exposes programatic manipulation of java.net.
+
+<p>
+This library wraps the web interface of java.net so that you can
+programatically access java.net to perform some tasks.
+
+<p>
+A typical usage of this library would look like the following:
+
+<pre>
+// connect to java.net
+JavaNet connection = {@link JavaNet}.connect(...);
+
+// then perform some tasks
+JNProject project = connection.getProject("jaxb");
+projects.getForums().createForum("test","creating a new forum with the java.net tasks");
+</pre>
+
+<p>
+The first thing you need to do is to connect to java.net.
+When you connect, you need to specify your username and password
+in one way or another.
+The various connect methods
+let you provide these information in different ways.
+The credentials of the user account determines what you can do.
+
+<p>
+Once you get a {@link JavaNet} object, you can access it
+just like any other object model. In the above example,
+it's creating a new forum in the JAXB project.
+
+<h3>Error Handling</h3>
+<p>
+Because most of this API relies heavily on HTML scraping and remote access,
+there's inherently a risk of errors. All the errors this API encouners
+are thrown as {@link ProcessingException}.
+
 </body>
 </html>
