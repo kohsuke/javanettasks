@@ -6,14 +6,16 @@
  */
 package org.kohsuke.jnt.tools;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.util.Iterator;
-
+import org.kohsuke.jnt.JNFile;
+import org.kohsuke.jnt.JNFileFolder;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JNUser;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
+
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Iterator;
 
 /**
  * Command line interface to the java.net automation tool.
@@ -21,34 +23,65 @@ import org.kohsuke.jnt.ProcessingException;
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
 public class Main {
-    
+
     public static void main(String[] args) throws Exception {
+        System.exit(run(args));
+    }
+
+    public static int run(String[] args) throws Exception {
         JavaNet connection = JavaNet.connect();
 
         if(args.length>0) {
+            if(args[0].equals("uploadFile")) {
+                String projectName = args[1];
+                String folderPath = args[2];
+                String description = args[3];
+                String status = args[4];
+                File src = new File(args[5]);
+                if(!src.isFile() || !src.exists()) {
+                    System.err.println("File "+src+" does not exist");
+                    return 1;
+                }
+
+                int idx = folderPath.lastIndexOf('/');
+                if(idx<0)
+                    throw new IllegalArgumentException(folderPath+" doesn't have a file name");
+                String fileName = folderPath.substring(idx+1);
+                folderPath = folderPath.substring(0,idx);
+
+                JNFileFolder folder = connection.getProject(projectName).getFolder(folderPath);
+                JNFile file = folder.getFiles().get(fileName);
+
+                if( file!=null ) {
+                    file.delete();
+                }
+
+                folder.uploadFile(fileName,description,status,src);
+                return 0;
+            }
             if(args[0].equals("grantRole")) {
                 // grant a new role
                 switch(args.length) {
                 case 1:
                     new RoleRequest(new InputStreamReader(System.in)).grant(connection);
-                    return;
+                    return 0;
                 case 4:
                     new RoleRequest(args[1],args[2],args[3]).grant(connection);
                     System.out.println("done");
-                    return;
+                    return 0;
                 }
             }
 
             if(args[0].equals("declineRole")) {
                 new RoleRequest(args[1],args[2],args[3]).decline(connection,args[4]);
                 System.out.println("done");
-                return;
+                return 0;
             }
 
             if(args[0].equals("processRole")) {
                 if(args.length!=2) {
                     usage("processRole <policyFile>");
-                    return;
+                    return 1;
                 }
                 RoleRequestPolicy policy = new RoleRequestPolicy(new File(args[1]));
                 RoleRequest request = new RoleRequest(new InputStreamReader(System.in));
@@ -60,14 +93,14 @@ public class Main {
                     System.out.println("action is to "+action);
                     action.process(request);
                 }
-                return;
+                return 0;
             }
 
             if(args[0].equals("grantRoleForBugReporter")) {
                 if(args.length!=3) {
                     System.out.println(args.length);
                     usage("grantRoleForBugReporter <projectName> <roleName>");
-                    return;
+                    return 1;
                 }
                 NewBugEmail nbe = new NewBugEmail(connection,new InputStreamReader(System.in));
                 if(args[1].equals(nbe.project.getName())) {
@@ -76,7 +109,7 @@ public class Main {
                 } else {
                     System.out.println("project name didn't match");
                 }
-                return;
+                return 0;
             }
 
             if(args[0].equals("listMyProjects")) {
@@ -85,7 +118,7 @@ public class Main {
                 while(itr.hasNext()) {
                     System.out.println(((JNProject)itr.next()).getName());
                 }
-                return;
+                return 0;
             }
 
             if(args[0].equals("projectInfo")) {
@@ -98,11 +131,9 @@ public class Main {
                 System.out.println( com!=null?("belong to "+com.getName()+" community"):"no parent community" );
                 System.out.println( proj.isCommunity()?"a community":"not a community" );
                 System.out.println( "owners are " );
-                for (Iterator itr = proj.getOwners().iterator(); itr.hasNext(); ) {
-                    JNUser u = (JNUser) itr.next();
+                for (JNUser u : proj.getOwners())
                     System.out.println(u.getName());
-                }
-                return;
+                return 0;
             }
 
             if(args[0].equals("listSubProjects")) {
@@ -115,7 +146,7 @@ public class Main {
 
                 JNProject proj = connection.getProject(args[idx]);
                 listProjects(proj,recursive);
-                return;
+                return 0;
             }
         }
 
@@ -129,14 +160,14 @@ public class Main {
                 "  listSubProjects [-r] <projectName>\n" +
                 "      list all sub-projects of the given project (recursively with -r)" +
                 "      to stdout\n");
+        return 1;
     }
 
     private static void listProjects(JNProject proj, boolean recursive) throws ProcessingException {
-        for (Iterator itr = proj.getSubProjects().iterator(); itr.hasNext();) {
-            JNProject sub = (JNProject) itr.next();
+        for (JNProject sub : proj.getSubProjects()) {
             System.out.println(sub.getName());
-            if(recursive)
-                listProjects(sub,recursive);
+            if (recursive)
+                listProjects(sub, recursive);
         }
 
     }
