@@ -1,0 +1,27 @@
+<document><body>
+
+<section name="What's this?">
+<p>
+	This tool dumps all the sub-projects of a given project to stdout.
+</p>
+</section>
+<section name="How to use">
+<p>
+	Run the program as follows:
+</p><pre>
+$ java -jar javaNetTasks.jar listSubProjects [-r] &lt;projectName>
+
+e.g.,
+$ java -jar javaNetTasks.jar listSubProjects java-ws-xml
+</pre>
+<p>
+	With the '-r' option, the tool will recursively list all the descendant projects of the specified project.
+	The listing will not include the specified project itself.
+</p>
+<hr/>
+<div align="right" style="font-size: smaller">
+$Id: listSubProjects.xml 169 2004-11-30 00:41:56Z kohsuke $
+</div>
+</section>
+</body>
+</document>

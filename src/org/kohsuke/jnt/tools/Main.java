@@ -13,6 +13,7 @@ import java.util.Iterator;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JNUser;
 import org.kohsuke.jnt.JavaNet;
+import org.kohsuke.jnt.ProcessingException;
 
 /**
  * Command line interface to the java.net automation tool.
@@ -23,7 +24,7 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         JavaNet connection = JavaNet.connect();
-        
+
         if(args.length>0) {
             if(args[0].equals("grantRole")) {
                 // grant a new role
@@ -37,13 +38,13 @@ public class Main {
                     return;
                 }
             }
-            
+
             if(args[0].equals("declineRole")) {
                 new RoleRequest(args[1],args[2],args[3]).decline(connection,args[4]);
                 System.out.println("done");
                 return;
             }
-            
+
             if(args[0].equals("processRole")) {
                 if(args.length!=2) {
                     usage("processRole <policyFile>");
@@ -51,7 +52,7 @@ public class Main {
                 }
                 RoleRequestPolicy policy = new RoleRequestPolicy(new File(args[1]));
                 RoleRequest request = new RoleRequest(new InputStreamReader(System.in));
-                
+
                 RoleRequestPolicy.Action action = policy.determineAction(request);
                 if(action==null) {
                     System.out.println("no action is taken");
@@ -61,7 +62,7 @@ public class Main {
                 }
                 return;
             }
-            
+
             if(args[0].equals("grantRoleForBugReporter")) {
                 if(args.length!=3) {
                     System.out.println(args.length);
@@ -77,7 +78,7 @@ public class Main {
                 }
                 return;
             }
-            
+
             if(args[0].equals("listMyProjects")) {
                 Iterator itr = connection.getMyself().getMyProjects().iterator();
                 System.err.println("user name "+connection.getMyself().getName());
@@ -86,7 +87,7 @@ public class Main {
                 }
                 return;
             }
-            
+
             if(args[0].equals("projectInfo")) {
                 JNProject proj = connection.getProject(args[1]);
                 if( proj.getParent()!=null )
@@ -103,17 +104,43 @@ public class Main {
                 }
                 return;
             }
+
+            if(args[0].equals("listSubProjects")) {
+                boolean recursive = false;
+                int idx=1;
+                if(args[1].equals("-r")) {
+                    recursive = true;
+                    idx++;
+                }
+
+                JNProject proj = connection.getProject(args[idx]);
+                listProjects(proj,recursive);
+                return;
+            }
         }
-        
+
         usage(
                 "<command> ....\n" +
                 "where commands are:\n" +
                 "  processRole\n" +
                 "      process 'new role requested' e-mails\n" +
                 "  grantRoleForBugReporter\n" +
-                "      process new bug report and grant a role to the submitter.\n");
+                "      process new bug report and grant a role to the submitter.\n" +
+                "  listSubProjects [-r] <projectName>\n" +
+                "      list all sub-projects of the given project (recursively with -r)" +
+                "      to stdout\n");
     }
-    
+
+    private static void listProjects(JNProject proj, boolean recursive) throws ProcessingException {
+        for (Iterator itr = proj.getSubProjects().iterator(); itr.hasNext();) {
+            JNProject sub = (JNProject) itr.next();
+            System.out.println(sub.getName());
+            if(recursive)
+                listProjects(sub,recursive);
+        }
+
+    }
+
     private static void usage(String msg) {
         System.err.println("Usage: java -jar javanettasks.jar "+msg);
         System.exit(1);

@@ -48,8 +48,10 @@
 				<a href="config.html">Setting up your account info</a>
 			</li><li>
         <a href="tools/processRole.html">role request processor</a>
-        </li><li>
+      </li><li>
         <a href="tools/grantRoleForBugReporter.html">BugReporter request processor</a>
+      </li><li>
+        <a href="tools/listSubProjects.html">Sub-projects lister</a>
 			</li>
 		</ul>
 	</ul>

@@ -21,6 +21,7 @@
       <item name="tools">
         <item name="processRole"             href="/tools/processRole.html"/>
         <item name="grantRoleForBugReporter" href="/tools/grantRoleForBugReporter.html"/>
+        <item name="listSubProjects"         href="/tools/listSubProjects.html"/>
       </item>
     </menu>
   </body>
