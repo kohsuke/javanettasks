@@ -2,5 +2,3 @@ bin
 target
 maven.log
 velocity.log
-.classpath
-.project
