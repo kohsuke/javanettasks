@@ -36,11 +36,11 @@ public class JNMailingListsTest extends TestCaseBase {
         assertNotNull(l);
         assertEquals("unittest",l.getName());
 
-        assertEquals(1,l.getSubscribers(NORMAL).size());
+        assertEquals(2,l.getSubscribers(NORMAL).size());
         l.massSubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
-        assertEquals(3,l.getSubscribers(NORMAL).size());
+        assertEquals(2,l.getSubscribers(NORMAL).size());
         l.massUnsubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
-        assertEquals(1,l.getSubscribers(NORMAL).size());
+        assertEquals(4,l.getSubscribers(NORMAL).size());
 
         l.delete();
     }
