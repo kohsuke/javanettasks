@@ -5,21 +5,21 @@ package org.kohsuke.jnt;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class ListType {
+public enum ListType {
     /**
      * Only subscribers can post.
      */
-    public static final ListType DISCUSS = new ListType("discuss");
+    DISCUSS("discuss"),
     /**
      * Only moderaters can post.
      */
-    public static final ListType MODERATED = new ListType("moderated");
+    MODERATED("moderated"),
     /**
      * Anyone can post.
      */
-    public static final ListType UNMODERATED = new ListType("unmoderated");
+    UNMODERATED("unmoderated");
 
-    private ListType(String name) {
+    ListType(String name) {
         this.name = name;
     }
 

@@ -60,8 +60,14 @@
     <developer>
       <name>Ryan Shoemaker</name>
       <id>ryan_shoemaker</id>
-      <email>ryan_shoemaker@java.net</email>
+      <email>ryan_shoemaker@dev.java.net</email>
       <organization>Sun Microsystems, Inc.</organization>
+    </developer>
+    <developer>
+      <name>Bruno F. Souza</name>
+      <id>brunos</id>
+      <email>brunos@dev.java.net</email>
+      <organization></organization>
     </developer>
   </developers>
   

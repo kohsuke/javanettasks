@@ -30,11 +30,41 @@
     <deploy:copy-deps xmlns:deploy="deploy"
       todir="${maven.dist.bin.archive.dir}/${maven.final.name}/lib"
     />
+    <copy todir="${maven.dist.bin.archive.dir}/${maven.final.name}"
+      file="target/${pom.artifactId}-jdk1.2-${pom.currentVersion}.jar" />
   </postGoal>
   
   <preGoal name="jar:jar">
     <build-dep-manifest xmlns="manifest-builder" />
   </preGoal>
+  
+  <postGoal name="jar:jar">
+    <!-- build 1.2 jar -->
+		<delete dir="target/classes12"/>
+		<mkdir dir="target/classes12"/>
+    <unjar src="target/${pom.artifactId}-${pom.currentVersion}.jar" dest="target/classes12"/>
+		
+		<java classname="com.rc.retroweaver.Weaver" fork="true">
+			<arg line="-version 1.2" />
+			<arg value="-source"/>
+			<arg path="target/classes12"/>
+			<classpath>
+				<fileset dir="lib/retroweaver">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
+
+    <mkdir dir="target/retroweaver"/>
+    <unjar src="lib/retroweaver/retroweaver.jar" dest="target/retroweaver"/>
+
+		<jar jarfile="target/${pom.artifactId}-jdk1.2-${pom.currentVersion}.jar" compress="true"
+			manifest="target/classes12/META-INF/MANIFEST.MF">
+      <!-- bundle the retroweaver runtime -->
+      <fileset dir="target/retroweaver" includes="**/runtime/*.class"/>
+			<fileset dir="target/classes12" includes="**/*" />
+		</jar>
+	</postGoal>
   
   <goal name="release">
     <attainGoal name="dist" />

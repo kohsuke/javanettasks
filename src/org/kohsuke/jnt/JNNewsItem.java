@@ -91,4 +91,16 @@ public final class JNNewsItem {
             throw new IllegalStateException();
         }
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JNNewsItem)) return false;
+
+        JNNewsItem that = (JNNewsItem) o;
+        return this.id == that.id && this.project==that.project;
+    }
+
+    public int hashCode() {
+        return id;
+    }
 }

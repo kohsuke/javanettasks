@@ -37,13 +37,13 @@ public class JNMembership {
      * Lazily created. {@link JNUser} to sets of {@link JNRole}s in this project.
      * @see #getMembers()
      */
-    private Map members;
+    private Map<JNUser,Set<JNRole>> members;
 
     /**
      * Lazily created.
      * {@link JNRole} to sets of {@link JNUser}s that hae that role in this project.
      */
-    private TreeMap roles;
+    private Map<JNRole,Set<JNUser>> roles;
 
     protected JNMembership(JNProject project) {
         this.wc = project.wc;
@@ -53,8 +53,8 @@ public class JNMembership {
     private void parseMembershipInfo() throws ProcessingException {
         // load all information that is on the membership pages
 
-        members = new TreeMap();
-        roles = new TreeMap();
+        members = new TreeMap<JNUser,Set<JNRole>>();
+        roles = new TreeMap<JNRole,Set<JNUser>>();
 
         try {
             WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
@@ -91,16 +91,16 @@ public class JNMembership {
                     // roleList are separated by commas. This is new layout
                     String cell = users.getCellAsText(r, 2);
                     StringTokenizer roleList = new StringTokenizer(cell,"\n");
-                    Set ra = new TreeSet();
+                    Set<JNRole> ra = new TreeSet<JNRole>();
                     while(roleList.hasMoreTokens()) {
                         String roleName = roleList.nextToken().trim();
                         if(roleName.length()==0)    continue;
                         JNRole role = project.net.getRole(roleName);
                         ra.add(role);
 
-                        Set l = (Set)roles.get(role);
+                        Set<JNUser> l = roles.get(role);
                         if(l==null) {
-                            roles.put(role,l=new TreeSet());
+                            roles.put(role,l=new TreeSet<JNUser>());
                         }
                         l.add(user);
                     }
@@ -160,10 +160,10 @@ public class JNMembership {
      * @return
      *      always return a read-only non-null (but possibly empty) set.
      */
-    public Set getRolesOf(JNUser user) throws ProcessingException {
+    public Set<JNRole> getRolesOf(JNUser user) throws ProcessingException {
         if(members==null)
             parseMembershipInfo();
-        Set r = (Set)members.get(user);
+        Set<JNRole> r = members.get(user);
         if(r==null)
             return Collections.EMPTY_SET;
 
@@ -176,10 +176,10 @@ public class JNMembership {
      * @return
      *      always return a read-only non-null (but possibly empty) set.
      */
-    public Set getUserOf(JNRole role) throws ProcessingException {
+    public Set<JNUser> getUserOf(JNRole role) throws ProcessingException {
         if(roles==null)
             parseMembershipInfo();
-        Set s = (Set)roles.get(role);
+        Set<JNUser> s = roles.get(role);
         if(s==null)
             return Collections.EMPTY_SET;
 
@@ -326,10 +326,8 @@ public class JNMembership {
     }
     
     private WebTable findPendingRoleTable( HTMLSegment r ) throws SAXException {
-        
-        WebTable[] tables = r.getTables();
-        for( int i=0; i<tables.length; i++ ) {
-            WebTable tbl = tables[i];
+
+        for( WebTable tbl : r.getTables() ) {
 
 //          System.out.println(tbl.getRowCount()+"x"+tbl.getColumnCount());
 //          System.out.println("["+tbl.getCellAsText(0,0)+"]");

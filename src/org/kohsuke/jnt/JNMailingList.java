@@ -39,6 +39,25 @@ public final class JNMailingList {
      */
     private final List[] subscribers = new List[2];
 
+    /**
+     * The number of messages posted per month.
+     */
+    public static class MessagePerMonth {
+        public final String month;
+        public final int count;
+
+        public MessagePerMonth(String month, int count) {
+            this.month = month;
+            this.count = count;
+        }
+    }
+
+    /**
+     * List of {@link MessagePerMonth}. Lazily parsed.
+     */
+    private ArrayList messagesPerMonth;
+
+
     JNMailingList(JNProject project, String name) {
         this.project = project;
         this.name = name;
@@ -158,7 +177,7 @@ public final class JNMailingList {
      * @param callback
      *      If not null, this interface receives progress indication.
      */
-    public int massSubscribe(Collection addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
+    public int massSubscribe(Collection<String> addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
         return doMassSubscribe(addresses, mode, callback);
     }
 
@@ -185,7 +204,7 @@ public final class JNMailingList {
      * @param callback
      *      If not null, this interface receives progress indication.
      */
-    public int massUnsubscribe(Collection addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
+    public int massUnsubscribe(Collection<String> addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
         return doMassUnsubscribe(addresses,mode);
     }
 
@@ -211,6 +230,21 @@ public final class JNMailingList {
     }
 
 
+    /**
+     * Returns a list of {@link MessagePerMonth}.
+     *
+     * <p>
+     * Becaus of the way java.net is designed, this information is cheap to obtain.
+     *
+     * @return
+     *      always non-null (but possibly empty) list of {@link MessagePerMonth}.
+     */
+    public List getMessagesPerMonth() throws ProcessingException {
+        if(messagesPerMonth==null)  parseListInfo();
+        return Collections.unmodifiableList(messagesPerMonth);
+    }
+
+
     private void parseListInfo() throws ProcessingException {
         new Scraper("Unable to parse the mailing list summary page") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
@@ -226,29 +260,30 @@ public final class JNMailingList {
 
                 WebTable monthInfo = response.getTableStartingWith("Month");
 
-//            messagesPerMonth = new ArrayList();
-//
-//            if(monthInfo==null) {
-//                if(totalMessages.intValue()==0)
-//                    return; //this is to be expected
-//                else
-//                    throw new ProcessingException("month table not found, even though the total message count isn't 0");
-//            }
-//
-//            int numRows = monthInfo.getRowCount();
-//
-//            // we start at row 1, since the row 0 is the header
-//            for (int r = 1; r < numRows; r++) {
-//                String month = monthInfo.getCellAsText(r,0);
-//                String messages = monthInfo.getCellAsText(r,1);
-//                messagesPerMonth[r-1] = month.trim() + ": " + messages;
-//            }
+                messagesPerMonth = new ArrayList();
+
+                if(monthInfo==null) {
+                    if(totalMessages.intValue()==0)
+                        return null; //this is to be expected
+                    else
+                        throw new ProcessingException("month table not found, even though the total message count isn't 0");
+                }
+
+                int numRows = monthInfo.getRowCount();
+
+                // we start at row 1, since the row 0 is the header
+                for (int r = 1; r < numRows; r++) {
+                    String month = monthInfo.getCellAsText(r,0);
+                    String messages = monthInfo.getCellAsText(r,1);
+                    messagesPerMonth.add( new MessagePerMonth(month,Integer.parseInt(messages)) );
+                }
+
                 return null;
             }
         }.run();
     }
 
-    private int doMassSubscribe(Collection addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
+    private int doMassSubscribe(Collection<String> addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
 
 //        if (!validateEmails(addresses)) {
 //            System.out.println("There are errors in the e-mails, aborting subscriptions.");
@@ -298,7 +333,7 @@ public final class JNMailingList {
 
         int totalSubscribed = 0;
 
-        List batch = new ArrayList(400);
+        List<String> batch = new ArrayList<String>(400);
         Iterator itr = addresses.iterator();
 
         while (itr.hasNext()) {
@@ -338,7 +373,7 @@ public final class JNMailingList {
     }
 
 
-    private int doMassSubscribe2(final Collection addresses, final SubscriptionMode mode) throws ProcessingException {
+    private int doMassSubscribe2(final Collection<String> addresses, final SubscriptionMode mode) throws ProcessingException {
         // we are going to change this
         subscribers[mode.index] = null;
 
@@ -390,7 +425,7 @@ public final class JNMailingList {
         return form;
     }
 
-    private int doMassUnsubscribe(final Collection addresses, final SubscriptionMode mode) throws ProcessingException {
+    private int doMassUnsubscribe(final Collection<String> addresses, final SubscriptionMode mode) throws ProcessingException {
         // we are going to change this
         subscribers[mode.index] = null;
 
@@ -437,5 +472,18 @@ public final class JNMailingList {
                 return null;
             }
         }.run();
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JNMailingList)) return false;
+
+        final JNMailingList that = (JNMailingList) o;
+
+        return this.name.equals(that.name) && this.project==that.project;
+    }
+
+    public int hashCode() {
+        return 29 * project.hashCode() + name.hashCode();
     }
 }

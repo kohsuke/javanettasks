@@ -24,9 +24,9 @@ import java.util.Properties;
 public class JavaNet {
     protected final WebConversation wc;
     
-    private final Map projects = new HashMap();
-    private final Map users = new HashMap();
-    private final Map roles = new HashMap();
+    private final Map<String,JNProject> projects = new HashMap<String,JNProject>();
+    private final Map<String,JNUser> users = new HashMap<String,JNUser>();
+    private final Map<String,JNRole> roles = new HashMap<String,JNRole>();
 
     /**
      * A special {@link JNUser} object that represents the current user.
@@ -174,7 +174,7 @@ public class JavaNet {
      * guarantee that the project actually exists.
      */
     public JNProject getProject(String projectName) throws ProcessingException {
-        JNProject p = (JNProject)projects.get(projectName);
+        JNProject p = projects.get(projectName);
         if(p==null){
             p = new JNProject(this,projectName);
             projects.put(projectName,p);
@@ -204,7 +204,7 @@ public class JavaNet {
      *      always return a non-null object.
      */
     public JNUser getUser(String userName) throws ProcessingException {
-        JNUser u = (JNUser)users.get(userName);
+        JNUser u = users.get(userName);
         if(u==null) {
             u = new JNUser(this,userName);
             users.put(userName,u);
@@ -220,10 +220,10 @@ public class JavaNet {
      * guarantee that the role actually exists.
      */
     public JNRole getRole(String roleName) throws ProcessingException {
-        JNRole r = (JNRole)roles.get(roleName);
+        JNRole r = roles.get(roleName);
         if(r==null) {
             r = new JNRole(this,roleName);
-            users.put(roleName,r);
+            roles.put(roleName,r);
         }
         return r;
     }

@@ -23,7 +23,7 @@ public final class JNForums {
     /**
      * List of all {@link JNForum}s. Parsed lazily.
      */
-    private List forums;
+    private List<JNForum> forums;
 
     JNForums(JNProject parent) {
         this.project = parent;
@@ -35,7 +35,7 @@ public final class JNForums {
      * @return
      *      always non-null. Can be empty.
      */
-    public List getForums() throws ProcessingException {
+    public List<JNForum> getForums() throws ProcessingException {
         if(forums==null)
             parse();
         return Collections.unmodifiableList(forums);
@@ -53,8 +53,7 @@ public final class JNForums {
     public JNForum getForum(String name) throws ProcessingException {
         if(forums==null)
             parse();
-        for( int i=0; i<forums.size(); i++ ) {
-            JNForum f = (JNForum) forums.get(i);
+        for( JNForum f : forums ) {
             if(f.getName().equals(name))
                 return f;
         }
@@ -93,8 +92,7 @@ public final class JNForums {
 
                 forums = null;
                 parse();
-                for( int i=0; i<forums.size(); i++ ) {
-                    JNForum f = (JNForum)forums.get(i);
+                for( JNForum f : forums ) {
                     if(f.getName().equals(name))
                         return f;
                 }
@@ -110,7 +108,7 @@ public final class JNForums {
     private void parse() throws ProcessingException {
         // load all information that is on the membership pages
 
-        forums = new ArrayList();
+        forums = new ArrayList<JNForum>();
 
         new Scraper("Unable to parse the forum view page") {
             protected Object scrape() throws IOException, SAXException {

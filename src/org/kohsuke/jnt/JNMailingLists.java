@@ -27,7 +27,7 @@ public final class JNMailingLists {
     /**
      * List of {@link JNMailingList}. Lazily parsed.
      */
-    private List lists;
+    private List<JNMailingList> lists;
 
     protected JNMailingLists(JNProject project) {
         this.wc = project.wc;
@@ -44,7 +44,7 @@ public final class JNMailingLists {
      * @return
      *      can be empty but never be null. read-only.
      */
-    public List getLists() throws ProcessingException {
+    public List<JNMailingList> getLists() throws ProcessingException {
         if(lists==null)     parse();
         return Collections.unmodifiableList(lists);
     }
@@ -58,11 +58,11 @@ public final class JNMailingLists {
      * @return
      *      null if no such forum is found
      */
-    public JNMailingList getForum(String name) throws ProcessingException {
+    public JNMailingList get(String name) throws ProcessingException {
         if(lists==null)
             parse();
         for( int i=0; i<lists.size(); i++ ) {
-            JNMailingList f = (JNMailingList) lists.get(i);
+            JNMailingList f = lists.get(i);
             if(f.getName().equals(name))
                 return f;
         }
@@ -70,15 +70,12 @@ public final class JNMailingLists {
     }
 
     private void parse() throws ProcessingException {
-        lists = new ArrayList();
+        lists = new ArrayList<JNMailingList>();
 
         try {
             WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectMailingListList");
 
-            WebLink[] links = response.getLinks();
-
-            for (int i = 0; i < links.length; i++) {
-                WebLink link = links[i];
+            for( WebLink link : response.getLinks() ) {
                 String linkTxt = link.getURLString();
                 if (linkTxt.startsWith(project.getURL() + "/servlets/SummarizeList?listName=")) {
                     String listName = linkTxt.substring(linkTxt.lastIndexOf('=')+1, linkTxt.length());

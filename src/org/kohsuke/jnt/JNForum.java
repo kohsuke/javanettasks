@@ -119,4 +119,16 @@ public final class JNForum {
         // TODO: implement this method later
         throw new UnsupportedOperationException();
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JNForum)) return false;
+
+        JNForum that = (JNForum) o;
+        return this.id == that.id && this.project==that.project;
+    }
+
+    public int hashCode() {
+        return id;
+    }
 }

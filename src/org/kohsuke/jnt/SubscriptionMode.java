@@ -5,16 +5,16 @@ package org.kohsuke.jnt;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class SubscriptionMode {
+public enum SubscriptionMode {
     /**
      * Normal subscription mode. One e-mail per a post.
      */
-    public static final SubscriptionMode NORMAL = new SubscriptionMode("normal","Subscribers",0);
+    NORMAL("normal","Subscribers",0),
 
     /**
      * Digest subscription mode. One e-mail per a day.
      */
-    public static final SubscriptionMode DIGEST = new SubscriptionMode("digest","Digest+Subscribers",1);
+    DIGEST("digest","Digest+Subscribers",1);
 
     private final String name;
 
@@ -28,7 +28,7 @@ public final class SubscriptionMode {
      */
     /*package*/ final int index;
 
-    private SubscriptionMode(String name, String groupName, int index) {
+    SubscriptionMode(String name, String groupName, int index) {
         this.name = name;
         this.groupName = groupName;
         this.index = index;

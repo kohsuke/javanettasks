@@ -3,8 +3,14 @@ package org.kohsuke.jnt;
 import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.text.ParseException;
 
 import org.xml.sax.SAXException;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 import com.meterware.httpunit.UploadFileSpec;
 import com.meterware.httpunit.WebConversation;
@@ -14,28 +20,52 @@ import com.meterware.httpunit.WebResponse;
 
 /**
  * folder in the java&#x2E;net file sharing section.
- * 
+ *
+ * <p>
+ * In java.net, the "documents &amp; files" section serves as
+ * a simle per-project file system.
+ *
+ * This object represents one folder in such a file system.
+ *
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class JNFileFolder {
+public final class JNFileFolder {
     
-    private final JNProject project;
+    /*package*/ final JNProject project;
     private final WebConversation wc;
     private final String url;
-    
-    protected JNFileFolder(JNProject project, String url) {
+
+    private final int id;
+
+    /**
+     * Lazily parsed subfolders. From {@link String} to {@link JNFileFolder}.
+     */
+    private Map<String,JNFileFolder> subFolders;
+
+    /**
+     * Lazily parsed files in this folder. From {@link String} to {@link JNFile}.
+     */
+    private Map<String,JNFile> files;
+
+    /**
+     * Parent folder, or null if this is the root.
+     */
+    private final JNFileFolder parent;
+
+    protected JNFileFolder(JNProject project, JNFileFolder parent, int id) {
         this.wc = project.wc;
         this.project = project;
-        this.url = url;
+        this.parent = parent;
+        this.id = id;
+        this.url = "https://jaxb.dev.java.net/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
     }
-    
     
     /**
      * Returns a sub-folder.
      * 
      * @param folderName
-     *      '/'-separated folder name. such as "/abc/def" or "abc/def". 
+     *      '/'-separated folder name. such as "abc", "abc/def", or "/abc/def".
      */
     public JNFileFolder getSubFolder( final String folderName ) throws ProcessingException {
         return (JNFileFolder)new Scraper("failed to cd into "+folderName) {
@@ -58,6 +88,56 @@ public class JNFileFolder {
                 return project.getFolderFromURL(wc.getCurrentPage().getURL().toExternalForm());
             }
         }.run();
+    }
+
+    private void parse() throws ProcessingException {
+        new Scraper("Failed to parse the documents&files section") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException, ParseException {
+                WebResponse response = wc.getResponse(url);
+                Document dom = Util.getDom4j(response);
+
+                // find the current folder
+                Element current = (Element)dom.selectSingleNode("//DIV[@id='projectdocumentlist']//LI[@class='selection']");
+
+                // parse sub folders
+                subFolders = new TreeMap<String,JNFileFolder>();
+                for( Element anchor : (List<Element>)current.selectNodes("UL/LI/A[SPAN]") ) {
+                    // https://jaxb.dev.java.net/servlets/ProjectDocumentList?folderID=1747&expandFolder=1747
+                    String name = anchor.getTextTrim();
+                    String href = anchor.attributeValue("href");
+                    int sidx = href.indexOf("?folderID=");
+                    int eidx = href.indexOf("&expandFolder=");
+                    if(sidx==-1 || eidx==-1)
+                        throw new ProcessingException("Failed to parse the link "+href);
+
+                    int id = Integer.parseInt( href.substring(sidx+"?folderID=".length(),eidx) );
+
+                    subFolders.put(name,new JNFileFolder(project,JNFileFolder.this,id));
+                }
+
+                // find the current folder
+                current = (Element)dom.selectSingleNode("//DIV[@id='projectdocumentlist']//TD[@class='filebrowse']/DIV/TABLE");
+
+                files = new TreeMap<String,JNFile>();
+
+                List trs = current.elements("TR");
+                for( int i=1; i<trs.size(); i++ ) { // row 0 == header
+                    Element tr = (Element)trs.get(i);
+
+                    JNFile file = new JNFile(JNFileFolder.this,tr);
+                    files.put(file.getName(),file);
+                }
+
+                return null;
+            }
+        }.run();
+    }
+
+    /**
+     * Returns the parent folder, or null if this folder is the root.
+     */
+    public JNFileFolder getParent() {
+        return parent;
     }
 
     /**

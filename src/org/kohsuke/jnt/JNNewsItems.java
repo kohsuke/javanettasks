@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 262 2004-12-17 15:56:59Z kohsuke $
+ * $Id: JNNewsItems.java 263 2004-12-18 18:23:01Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -28,7 +28,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 262 $
+ * @version $Revision: 263 $
  */
 public final class JNNewsItems {
 
@@ -42,7 +42,7 @@ public final class JNNewsItems {
      * List of {@link JNNewsItem}s.
      * Lazily parsed.
      */
-    private List newsItems;
+    private List<JNNewsItem> newsItems;
 
     // constants for the form field names
     private static final String FORM_NAME = "ProjectNewsAddForm";
@@ -171,7 +171,7 @@ public final class JNNewsItems {
      * @return
      *      can be empty but never be null. Read-only.
      */
-    public List getNewsItems() throws ProcessingException {
+    public List<JNNewsItem> getNewsItems() throws ProcessingException {
         if (newsItems == null)
             loadNewsInfo();
         return Collections.unmodifiableList(newsItems);
@@ -182,7 +182,7 @@ public final class JNNewsItems {
 
     private void loadNewsInfo() throws ProcessingException {
         // load all information that is on the membership pages
-        newsItems = new ArrayList();
+        newsItems = new ArrayList<JNNewsItem>();
 
         new Scraper("Unable to parse the announcement list") {
             protected Object scrape() throws IOException, SAXException, ParseException {

@@ -12,10 +12,10 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Java&#x2E;net project.
@@ -27,7 +27,7 @@ import java.util.Set;
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public final class JNProject {
+public final class JNProject implements Comparable {
     /** The project name. */
     protected final String projectName;
     
@@ -82,9 +82,9 @@ public final class JNProject {
      * A set of {@link JNUser} objects that represent the project owners. 
      * Lazily retrieved by the {@link #parseProjectInfo()}method. 
      */
-    private Set owners;
+    private Set<JNUser> owners;
 
-    private Set subProjects;
+    private Set<JNProject> subProjects;
 
     private String summmary;
 
@@ -126,14 +126,14 @@ public final class JNProject {
                 summmary = dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[TH/text()='Summary']/TD").getText();
 
                 // parse owners
-                Set owners = new HashSet();
+                Set<JNUser> owners = new TreeSet<JNUser>();
                 List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
                 for( int i=0; i<os.size(); i++ )
                     owners.add( net.getUser( ((Element)os.get(i)).getTextTrim() ) );
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
 
                 // parse sub-projects
-                Set subProjects = new HashSet();
+                Set<JNProject> subProjects = new TreeSet<JNProject>();
                 List sp = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
                 for( int i=0; i<sp.size(); i++ )
                     subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
@@ -246,7 +246,7 @@ public final class JNProject {
      *
      * @see #getOwners()
      */
-    public Set getOwners() throws ProcessingException {
+    public Set<JNUser> getOwners() throws ProcessingException {
         parseProjectInfo();
         return owners;
     }
@@ -276,7 +276,7 @@ public final class JNProject {
      *      always return non-null set. If the project doesn't have
      *      any sub-project, it returns an empty set. The set is read-only.
      */
-    public Set getSubProjects() throws ProcessingException {
+    public Set<JNProject> getSubProjects() throws ProcessingException {
         parseProjectInfo();
         return subProjects;
     }
@@ -318,7 +318,7 @@ public final class JNProject {
     protected JNFileFolder getFolderFromURL(String url) {
         JNFileFolder r = (JNFileFolder)folders.get(url);
         if(r==null) {
-            folders.put(url, r=new JNFileFolder(this,url) );
+            folders.put(url, r=new JNFileFolder(this,null,0) );
         }
         return r;
     }
@@ -407,5 +407,10 @@ public final class JNProject {
         if( o.getClass()!=this.getClass() )
             return false;
         return this.projectName.equals( ((JNProject)o).projectName );
+    }
+
+    public int compareTo(Object o) {
+        JNProject that = (JNProject) o;
+        return this.projectName.compareTo(that.projectName);
     }
 }

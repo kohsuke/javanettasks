@@ -21,7 +21,7 @@ public class JNMyself extends JNUser {
      * Set of {@link JNProject} to which the current user belongs.
      * Never null.
      */
-    private Set myProjects;
+    private Set<JNProject> myProjects;
     
     protected JNMyself(JavaNet net,String userName) {
         super(net,userName);
@@ -37,7 +37,7 @@ public class JNMyself extends JNUser {
                 Document dom = Util.getDom4j(wc.getResponse("https://www.dev.java.net/servlets/StartPage"));
 
                 // parse my projects
-                Set myProjects = new HashSet();
+                Set<JNProject> myProjects = new HashSet<JNProject>();
                 List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
                 for( int i=0; i<projects.size(); i++) {
                     Element e = (Element)projects.get(i);
@@ -56,7 +56,7 @@ public class JNMyself extends JNUser {
      * @return
      *      non-null (but possibly empty) set. The set is read-only.
      */
-    public final Set getMyProjects() throws ProcessingException {
+    public final Set<JNProject> getMyProjects() throws ProcessingException {
         parseStartPage();
         return myProjects;
     }
