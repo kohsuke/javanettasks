@@ -174,6 +174,7 @@ public class JavaNet {
      * guarantee that the project actually exists.
      */
     public JNProject getProject(String projectName) throws ProcessingException {
+        projectName = projectName.toLowerCase();
         JNProject p = projects.get(projectName);
         if(p==null){
             p = new JNProject(this,projectName);
