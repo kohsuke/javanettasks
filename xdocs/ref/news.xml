@@ -79,16 +79,16 @@
 	<section name="Nested Parameter Elements">
 		<h4>headline</h4>
 		<p>
-			You must specify a headline for the news item via @headline or a nested &lt;headline&gt; element.  This element can only contain character data - html markup is permitted, but should be enclosed within a lt;![CDATA[ ... ]]&gt; section.
+			You must specify a headline for the news item via @headline or a nested &lt;headline&gt; element.  This element can only contain character data - html markup is permitted, but should be enclosed within a &lt;![CDATA[ ... ]]&gt; section.
 		</p>
 
 		<h4>body</h4>
 		<p>
-			You can specify the body of the news item via @body or a nested &lt;body&gt; element.  This element can only contain character data - html markup is permitted, but should be enclosed within a lt;![CDATA[ ... ]]&gt; section.
+			You can specify the body of the news item via @body or a nested &lt;body&gt; element.  This element can only contain character data - html markup is permitted, but should be enclosed within a &lt;![CDATA[ ... ]]&gt; section.
 		</p>
 	</section>
 	<div align="right" style="font-size: smaller">
-	$Id: news.xml 67 2003-12-17 06:33:59Z ryan_shoemaker $
+	$Id: news.xml 68 2003-12-17 21:45:28Z ryan_shoemaker $
 	</div>
 </section>
 </body></document>
