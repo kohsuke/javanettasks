@@ -37,29 +37,27 @@ public class JNFileFolder {
      * @param folderName
      *      '/'-separated folder name. such as "/abc/def" or "abc/def". 
      */
-    public JNFileFolder getSubFolder( String folderName ) throws ProcessingException {
-        try {
-            // chdir to root
-            if( folderName.startsWith("/"))
-                wc.getResponse(project.getURL()+"/servlets/ProjectDocumentList");
-            else
-                wc.getResponse(url);
-            
-            StringTokenizer tokens = new StringTokenizer(folderName,"/");
-            while( tokens.hasMoreTokens() ) {
-                String dirName = tokens.nextToken();
-    //          System.out.println("cd "+dirName);
-                // find the link target
-                Util.findLink( wc,
-                    dirName,project.getURL()+"/servlets/ProjectDocumentList?folderID=").click();
+    public JNFileFolder getSubFolder( final String folderName ) throws ProcessingException {
+        return (JNFileFolder)new Scraper("failed to cd into "+folderName) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                // chdir to root
+                if( folderName.startsWith("/"))
+                    wc.getResponse(project.getURL()+"/servlets/ProjectDocumentList");
+                else
+                    wc.getResponse(url);
+
+                StringTokenizer tokens = new StringTokenizer(folderName,"/");
+                while( tokens.hasMoreTokens() ) {
+                    String dirName = tokens.nextToken();
+        //          System.out.println("cd "+dirName);
+                    // find the link target
+                    Util.findLink( wc,
+                        dirName,project.getURL()+"/servlets/ProjectDocumentList?folderID=").click();
+                }
+
+                return project.getFolderFromURL(wc.getCurrentPage().getURL().toExternalForm());
             }
-            
-            return project.getFolderFromURL(wc.getCurrentPage().getURL().toExternalForm());
-        } catch( IOException e ) {
-            throw new ProcessingException("unable to cd to "+folderName,e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("unable to cd to "+folderName,e);
-        }
+        }.run();
     }
 
     /**
@@ -68,97 +66,95 @@ public class JNFileFolder {
      * @param fileStatus
      *      can be null.
      */
-    public void uploadFile( String fileName, String description, String fileStatus, File fileToUpload ) throws ProcessingException {
-        try {
-            setCurrentPage();
-            
-            WebResponse r = wc.getCurrentPage();
-            
-            WebLink addFileLink = r.getLinkWith("Add new file");
-            if(addFileLink==null) {
-                throw new ProcessingException("Unable to find 'add new file' link. Does this account have a permission to post a file?");
+    public void uploadFile( final String fileName, final String description, final String fileStatus, final File fileToUpload ) throws ProcessingException {
+        new Scraper("error uploading a file "+fileToUpload) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                setCurrentPage();
+
+                WebResponse r = wc.getCurrentPage();
+
+                WebLink addFileLink = r.getLinkWith("Add new file");
+                if(addFileLink==null) {
+                    throw new ProcessingException("Unable to find 'add new file' link. Does this account have a permission to post a file?");
+                }
+                r = addFileLink.click();
+
+                WebForm form = r.getFormWithName("ProjectDocumentAddForm");
+                form.setParameter("name",fileName);
+                if( fileStatus!=null )
+                    form.setParameter("status",fileStatus);
+                form.setParameter("description",description);
+
+                form.setParameter("type","file");
+                form.setParameter("file",new UploadFileSpec[]{
+                    new UploadFileSpec(fileToUpload)});
+                r = form.submit();
+
+                if( r.getImageWithAltText("Alert notification")!=null )
+                    // TODO: obtain the error message
+                    throw new ProcessingException("error uploading a file "+fileToUpload);
+                return null;
             }
-            r = addFileLink.click();
-            
-            WebForm form = r.getFormWithName("ProjectDocumentAddForm");
-            form.setParameter("name",fileName);
-            if( fileStatus!=null )
-                form.setParameter("status",fileStatus);
-            form.setParameter("description",description);
-            
-            form.setParameter("type","file");
-            form.setParameter("file",new UploadFileSpec[]{
-                new UploadFileSpec(fileToUpload)});
-            r = form.submit();
-            
-            if( r.getImageWithAltText("Alert notification")!=null )
-                // TODO: obtain the error message
-                throw new ProcessingException("error uploading a file "+fileToUpload);
-        } catch( IOException e ) {
-            throw new ProcessingException("error uploading a file "+fileToUpload,e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("error uploading a file "+fileToUpload,e);
-        }
+        }.run();
     }
     
     /**
      * Gets a document id of the given file or null if such a file doesn't exist.
      */
-    private String getDocumentId( String fileName ) throws ProcessingException {
-        try {
-            try {
-                WebLink link = Util.findLink(wc,fileName,
-                    project.getURL()+"/servlets/ProjectDocumentView?documentID=");
-                String url = link.getURLString();
-                return url.substring(url.indexOf('=')+1,url.indexOf('&'));          
-            } catch( ProcessingException e ) {
+    private String getDocumentId( final String fileName ) throws ProcessingException {
+        return (String)new Scraper("Unable to fetch the document id for "+fileName) {
+            protected Object scrape() throws SAXException {
                 try {
-                    WebLink link = Util.findLink(wc,fileName,"/files/documents/");
+                    WebLink link = Util.findLink(wc,fileName,
+                        project.getURL()+"/servlets/ProjectDocumentView?documentID=");
                     String url = link.getURLString();
-                    int l = url.lastIndexOf('/');
-                    return url.substring(url.lastIndexOf('/',l-1)+1,l);
-                } catch( ProcessingException ee ) {
-                    return null;
+                    return url.substring(url.indexOf('=')+1,url.indexOf('&'));
+                } catch( ProcessingException e ) {
+                    try {
+                        WebLink link = Util.findLink(wc,fileName,"/files/documents/");
+                        String url = link.getURLString();
+                        int l = url.lastIndexOf('/');
+                        return url.substring(url.lastIndexOf('/',l-1)+1,l);
+                    } catch( ProcessingException ee ) {
+                        return null;
+                    }
                 }
             }
-        } catch( SAXException e ) {
-            throw new ProcessingException("error processing page "+wc.getCurrentPage().getURL(),e);
-        }
+        }.run();
     }
     
     /**
      * Checks if the specified file exists in the folder. 
      */
-    public boolean existsFile( String fileName ) throws ProcessingException {
-        try {
-            setCurrentPage();
-                
-            return getDocumentId(fileName)!=null;
-        } catch( IOException e ) {
-            throw new ProcessingException("error checking file "+fileName,e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("error checking file "+fileName,e);
-        }
+    public boolean existsFile( final String fileName ) throws ProcessingException {
+        String id = (String)new Scraper("error checking file "+fileName) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                setCurrentPage();
+                return getDocumentId(fileName);
+            }
+        }.run();
+
+        return id!=null;
     }
     
     /**
      * Delets a file from the folder.
      */
-    public void deleteFile( String fileName ) throws ProcessingException {
-        try {
-            setCurrentPage();
-            
-            String documentId = getDocumentId(fileName);
-        
-            WebResponse r = wc.getResponse(
-                project.getURL()+"/servlets/ProjectDocumentDelete?documentID="+documentId+"&maxDepth=");
-            
-            r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
-        } catch( IOException e ) {
-            throw new ProcessingException("error deleting file "+fileName,e);
-        } catch( SAXException e ) {
-            throw new ProcessingException("error deleting file "+fileName,e);
-        }
+    public void deleteFile( final String fileName ) throws ProcessingException {
+        new Scraper("error deleting file "+fileName) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                setCurrentPage();
+
+                String documentId = getDocumentId(fileName);
+
+                WebResponse r = wc.getResponse(
+                    project.getURL()+"/servlets/ProjectDocumentDelete?documentID="+documentId+"&maxDepth=");
+
+                r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
+
+                return null;
+            }
+        }.run();
     }
     
     /**

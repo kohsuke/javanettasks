@@ -1,20 +1,18 @@
 package org.kohsuke.jnt;
 
-import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
-import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * A mailing list of a project on java&#x2E;net.
@@ -117,6 +115,14 @@ public final class JNMailingList {
     }
 
     /**
+     * Subscribes yourself.
+     */
+    public void subscribe( SubscriptionMode mode ) throws ProcessingException {
+        // TODO: implement this method later
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Subscribes the specified e-mail address to this mailing list.
      *
      * <p>
@@ -190,38 +196,35 @@ public final class JNMailingList {
      * This is a priviledged operation.
      */
     public void delete() throws ProcessingException {
-        try {
-            WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/MailingListDelete?list="+name);
-            WebForm form = response.getFormWithName("MailingListDeleteForm");
-            if(form==null)
-                throw new ProcessingException("form not found");
-            form.submit();
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+        new Scraper("Unable to delete mailing list "+name) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/MailingListDelete?list="+name);
+                WebForm form = response.getFormWithName("MailingListDeleteForm");
+                if(form==null)
+                    throw new ProcessingException("form not found");
+                form.submit();
+                return null;
+            }
+        }.run();
+
         project.getMailingLists().reset();
     }
 
 
     private void parseListInfo() throws ProcessingException {
-        try {
-            WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/SummarizeList?listName="+name);
+        new Scraper("Unable to parse the mailing list summary page") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/SummarizeList?listName="+name);
 
-            WebTable listInfo = response.getTableStartingWith("List address");
+                WebTable listInfo = response.getTableStartingWith("List address");
 
-            if (listInfo == null)
-                throw new ProcessingException("Unable to find the list table");
+                if (listInfo == null)
+                    throw new ProcessingException("Unable to find the list table");
 
-            description = listInfo.getCellAsText(1,1);
-            totalMessages = new Integer(listInfo.getCellAsText(2,1));
+                description = listInfo.getCellAsText(1,1);
+                totalMessages = new Integer(listInfo.getCellAsText(2,1));
 
-            WebTable monthInfo = response.getTableStartingWith("Month");
+                WebTable monthInfo = response.getTableStartingWith("Month");
 
 //            messagesPerMonth = new ArrayList();
 //
@@ -240,15 +243,9 @@ public final class JNMailingList {
 //                String messages = monthInfo.getCellAsText(r,1);
 //                messagesPerMonth[r-1] = month.trim() + ": " + messages;
 //            }
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+                return null;
+            }
+        }.run();
     }
 
     private int doMassSubscribe(Collection addresses, SubscriptionMode mode, ProgressCallback callback ) throws ProcessingException {
@@ -341,45 +338,41 @@ public final class JNMailingList {
     }
 
 
-    private int doMassSubscribe2(Collection addresses, SubscriptionMode mode) throws ProcessingException {
+    private int doMassSubscribe2(final Collection addresses, final SubscriptionMode mode) throws ProcessingException {
         // we are going to change this
         subscribers[mode.index] = null;
 
-        try {
-            WebForm form = getListMemberForm(mode);
+        Integer result = (Integer) new Scraper("Unable to mass-subscribe") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebForm form = getListMemberForm(mode);
 
-            form.setParameter("subscribeList",Util.toList(addresses,' '));
+                form.setParameter("subscribeList",Util.toList(addresses,' '));
 
-            // we must change the method, from get to post, to be able to include
-            // a large number of e-mails... Need to experiment with that.
-            // There's no way in HTTP Unit to change the method, so, we had to
-            // break the e-mails in groups...
+                // we must change the method, from get to post, to be able to include
+                // a large number of e-mails... Need to experiment with that.
+                // There's no way in HTTP Unit to change the method, so, we had to
+                // break the e-mails in groups...
 
-            SubmitButton subscribeBt = form.getSubmitButton("Button", "Subscribe");
-            if (subscribeBt == null)
-                throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
+                SubmitButton subscribeBt = form.getSubmitButton("Button", "Subscribe");
+                if (subscribeBt == null)
+                    throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
-            // check the response
-            String text = form.submit(subscribeBt).getText();
+                // check the response
+                String text = form.submit(subscribeBt).getText();
 
-            int start = text.indexOf("<p>New members subscribed:");
-            int end = text.indexOf("</p>", start);
+                int start = text.indexOf("<p>New members subscribed:");
+                int end = text.indexOf("</p>", start);
 
-            if (start == -1 || end == -1)
-                throw new ProcessingException("Error: wrong answer while subscribing.");
+                if (start == -1 || end == -1)
+                    throw new ProcessingException("Error: wrong answer while subscribing.");
 
-            String numberTxt = text.substring(start+26, end).trim();
+                String numberTxt = text.substring(start+26, end).trim();
 
-            return Integer.parseInt(numberTxt);
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+                return new Integer(numberTxt);
+            }
+        }.run();
+
+        return result.intValue();
     }
 
     /**
@@ -397,61 +390,52 @@ public final class JNMailingList {
         return form;
     }
 
-    private int doMassUnsubscribe(Collection addresses, SubscriptionMode mode) throws ProcessingException {
+    private int doMassUnsubscribe(final Collection addresses, final SubscriptionMode mode) throws ProcessingException {
         // we are going to change this
         subscribers[mode.index] = null;
 
-        try {
-            WebForm form = getListMemberForm(mode);
-            form.setParameter("unsubscribeList",Util.toList(addresses,' '));
+        Integer r = (Integer)new Scraper("Unable to mass-unsubscribe") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebForm form = getListMemberForm(mode);
+                form.setParameter("unsubscribeList",Util.toList(addresses,' '));
 
-            // we must change the method, from get to post, to be able to include
-            // a large number of e-mails... The unsubscribe has the same problem
-            // of the subscribe (see method doMassSubscribe2()).
-            // It is very unusual to have large unsubscibes and it is more dangerous
-            // too, so, I'll leave this for a future implementation. Right now,
-            // let's just handle small unsubscribes.
-            SubmitButton subscribeBt = form.getSubmitButton("Button", "Unsubscribe");
-            if (subscribeBt == null)
-                throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
+                // we must change the method, from get to post, to be able to include
+                // a large number of e-mails... The unsubscribe has the same problem
+                // of the subscribe (see method doMassSubscribe2()).
+                // It is very unusual to have large unsubscibes and it is more dangerous
+                // too, so, I'll leave this for a future implementation. Right now,
+                // let's just handle small unsubscribes.
+                SubmitButton subscribeBt = form.getSubmitButton("Button", "Unsubscribe");
+                if (subscribeBt == null)
+                    throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
-            String text = form.submit(subscribeBt).getText();
+                String text = form.submit(subscribeBt).getText();
 
-            int start = text.indexOf("<p>Members unsubscribed:");
-            int end = text.indexOf("</p>", start);
+                int start = text.indexOf("<p>Members unsubscribed:");
+                int end = text.indexOf("</p>", start);
 
-            if (start == -1 || end == -1)
-                throw new ProcessingException("Error: wrong answer while subscribing.");
+                if (start == -1 || end == -1)
+                    throw new ProcessingException("Error: wrong answer while subscribing.");
 
-            String numberTxt = text.substring(start+24, end).trim();
+                String numberTxt = text.substring(start+24, end).trim();
 
-            return Integer.parseInt(numberTxt);
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+                return new Integer(numberTxt);
+            }
+        }.run();
+
+        return r.intValue();
     }
 
     /**
      * Parses all the subscribers.
      */
-    private void parseSubscribers(SubscriptionMode mode) throws ProcessingException {
-        try {
-            WebForm form = getListMemberForm(mode);
-            subscribers[mode.index] = Collections.unmodifiableList(Arrays.asList(form.getOptions("unsubscribeList")));
-        } catch( SAXException e ) {
-            throw new ProcessingException(e);
-        } catch( IOException e ) {
-            throw new ProcessingException(e);
-        } catch( DOMException e ) {
-            throw new ProcessingException(e);
-        } catch(HttpException e) {
-            throw new ProcessingException(e);
-        }
+    private void parseSubscribers(final SubscriptionMode mode) throws ProcessingException {
+        new Scraper("Unable to parse subscriber info") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebForm form = getListMemberForm(mode);
+                subscribers[mode.index] = Collections.unmodifiableList(Arrays.asList(form.getOptions("unsubscribeList")));
+                return null;
+            }
+        }.run();
     }
 }

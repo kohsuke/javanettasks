@@ -1,5 +1,16 @@
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.HttpException;
+import com.meterware.httpunit.TableCell;
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebTable;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,14 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
-import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.WebConversation;
 
 /**
  * Java&#x2E;net project.
@@ -38,7 +41,7 @@ public final class JNProject {
     // lazily created
     //
     private JNMembership membership;
-
+    private JNForums forums;
     private JNMailingLists mailingLists;
 
     /**
@@ -85,6 +88,8 @@ public final class JNProject {
 
     private Set subProjects;
 
+    private String summmary;
+
     protected JNProject(JavaNet net, String name) {
         this.net = net;
         this.wc = net.wc;
@@ -118,6 +123,9 @@ public final class JNProject {
             else
                 isCommunity=Boolean.FALSE;
 
+            // parse summary
+            summmary = dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[TH/text()='Summary']/TD").getText();
+
             // parse owners
             Set owners = new HashSet();
             List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
@@ -144,11 +152,26 @@ public final class JNProject {
 
     /**
      * Gets the name of this project.
+     *
+     * @return
+     *      always non-null.
      */
     public String getName() {
         return projectName;
     }
-    
+
+    /**
+     * Gets the one-line summary of this project.
+     * such as "This is the java.net community project. All are welcome."
+     *
+     * @return
+     *      always non-null.
+     */
+    public String getSummary() throws ProcessingException {
+        parseProjectInfo();
+        return summmary;
+    }
+
     /**
      * Gets the parent project.
      * 
@@ -254,7 +277,7 @@ public final class JNProject {
     /**
      * Accesses the membership section of the project.
      *
-     * @return 
+     * @return
      *      always non-null.
      */
     public JNMailingLists getMailingLists() {
@@ -296,6 +319,65 @@ public final class JNProject {
         if(newsItems==null)
             newsItems = new JNNewsItems(this);
         return newsItems;
+    }
+
+    /**
+     * Obtains the object that represents the discussion forums section.
+     */
+    public JNForums getForums() {
+        if(forums==null)
+            forums = new JNForums(this);
+        return forums;
+    }
+
+    /**
+     * Approves the project.
+     */
+    public void approve() throws ProcessingException {
+        new Scraper("failed to approve project "+projectName) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = wc.getResponse(getURL()+"/servlets/ProjectApproval");
+
+                WebTable table = response.getTableStartingWith("Project");
+
+                int rows = table.getRowCount();
+
+                boolean found = false;
+
+                String approveElementName = null;
+
+                for (int r = 1; r < rows && !found; r++ ) {
+                    TableCell c1 = table.getTableCell(r, 0);
+
+                    if (c1.getLinks().length > 0) {
+                        String link = c1.getLinks()[0].getURLString();
+
+                        if (link.equals(getURL())) {
+                            TableCell c2 = table.getTableCell(r, 3);
+                            String[] names = c2.getElementNames();
+                            if (names.length > 0) {
+                                approveElementName = names[0];
+                                found = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!found)
+                    throw new ProcessingException("Unable to find project "+projectName+" in the approval page");
+
+                // we already have the info we need to approve the project, now, do it
+
+                WebForm form = response.getFormWithName("ProjectApprovalForm");
+
+                form.setParameter(approveElementName, "Approve");
+
+                response = form.submit();
+
+                // TODO: need to treat errors here, if something goes wrong.
+                return null;
+            }
+        }.run();
     }
 
     public int hashCode() {

@@ -58,7 +58,7 @@ class Util {
             return links[i];
         }
         
-        throw new ProcessingException("no link found for '"+text+"'");
+        throw new ProcessingException("no link found for '"+text+'\'');
     }
     
     /**
@@ -79,5 +79,20 @@ class Util {
             buf.append(address);
         }
         return buf.toString();
+    }
+
+    /**
+     * Gets the form with a specified action, or throw an error
+     */
+    public static WebForm getFormWithAction(WebResponse response, String actionName) throws ProcessingException, SAXException {
+        WebForm[] forms = response.getForms();
+        for( int i=0; i<forms.length; i++ ) {
+            WebForm form = forms[i];
+
+            if(form.getAction().equals(actionName))
+                return form;
+        }
+
+        throw new ProcessingException("Unable to find a form with action="+actionName);
     }
 }
