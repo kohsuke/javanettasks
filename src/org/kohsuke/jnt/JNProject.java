@@ -94,16 +94,17 @@ public final class JNProject {
         
         try {
             Document dom = Util.getDom4j(wc.getResponse(getURL()+"/"));
-            List as = dom.selectNodes("//DIV[@id='breadcrumbs']/TABLE[1]/TR[1]/TD[1]/A");
+            List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
             if(as.size()==0)
                 throw new ProcessingException("failed to parse "+getURL()+"/");
             
-            if(as.size()>2)
+            if(as.size()>2) {
                 topLevelName = ((Element)as.get(1)).getTextTrim();
-            else
+                parentProject = ((Element)as.get(as.size()-2)).getTextTrim();
+            } else {
                 topLevelName = projectName;
-            
-                parentProject = ((Element)as.get(as.size()-1)).getTextTrim();
+                parentProject = null;
+            }
             
             if( dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
                 isCommunity=Boolean.TRUE;
