@@ -13,7 +13,7 @@ import org.dom4j.Element;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
-import com.meterware.httpunit.HttpInternalErrorException;
+import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.WebConversation;
 
 /**
@@ -125,7 +125,7 @@ public final class JNProject {
             throw new ProcessingException(e);
         } catch( DOMException e ) {
             throw new ProcessingException(e);
-        } catch(HttpInternalErrorException e) {
+        } catch(HttpException e) {
             throw new ProcessingException(e);
         }
     }
