@@ -110,7 +110,7 @@ public final class JNProject implements Comparable {
         if(topLevelName!=null)
             return; // already parsed.
 
-        new Scraper("unable to parse the project page") {
+        new Scraper("unable to parse the project page of "+projectName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 Document dom = Util.getDom4j(wc.getResponse(_getURL()+'/'));
 
