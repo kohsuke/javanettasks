@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.WebConversation;
@@ -119,6 +120,8 @@ public final class JNProject {
         } catch( SAXException e ) {
             throw new ProcessingException(e);
         } catch( IOException e ) {
+            throw new ProcessingException(e);
+        } catch( DOMException e ) {
             throw new ProcessingException(e);
         }
     }
