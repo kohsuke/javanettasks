@@ -151,10 +151,14 @@ public final class JNProject implements Comparable {
                 // parse owner's message.
                 // this isn't actually too reliable, because NekoHTML changes
                 // tag names to upper cases for one thing.
-                Node node = dom.selectSingleNode("//DIV[@id='ownermessage']/P");
+                Node node = dom.selectSingleNode("//DIV[@id='ownermessage']");
                 if(node!=null) {
-                    ownerMessage = node.asXML();
-                    // trim off the <P> and </P>.
+                    Element e = (Element)node;
+                    ownerMessage = "";
+                    List children = e.elements();
+                    // skip the first H3 which is used for a caption
+                    for( int i=1; i<children.size(); i++ )
+                        ownerMessage += ((Element)children.get(i)).asXML();
                     ownerMessage = ownerMessage.substring(3,ownerMessage.length()-4);
                 }
 
