@@ -82,11 +82,11 @@
       <version>2.2.1</version>
     </dependency>
 
-    <dependency>
+    <!--dependency>
       <id>rhino</id>
       <version>1.5R4-RC3</version>
       <jar>js-1.5R4-RC3.jar</jar>
-    </dependency>
+    </dependencyi-->
 
     <dependency>
       <id>jtidy</id>
