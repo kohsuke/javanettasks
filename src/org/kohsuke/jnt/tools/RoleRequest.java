@@ -69,10 +69,13 @@ public class RoleRequest {
         Matcher m = regexp.matcher(interest);
         if(!m.matches())
             throw new ParseException("unable to parse the meat of the message against the template",-1);
-            
+        
+        // the notification e-mail from java.net
+        // main contains HTML escapes. So normalize them here
+        
         this.projectName = m.group(3);
         this.userName = m.group(1);
-        this.roleName = m.group(2);
+        this.roleName = m.group(2).replaceAll("&nbsp;"," ").replaceAll("&gt;",">");
     }
     
     /** Grants this request. */
