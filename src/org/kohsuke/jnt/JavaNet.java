@@ -86,7 +86,14 @@ public class JavaNet {
                 Integer.parseInt(accountInfo.getProperty("proxyPort")) );
         }
         
-        session.login(accountInfo.getProperty("userName"),accountInfo.getProperty("password"));
+        String userName = accountInfo.getProperty("userName");
+        if(userName==null)
+            throw new ProcessingException("userName property is missing");
+        String password = accountInfo.getProperty("password");
+        if(password==null)
+            throw new ProcessingException("password property is missing");
+        
+        session.login(userName,password);
         
         return session;
     }
