@@ -18,7 +18,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.cookies.CookieProperties;
 
 /**
- * Root of java&#2E;net.
+ * Root of java&#x2E;net.
  * 
  * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */

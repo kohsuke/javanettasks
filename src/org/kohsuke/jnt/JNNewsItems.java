@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 79 2003-12-18 17:16:53Z kohsuke $
+ * $Id: JNNewsItems.java 172 2004-11-30 00:48:18Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -16,12 +16,12 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * java&#x2#;net project news item section.
+ * java&#x2E;net project news item section.
  * 
  * TODO: add support for advanced news item options
  * 
  * @author Ryan Shoemaker
- * @version $Revision: 79 $
+ * @version $Revision: 172 $
  */
 public final class JNNewsItems {
 

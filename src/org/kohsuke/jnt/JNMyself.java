@@ -11,7 +11,7 @@ import org.dom4j.Element;
 import org.xml.sax.SAXException;
 
 /**
- * The current logged-in user in java&#2E;net.
+ * The current logged-in user in java&#x2E;net.
  * 
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)

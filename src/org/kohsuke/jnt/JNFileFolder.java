@@ -13,7 +13,7 @@ import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
 /**
- * folder in the java&#x2#;net file sharing section.
+ * folder in the java&#x2E;net file sharing section.
  * 
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)

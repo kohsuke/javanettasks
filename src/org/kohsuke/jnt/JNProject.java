@@ -17,7 +17,7 @@ import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.WebConversation;
 
 /**
- * Java&#2E;net project.
+ * Java&#x2E;net project.
  * 
  * <p>
  * Comparisons are based on their project names, so one can compare
