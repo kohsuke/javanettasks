@@ -55,9 +55,12 @@
       <name>Kohsuke Kawaguchi</name>
       <id>kohsuke</id>
       <email>kk@kohsuke.org</email>
-      <organization>Sun Microsystems</organization>
     </developer>
-    
+    <developer>
+      <name>Ryan Shoemaker</name>
+      <id>ryan_shoemaker</id>
+      <email>ryan_shoemaker@java.net</email>
+    </developer>
   </developers>
   
   <dependencies>
