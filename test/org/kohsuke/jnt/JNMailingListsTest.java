@@ -2,6 +2,9 @@ package org.kohsuke.jnt;
 
 import junit.textui.TestRunner;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * @author Kohsuke Kawaguchi
  */
@@ -19,5 +22,19 @@ public class JNMailingListsTest extends TestCaseBase {
         JNMailingList list1 = (JNMailingList) lists.getLists().get(0);
         assertEquals("dev",list1.getName());
         assertSame(list1.getProject(),project);
+    }
+
+    /**
+     * Test to create a new list and then delete.
+     */
+    public void test2() throws ProcessingException {
+        JNProject project = con.getProject("javanettasks-test");
+        JNMailingLists lists = project.getMailingLists();
+        JNMailingList l = lists.create("unittest","test mailing list","kohsuke@dev.java.net","prefix",true,true,ListType.MODERATED,
+                    Collections.singletonList("kk@kohsuke.org"),
+                    Collections.singletonList("kohsuke@dev.java.net"));
+        assertNotNull(l);
+        assertEquals("unittest",l.getName());
+        assertTrue(lists.getLists().contains(l));
     }
 }

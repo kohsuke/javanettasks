@@ -183,6 +183,31 @@ public final class JNMailingList {
         return doMassUnsubscribe(addresses,mode);
     }
 
+    /**
+     * Deletes this mailing list.
+     *
+     * <p>
+     * This is a priviledged operation.
+     */
+    public void delete() throws ProcessingException {
+        try {
+            WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/MailingListDelete?list="+name);
+            WebForm form = response.getFormWithName("MailingListDeleteForm");
+            if(form==null)
+                throw new ProcessingException("form not found");
+            form.submit();
+        } catch( SAXException e ) {
+            throw new ProcessingException(e);
+        } catch( IOException e ) {
+            throw new ProcessingException(e);
+        } catch( DOMException e ) {
+            throw new ProcessingException(e);
+        } catch(HttpException e) {
+            throw new ProcessingException(e);
+        }
+        project.getMailingLists().reset();
+    }
+
 
     private void parseListInfo() throws ProcessingException {
         try {

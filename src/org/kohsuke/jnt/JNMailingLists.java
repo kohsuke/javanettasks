@@ -162,4 +162,11 @@ public final class JNMailingLists {
             throw new ProcessingException(e);
         }
     }
+
+    /**
+     * Resets the current list of {@link JNMailingList}.
+     */
+    /*package*/ void reset() {
+        lists = null;
+    }
 }
