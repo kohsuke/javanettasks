@@ -421,6 +421,9 @@ public final class JNProject implements Comparable {
 
     /**
      * Obtains the top folder in the file sharing section.
+     *
+     * @return
+     *      if the folder is not found, return null.
      */
     public JNFileFolder getFolder( String folderPathName ) throws ProcessingException {
         return getRootFolder().getSubFolder(folderPathName);
