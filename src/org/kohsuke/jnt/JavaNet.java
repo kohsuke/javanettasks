@@ -108,7 +108,7 @@ public class JavaNet {
         if(accountInfo.containsKey("proxyServer")) {
             String host = accountInfo.getProperty("proxyServer");
             String port = accountInfo.getProperty("proxyPort");
-            System.out.println("Using the proxy server "+host+":"+port);
+//            System.out.println("Using the proxy server "+host+":"+port);
             session.setProxyServer( host, Integer.parseInt(port) );
         }
         
