@@ -65,6 +65,9 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
         log("moving to the target folder",Project.MSG_VERBOSE);
         JNFileFolder folder = cmd.getFolder(getTargetFolder());
 
+        if(folder==null)
+            throw new BuildException("folder "+getTargetFolder()+" was not found");
+
         JNFile file = folder.getFiles().get(getTargetFileName());
 
         if( file!=null ) {
