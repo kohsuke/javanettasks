@@ -26,7 +26,11 @@ public class JavaNet {
     protected final WebConversation wc = new WebConversation();
     
     private final Map projects = new HashMap();
+    private final Map users = new HashMap();
 
+    /**
+     * A special {@link JNUser} object that represents the current user.
+     */
     private JNMyself myself;
     
     private JavaNet() {
@@ -67,6 +71,11 @@ public class JavaNet {
             // check if the login was successful
             if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)
                 throw new ProcessingException("authentication failed. invalid username/password");
+            
+            // create a special myself object.
+            myself = new JNMyself(this,userName);
+            users.put(userName,myself);
+            
         } catch( IOException e ) {
             throw new ProcessingException("unable to log in for user "+userName+" : "+e.getMessage(),e);
         } catch( SAXException e ) {
@@ -144,11 +153,25 @@ public class JavaNet {
     }
     
     /**
-     * Obtains a {@link JNMyself} object.
+     * Obtains a special {@link JNUser} object that represents
+     * the currently logged-in user.
+     * 
+     * @return
+     *      always return non-null object.
      */
     public JNMyself getMyself() throws ProcessingException {
-        if( myself==null )
-            myself = new JNMyself(this);
         return myself;
+    }
+
+    /**
+     * Obtains a {@link JNUser} object from an user name.
+     */
+    public JNUser getUser(String userName) throws ProcessingException {
+        JNUser u = (JNUser)users.get(userName);
+        if(u==null) {
+            u = new JNUser(this,userName);
+            users.put(userName,u);
+        }
+        return u;
     }
 }

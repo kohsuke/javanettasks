@@ -8,47 +8,32 @@ import java.util.Set;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.io.DOMReader;
 import org.xml.sax.SAXException;
 
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-
 /**
- * information about the current user in java&#2E;net.
+ * The current logged-in user in java&#2E;net.
  * 
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class JNMyself {
-    protected final WebConversation wc;
-
-    private final JavaNet net;
-    
+public class JNMyself extends JNUser {
     /**
      * Set of {@link JNProject} to which the current user belongs.
      * Never null.
-     * 
-     * This set is read-only.
      */
-    public final Set myProjects;
+    private Set myProjects;
     
-    /**
-     * Current user id logged in.
-     */
-    public final String userName;
+    protected JNMyself(JavaNet net,String userName) throws ProcessingException {
+        super(net,userName);
+    }
     
-    protected JNMyself(JavaNet net) throws ProcessingException {
-        this.net = net;
-        this.wc = net.wc;
+    private void parseStartPage() throws ProcessingException {
+        if( myProjects!=null )
+            return;     // already parsed
         
         try {
             // obtain current user information
-            WebResponse wr = wc.getResponse("https://www.dev.java.net/servlets/StartPage");
-            Document dom = new DOMReader().read(wr.getDOM());
-            
-            // parse the user name
-            userName = dom.selectSingleNode("//STRONG[@class='username']").getText();
+            Document dom = Util.getDom4j(wc.getResponse("https://www.dev.java.net/servlets/StartPage"));
             
             // parse my projects
             Set myProjects = new HashSet(); 
@@ -63,5 +48,16 @@ public class JNMyself {
         } catch( SAXException e ) {
             throw new ProcessingException("unable to parse 'My start page'",e);
         }
+    }
+    
+    /**
+     * Set of {@link JNProject} to which the current user belongs.
+     * 
+     * @return
+     *      non-null (but possibly empty) set. The set is read-only.
+     */
+    public final Set getMyProjects() throws ProcessingException {
+        parseStartPage();
+        return myProjects;
     }
 }

@@ -1,5 +1,7 @@
 package org.kohsuke.jnt;
 
+import org.dom4j.Document;
+import org.dom4j.io.DOMReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -7,6 +9,7 @@ import org.xml.sax.SAXException;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.WebResponse;
 
 /**
  * Utility code.
@@ -53,5 +56,12 @@ class Util {
         }
         
         throw new ProcessingException("no link found for '"+text+"'");
+    }
+    
+    /**
+     * Obtains the HTML of the response as a dom4j document.
+     */
+    static Document getDom4j( WebResponse wr ) throws SAXException {
+        return new DOMReader().read(wr.getDOM());
     }
 }

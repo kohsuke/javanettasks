@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 
 import org.kohsuke.jnt.JNProject;
+import org.kohsuke.jnt.JNUser;
 import org.kohsuke.jnt.JavaNet;
 
 /**
@@ -78,10 +79,21 @@ public class Main {
             }
             
             if(args[0].equals("listMyProjects")) {
-                Iterator itr = connection.getMyself().myProjects.iterator();
-                System.err.println("user name "+connection.getMyself().userName);
+                Iterator itr = connection.getMyself().getMyProjects().iterator();
+                System.err.println("user name "+connection.getMyself().getName());
                 while(itr.hasNext()) {
                     System.out.println(((JNProject)itr.next()).getName());
+                }
+                return;
+            }
+            
+            if(args[0].equals("projectInfo")) {
+                JNProject proj = connection.getProject(args[1]);
+                System.out.println( proj.getParent().getName() );
+                System.out.println( proj.getOwnerCommunity().getName() );
+                for (Iterator itr = proj.getOwners().iterator(); itr.hasNext(); ) {
+                    JNUser u = (JNUser) itr.next();
+                    System.out.println(u.getName());
                 }
                 return;
             }
