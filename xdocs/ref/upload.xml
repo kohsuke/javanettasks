@@ -45,14 +45,14 @@
 			<tr>
 				<td>toFile</td>
 				<td>
-					The full path name of the file that receives data. It uses a Unix-like path name (e.g., "/folder1/subFolder/target.zip"). The task does not create directories and therefore they need to be there before the task runs. 
+					The full path name of the file that receives data. It uses a Unix-like path name (e.g., "/folder1/subFolder/target.zip"). For example, if you want to post a file in <a href="https://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">this folder</a>, you say <tt>"/releases/something.zip"</tt>. The task does not create directories and therefore they need to be there before the task runs. 
 				</td>
 				<td>Yes</td>
 			</tr>
 			<tr>
 				<td>fromFile</td>
 				<td>
-					The local file to be sent to the server. (e.g., "dist/javanettasks.zip")
+					The local file to be sent to the server, like "dist/javanettasks.zip". If relative, the path is resolved against the base directory of the build script, just like all the other Ant tasks do.
 				</td>
 				<td>Yes</td>
 			</tr>
@@ -85,7 +85,7 @@
 		none.
 	</p>
 	<div align="right" style="font-size: smaller">
-	$Id: upload.xml 59 2003-12-17 06:20:07Z kohsuke $
+	$Id: upload.xml 127 2004-08-10 19:03:29Z kohsuke $
 	</div>
 </section>
 </body></document>
