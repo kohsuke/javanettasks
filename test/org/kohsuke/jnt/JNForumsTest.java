@@ -2,8 +2,6 @@ package org.kohsuke.jnt;
 
 import junit.textui.TestRunner;
 
-import java.util.Collections;
-
 /**
  * @author Kohsuke Kawaguchi
  */
