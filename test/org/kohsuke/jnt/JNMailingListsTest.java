@@ -2,7 +2,6 @@ package org.kohsuke.jnt;
 
 import junit.textui.TestRunner;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -17,7 +16,7 @@ public class JNMailingListsTest extends TestCaseBase {
         JNProject project = con.getProject("jaxb");
         JNMailingLists lists = project.getMailingLists();
 
-        assertEquals(5,lists.getLists().size());
+        assertEquals(4,lists.getLists().size());
 
         JNMailingList list1 = (JNMailingList) lists.getLists().get(0);
         assertEquals("dev",list1.getName());
