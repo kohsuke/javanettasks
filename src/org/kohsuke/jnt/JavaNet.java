@@ -6,6 +6,8 @@ package org.kohsuke.jnt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.xml.sax.SAXException;
@@ -23,6 +25,9 @@ import com.meterware.httpunit.cookies.CookieProperties;
 public class JavaNet {
     protected final WebConversation wc = new WebConversation();
     
+    private final Map projects = new HashMap();
+
+    private JNMyself myself;
     
     private JavaNet() {
         // java.net security certificate cause a problem. So avoid it by disabling certificate validation.
@@ -127,15 +132,23 @@ public class JavaNet {
     }
 	
     /**
-     * Obtains a {@link JNProject object} from its name.
+     * Obtains a {@link JNProject} object from its name.
      */
     public JNProject getProject(String projectName) throws ProcessingException {
-        try {
-            return new JNProject(this,projectName);
-        } catch (IOException e) {
-            throw new ProcessingException("unable to find project " +projectName, e);
-        } catch (SAXException e) {
-            throw new ProcessingException("unable to find project " +projectName, e);
+        JNProject p = (JNProject)projects.get(projectName);
+        if(p==null){
+            p = new JNProject(this,projectName);
+            projects.put(projectName,p);
         }
+        return p; 
+    }
+    
+    /**
+     * Obtains a {@link JNMyself} object.
+     */
+    public JNMyself getMyself() throws ProcessingException {
+        if( myself==null )
+            myself = new JNMyself(this);
+        return myself;
     }
 }

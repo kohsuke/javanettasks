@@ -8,7 +8,9 @@ package org.kohsuke.jnt.tools;
 
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 
+import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 
 /**
@@ -71,6 +73,15 @@ public class Main {
                     nbe.project.getMembership().grantRole(nbe.reportedBy,args[2]);
                 } else {
                     System.out.println("project name didn't match");
+                }
+                return;
+            }
+            
+            if(args[0].equals("listMyProjects")) {
+                Iterator itr = connection.getMyself().myProjects.iterator();
+                System.err.println("user name "+connection.getMyself().userName);
+                while(itr.hasNext()) {
+                    System.out.println(((JNProject)itr.next()).getName());
                 }
                 return;
             }

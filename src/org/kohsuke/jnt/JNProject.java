@@ -1,10 +1,7 @@
 package org.kohsuke.jnt;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.WebConversation;
 
@@ -36,12 +33,9 @@ public final class JNProject {
     private JNNewsItems newsItems = new JNNewsItems(this);
     
     
-    protected JNProject(JavaNet net, String name) throws IOException, SAXException {
+    protected JNProject(JavaNet net, String name) {
         this.wc = net.wc;
         this.projectName = name;
-        
-        // check if the project really exists
-        wc.getResponse(getURL()+"/");
     }
 
     /**
