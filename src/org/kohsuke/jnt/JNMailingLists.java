@@ -49,6 +49,26 @@ public final class JNMailingLists {
         return Collections.unmodifiableList(lists);
     }
 
+    /**
+     * Returns the mailing list of the specified name.
+     * <p>
+     * This method returns the {@link JNMailingList} from {@link #getLists()}
+     * such that <tt>{@link JNMailingList#getName()}.equals(name)</tt>.
+     *
+     * @return
+     *      null if no such forum is found
+     */
+    public JNMailingList getForum(String name) throws ProcessingException {
+        if(lists==null)
+            parse();
+        for( int i=0; i<lists.size(); i++ ) {
+            JNMailingList f = (JNMailingList) lists.get(i);
+            if(f.getName().equals(name))
+                return f;
+        }
+        return null;
+    }
+
     private void parse() throws ProcessingException {
         lists = new ArrayList();
 

@@ -42,6 +42,26 @@ public final class JNForums {
     }
 
     /**
+     * Returns the forum of the specified name.
+     * <p>
+     * This method returns the {@link JNForum} from {@link #getForums()}
+     * such that <tt>{@link JNForum#getName()}.equals(name)</tt>.
+     *
+     * @return
+     *      null if no such forum is found
+     */
+    public JNForum getForum(String name) throws ProcessingException {
+        if(forums==null)
+            parse();
+        for( int i=0; i<forums.size(); i++ ) {
+            JNForum f = (JNForum) forums.get(i);
+            if(f.getName().equals(name))
+                return f;
+        }
+        return null;
+    }
+
+    /**
      * Creats a new forum.
      *
      * <p>
