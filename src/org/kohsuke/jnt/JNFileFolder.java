@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Collections;
 import java.text.ParseException;
 
 import org.xml.sax.SAXException;
@@ -33,7 +34,7 @@ import com.meterware.httpunit.WebResponse;
 public final class JNFileFolder {
     
     /*package*/ final JNProject project;
-    private final WebConversation wc;
+    /*package*/ final WebConversation wc;
     private final String url;
 
     private final int id;
@@ -58,7 +59,7 @@ public final class JNFileFolder {
         this.project = project;
         this.parent = parent;
         this.id = id;
-        this.url = "https://jaxb.dev.java.net/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
+        this.url = project.getURL()+"/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
     }
     
     /**
@@ -66,28 +67,24 @@ public final class JNFileFolder {
      * 
      * @param folderName
      *      '/'-separated folder name. such as "abc", "abc/def", or "/abc/def".
+     *
+     * @return
+     *      if the folder is not found, return null.
      */
-    public JNFileFolder getSubFolder( final String folderName ) throws ProcessingException {
-        return (JNFileFolder)new Scraper("failed to cd into "+folderName) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                // chdir to root
-                if( folderName.startsWith("/"))
-                    wc.getResponse(project.getURL()+"/servlets/ProjectDocumentList");
-                else
-                    wc.getResponse(url);
+    public JNFileFolder getSubFolder( String folderName ) throws ProcessingException {
+        JNFileFolder f = this;
+        // chdir to root
+        if( folderName.startsWith("/"))
+            f = project.getRootFolder();
 
-                StringTokenizer tokens = new StringTokenizer(folderName,"/");
-                while( tokens.hasMoreTokens() ) {
-                    String dirName = tokens.nextToken();
-        //          System.out.println("cd "+dirName);
-                    // find the link target
-                    Util.findLink( wc,
-                        dirName,project.getURL()+"/servlets/ProjectDocumentList?folderID=").click();
-                }
+        StringTokenizer tokens = new StringTokenizer(folderName,"/");
+        while( tokens.hasMoreTokens() && f!=null ) {
+            String dirName = tokens.nextToken();
+//          System.out.println("cd "+dirName);
+            f = f.getSubFolders().get(dirName);
+        }
 
-                return project.getFolderFromURL(wc.getCurrentPage().getURL().toExternalForm());
-            }
-        }.run();
+        return f;
     }
 
     private void parse() throws ProcessingException {
@@ -116,11 +113,11 @@ public final class JNFileFolder {
                 }
 
                 // find the current folder
-                current = (Element)dom.selectSingleNode("//DIV[@id='projectdocumentlist']//TD[@class='filebrowse']/DIV/TABLE");
 
                 files = new TreeMap<String,JNFile>();
 
-                List trs = current.elements("TR");
+
+                List trs = dom.selectNodes("//DIV[@id='projectdocumentlist']//TD[@class='filebrowse']/DIV/TABLE/TR");
                 for( int i=1; i<trs.size(); i++ ) { // row 0 == header
                     Element tr = (Element)trs.get(i);
 
@@ -141,14 +138,77 @@ public final class JNFileFolder {
     }
 
     /**
+     * Gets the unique ID that distinguishes this folder.
+     * <p>
+     * The uniqueness is within a project.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Returns true if this is the root folder of a project.
+     */
+    public boolean isRoot() {
+        return parent==null;
+    }
+
+    /**
+     * Returns the subfolders of this folder.
+     *
+     * @return
+     *      can be empty but never be null. read-only.
+     */
+    public Map<String, JNFileFolder> getSubFolders() throws ProcessingException {
+        if(subFolders==null)  parse();
+        return Collections.unmodifiableMap(subFolders);
+    }
+
+    /**
+     * Returns the files in this folder.
+     *
+     * @return
+     *      can be empty but never be null. read-only.
+     */
+    public Map<String, JNFile> getFiles() throws ProcessingException {
+        if(files==null)  parse();
+        return Collections.unmodifiableMap(files);
+    }
+
+    /**
+     * Gets a file in this folder.
+     *
+     * <p>
+     * Convenience method for <code>getFiles().get(fileName)</code>.
+     */
+    public JNFile getFile(String fileName) throws ProcessingException {
+        return getFiles().get(fileName);
+    }
+
+    /**
+     * Uploads a file to the folder.
+     *
+     * @param fileStatus
+     *      can be null.
+     * @deprecated
+     *      use {@link #uploadFile(String, String, FileStatus, File)}
+     */
+    public void uploadFile( String fileName, String description, String fileStatus, File fileToUpload ) throws ProcessingException {
+        uploadFile(fileName,description,FileStatus.parse(fileStatus),fileToUpload);
+    }
+
+    /**
      * Uploads a file to the folder.
      * 
      * @param fileStatus
      *      can be null.
      */
-    public void uploadFile( final String fileName, final String description, final String fileStatus, final File fileToUpload ) throws ProcessingException {
+    public void uploadFile( final String fileName, final String description, final FileStatus fileStatus, final File fileToUpload ) throws ProcessingException {
         new Scraper("error uploading a file "+fileToUpload) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
+                if(!fileToUpload.exists() || !fileToUpload.isFile())
+                    throw new IOException(fileToUpload+" is not a file");
+
                 setCurrentPage();
 
                 WebResponse r = wc.getCurrentPage();
@@ -162,7 +222,7 @@ public final class JNFileFolder {
                 WebForm form = r.getFormWithName("ProjectDocumentAddForm");
                 form.setParameter("name",fileName);
                 if( fileStatus!=null )
-                    form.setParameter("status",fileStatus);
+                    form.setParameter("status",fileStatus.toString());
                 form.setParameter("description",description);
 
                 form.setParameter("type","file");
@@ -179,62 +239,26 @@ public final class JNFileFolder {
     }
     
     /**
-     * Gets a document id of the given file or null if such a file doesn't exist.
+     * Checks if the specified file exists in the folder.
+     *
+     * @deprecated
+     *      use <code>getFiles().containsKey(fileName)</code>
      */
-    private String getDocumentId( final String fileName ) throws ProcessingException {
-        return (String)new Scraper("Unable to fetch the document id for "+fileName) {
-            protected Object scrape() throws SAXException {
-                try {
-                    WebLink link = Util.findLink(wc,fileName,
-                        project.getURL()+"/servlets/ProjectDocumentView?documentID=");
-                    String url = link.getURLString();
-                    return url.substring(url.indexOf('=')+1,url.indexOf('&'));
-                } catch( ProcessingException e ) {
-                    try {
-                        WebLink link = Util.findLink(wc,fileName,"/files/documents/");
-                        String url = link.getURLString();
-                        int l = url.lastIndexOf('/');
-                        return url.substring(url.lastIndexOf('/',l-1)+1,l);
-                    } catch( ProcessingException ee ) {
-                        return null;
-                    }
-                }
-            }
-        }.run();
+    public boolean existsFile( String fileName ) throws ProcessingException {
+        return getFiles().containsKey(fileName);
     }
     
     /**
-     * Checks if the specified file exists in the folder. 
+     * Deletes a file from the folder.
+     *
+     * @deprecated
+     *      use <code>getFiles().get(fileName).delete()</code>
      */
-    public boolean existsFile( final String fileName ) throws ProcessingException {
-        String id = (String)new Scraper("error checking file "+fileName) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                setCurrentPage();
-                return getDocumentId(fileName);
-            }
-        }.run();
-
-        return id!=null;
-    }
-    
-    /**
-     * Delets a file from the folder.
-     */
-    public void deleteFile( final String fileName ) throws ProcessingException {
-        new Scraper("error deleting file "+fileName) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                setCurrentPage();
-
-                String documentId = getDocumentId(fileName);
-
-                WebResponse r = wc.getResponse(
-                    project.getURL()+"/servlets/ProjectDocumentDelete?documentID="+documentId+"&maxDepth=");
-
-                r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
-
-                return null;
-            }
-        }.run();
+    public void deleteFile( String fileName ) throws ProcessingException {
+        JNFile file = getFiles().get(fileName);
+        if(file==null)
+            throw new ProcessingException("no such file "+fileName);
+        file.delete();
     }
     
     /**

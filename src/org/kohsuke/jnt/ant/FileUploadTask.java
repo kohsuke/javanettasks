@@ -12,6 +12,8 @@ import org.apache.tools.ant.Project;
 import org.kohsuke.jnt.JNFileFolder;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.ProcessingException;
+import org.kohsuke.jnt.JNFile;
+import org.kohsuke.jnt.FileStatus;
 
 /**
  * Uploads a file to a java.net file sharing section. 
@@ -27,7 +29,7 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
     private String toFileName;
     
     /** Status of the file. */
-    private String fileStatus;
+    private FileStatus fileStatus;
     
     /** File description. */
     private String fileDescription;
@@ -43,7 +45,7 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
     }
     
     public void setFileStatus( String value ) {
-        this.fileStatus = value;
+        this.fileStatus = FileStatus.parse(value);
     }
     public void setFileDescription( String value ) {
         this.fileDescription = value;
@@ -66,11 +68,13 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
             
         log("moving to the target folder",Project.MSG_VERBOSE);
         JNFileFolder folder = cmd.getFolder(getTargetFolder());
-        
-        if( folder.existsFile(getTargetFileName()) ) {
+
+        JNFile file = folder.getFiles().get(getTargetFileName());
+
+        if( file!=null ) {
             if( overwrite ) {
                 log("deleting existing file '"+toFileName+"' first", Project.MSG_INFO);
-                folder.deleteFile(getTargetFileName());
+                file.delete();
             } else {
                 log("file '"+toFileName+"' already exists",Project.MSG_ERR);
                 throw new BuildException();

@@ -87,6 +87,7 @@ public final class JNProject implements Comparable {
     private Set<JNProject> subProjects;
 
     private String summmary;
+    private JNFileFolder rootFolder;
 
     protected JNProject(JavaNet net, String name) {
         this.net = net;
@@ -313,24 +314,21 @@ public final class JNProject implements Comparable {
     }
 
     /**
-     * Obtains a file folder object for the given URL.
-     */
-    protected JNFileFolder getFolderFromURL(String url) {
-        JNFileFolder r = (JNFileFolder)folders.get(url);
-        if(r==null) {
-            folders.put(url, r=new JNFileFolder(this,null,0) );
-        }
-        return r;
-    }
-    
-    /**
      * Obtains the top folder in the file sharing section.
      */
     public JNFileFolder getFolder( String folderPathName ) throws ProcessingException {
-        JNFileFolder top = getFolderFromURL(getURL()+"/servlets/ProjectDocumentList");
-        return top.getSubFolder(folderPathName);
+        return getRootFolder().getSubFolder(folderPathName);
     }
-    
+
+    /**
+     * Returns the top folder in the document &amp; files section.
+     */
+    public JNFileFolder getRootFolder() {
+        if(rootFolder==null)
+            rootFolder = new JNFileFolder(this,null,0);
+        return rootFolder;
+    }
+
     /**
      * Obtains the object that represents the news item section.
      */

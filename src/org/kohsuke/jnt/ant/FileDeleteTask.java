@@ -8,6 +8,7 @@ import org.apache.tools.ant.Project;
 import org.kohsuke.jnt.JNFileFolder;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.ProcessingException;
+import org.kohsuke.jnt.JNFile;
 
 /**
  * 
@@ -31,14 +32,16 @@ public class FileDeleteTask extends AbstractJavaNetTaskForProject {
         
         log("moving to the target folder",Project.MSG_VERBOSE);
                 JNFileFolder folder = cmd.getFolder(getTargetFolder());
-        
-        if( !folder.existsFile(getTargetFileName()) ) {
+
+        JNFile file = folder.getFiles().get(getTargetFileName());
+
+        if( file==null ) {
             log("file "+getTargetFileName()+" doesn't exist",Project.MSG_WARN);
             return;
         }
         
         log("deleting file",Project.MSG_VERBOSE);
-        folder.deleteFile(getTargetFileName());
+        file.delete();
         
         log("done",Project.MSG_VERBOSE);
     }

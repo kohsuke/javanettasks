@@ -1,13 +1,19 @@
 package org.kohsuke.jnt;
 
 import org.dom4j.Element;
+import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.io.IOException;
+
+import com.meterware.httpunit.WebResponse;
 
 /**
  * File in the documents &amp; files section.
@@ -24,6 +30,8 @@ public final class JNFile {
     private final Date lastModified;
     private final String description;
 
+    private final int id;
+
     /**
      * Parses the information from the TR element.
      */
@@ -31,7 +39,7 @@ public final class JNFile {
         this.folder = folder;
 
         Element anchor = (Element)tr.selectSingleNode("TD[1]//A");  // XPath is 1-origin
-        href = new URL(anchor.attributeValue("href"));
+        href = new URL(new URL(folder.project.getURL()),anchor.attributeValue("href"));
         name = anchor.getTextTrim();
 
         String statusText = ((Element) tr.elements("TD").get(1)).getTextTrim();
@@ -39,20 +47,29 @@ public final class JNFile {
         if(status==null)
             throw new ProcessingException("Unable to parse the status " + statusText);
 
-        String modifiedByCell = ((Element) tr.elements("TD").get(2)).getTextTrim();
 
-        // temp is a string in the format:
-        //    brunos on Sunday, December 21, 2003
-        //    <user> on <date------------------->
-        // we are not even treating errors here... no idea of what will happen if this changes...
+        Element td2 = (Element) tr.elements("TD").get(2);
 
-        int firstSpace = modifiedByCell.indexOf(' ');
+        modifiedBy = folder.project.net.getUser( td2.element("A").getTextTrim() );
 
-        modifiedBy = folder.project.net.getUser( modifiedByCell.substring(0, firstSpace) );
-
-        lastModified = LONG_FORMAT.parse(modifiedByCell.substring(firstSpace + 4));
+        lastModified = LONG_FORMAT.parse(td2.getTextTrim().substring(3));   // trim off the first "on "
 
         description = ((Element) tr.elements("TD").get(5)).getTextTrim();
+
+        Element infoLink = (Element)tr.selectSingleNode("TD[7]//A");  // XPath is 1-origin
+        String href = infoLink.attributeValue("href");
+
+        final String param = "?documentID=";
+        int idx = href.indexOf(param);
+        if(idx==-1)
+            throw new ProcessingException("Unable to parse the document ID");
+
+        href = href.substring(idx+param.length());
+        idx = href.indexOf('&');
+        if(idx>0)
+            href = href.substring(0,idx);
+
+        id = Integer.parseInt(href);
     }
 
     /**
@@ -125,6 +142,35 @@ public final class JNFile {
         return description;
     }
 
+    /**
+     * Gets the unique ID that distinguishes this document.
+     * <p>
+     * It's not clear to me whether the scope of the uniqueness is within
+     * a project or the whole java.net. I suspect the latter.
+     */
+    public int getId() {
+        return id;
+    }
 
-    private static final DateFormat LONG_FORMAT = DateFormat.getDateInstance(DateFormat.FULL,Locale.ENGLISH);
+    /**
+     * Removes this file.
+     */
+    public void delete() throws ProcessingException {
+        new Scraper("error deleting file "+name) {
+            protected Object scrape() throws IOException, SAXException {
+                WebResponse r = folder.wc.getResponse(
+                    folder.project.getURL()+"/servlets/ProjectDocumentDelete?documentID="+id+"&maxDepth=");
+
+                r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
+
+                return null;
+            }
+        }.run();
+    }
+
+    private static final DateFormat LONG_FORMAT = new SimpleDateFormat("EEEE, MMMM dd, yyyy 'at' hh:mm:ss aa",Locale.ENGLISH);
+
+    static {
+        LONG_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 }

@@ -15,7 +15,7 @@ public enum FileStatus {
     ARCHIVAL("Archival"),
     OBSOLETE("Obsolete");
 
-    private static final Map index = new HashMap();
+    private static final Map<String,FileStatus> index = new HashMap<String,FileStatus>();
 
     private final String name;
 
@@ -24,7 +24,7 @@ public enum FileStatus {
     }
 
     /**
-     * Returns the human-readable name.
+     * {@inheritDoc}
      */
     public String toString() {
         return name;
@@ -32,9 +32,14 @@ public enum FileStatus {
 
     /**
      * Gets the {@link FileStatus} objcet from its name (such as "Draft").
+     *
+     * @throws IllegalArgumentException
+     *      if the name is unrecognized.
      */
     public static FileStatus parse(String name) {
-        return (FileStatus)index.get(name);
+        FileStatus r = index.get(name);
+        if(r==null) throw new IllegalArgumentException("Unrecognized file status: "+name);
+        return r;
     }
 
     static {
