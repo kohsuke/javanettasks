@@ -10,6 +10,7 @@
   </p>
   <p>
     For example, if you save the following text as a filed called "myScript.groovy"
+  </p>
 <source>
 #!/usr/bin/env groovy -cp lib/javanettasks.jar
 import org.kohsuke.jnt.*;
