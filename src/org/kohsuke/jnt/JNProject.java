@@ -38,7 +38,9 @@ public final class JNProject {
     // lazily created
     //
     private JNMembership membership;
-    
+
+    private JNMailingLists mailingLists;
+
     /**
      * URL (as String) to {@link JNFileFolder} map.
      */
@@ -239,6 +241,9 @@ public final class JNProject {
 
     /**
      * Accesses the membership section of the project.
+     *
+     * @return
+     *      always non-null.
      */
     public JNMembership getMembership() {
         if(membership==null)
@@ -246,7 +251,18 @@ public final class JNProject {
         return membership;
     }
 
-    
+    /**
+     * Accesses the membership section of the project.
+     *
+     * @return 
+     *      always non-null.
+     */
+    public JNMailingLists getMailingLists() {
+        if(mailingLists==null)
+            mailingLists = new JNMailingLists(this);
+        return mailingLists;
+    }
+
     /**
      * @return "http://PROJECTNAME.dev.java.net"
      */
