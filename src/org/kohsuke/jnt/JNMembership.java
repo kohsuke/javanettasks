@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.HTMLSegment;
+import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.TableCell;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
@@ -43,7 +44,10 @@ public class JNMembership {
             form.setParameter("massAdd",userName);
             form.setParameter("roles", Util.getOptionValueFor(form,"roles",roleName) );
             
-            r = form.submit(form.getSubmitButton("Grant roles"));
+            SubmitButton submitButton = form.getSubmitButton("Button");
+            if(submitButton==null)
+                throw new IllegalStateException("no grant role button");
+            r = form.submit(submitButton);
             
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful
