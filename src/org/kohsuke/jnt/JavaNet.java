@@ -89,8 +89,7 @@ public class JavaNet {
      * obtains the connection info from ~/.java.net and returns the connected {@link JavaNet} object.
      */
     public static JavaNet connect() throws ProcessingException {
-        File homeDir = new File(System.getProperty("user.home"));
-        File accountFile = new File(homeDir,".java.net");
+        File accountFile = getPropertyFile();
 
         Properties accountInfo = new Properties();
         
@@ -120,7 +119,21 @@ public class JavaNet {
         
         return session;
     }
-    
+
+    /**
+     * Gets the ".java.net" config property file.
+     */
+    private static File getPropertyFile() {
+        // look for the system property that points to the file first
+        String p = System.getProperty(".java.net");
+        if(p!=null)
+            return new File(p);
+
+        // otherwise default to ~/.java.net
+        File homeDir = new File(System.getProperty("user.home"));
+        return new File(homeDir,".java.net");
+    }
+
     /**
      * Connects to java&#x2E;net directly by using the given account info.
      */
