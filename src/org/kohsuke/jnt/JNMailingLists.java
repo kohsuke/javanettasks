@@ -56,7 +56,7 @@ public final class JNMailingLists {
      * such that <tt>{@link JNMailingList#getName()}.equals(name)</tt>.
      *
      * @return
-     *      null if no such forum is found
+     *      null if no such list is found
      */
     public JNMailingList get(String name) throws ProcessingException {
         if(lists==null)
@@ -73,11 +73,11 @@ public final class JNMailingLists {
         lists = new ArrayList<JNMailingList>();
 
         try {
-            WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectMailingListList");
+            WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectMailingListList");
 
             for( WebLink link : response.getLinks() ) {
                 String linkTxt = link.getURLString();
-                if (linkTxt.startsWith(project.getURL() + "/servlets/SummarizeList?listName=")) {
+                if (linkTxt.startsWith(project._getURL() + "/servlets/SummarizeList?listName=")) {
                     String listName = linkTxt.substring(linkTxt.lastIndexOf('=')+1, linkTxt.length());
                     lists.add(new JNMailingList(project,listName));
                 }
@@ -134,7 +134,7 @@ public final class JNMailingLists {
                                 Collection moderators ) throws ProcessingException {
 
         try {
-            WebResponse response = wc.getResponse(project.getURL()+"/servlets/MailingListAdd");
+            WebResponse response = wc.getResponse(project._getURL()+"/servlets/MailingListAdd");
 
             WebForm form = response.getFormWithName("MailingListAddForm");
 

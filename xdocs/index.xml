@@ -7,7 +7,7 @@
 	</p>
 	<ol>
 		<li>
-			a Java library that provides programatic acess to the web interface of java.net
+			a Java library that provides programatic access to the web interface of java.net
 		</li><li>
 			a set of <a href="http://ant.apache.org/">Ant</a> tasks on top of it.
 		</li><li>
@@ -15,7 +15,7 @@
 		</li>
 	</ol>
 	<p>
-		For example, with Ant tasks, one can post a new file to the file sharing section as a part of your nightly automatic build process, or adding e-mail addresses to a particular mailing list, and etc.
+		For example, with Ant tasks, one can post a new file to the file sharing section as a part of your nightly automated build process, or adding e-mail addresses to a particular mailing list, and etc.
 	</p><p>
 		Another example is to combine one of the tools to <a href="www.procmail.org">procmail</a> so that you can automatically approve/decline new role requests based on pre-defined rules.
 	</p>

@@ -62,7 +62,7 @@ public final class JNFileFolder {
         this.parent = parent;
         this.name = name;
         this.id = id;
-        this.url = project.getURL()+"/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
+        this.url = project._getURL()+"/servlets/ProjectDocumentList?folderID="+id+"&expandFolder="+id;
     }
     
     /**
@@ -218,9 +218,9 @@ public final class JNFileFolder {
      * @param fileStatus
      *      can be null.
      */
-    public void uploadFile( final String fileName, final String description, final FileStatus fileStatus, final File fileToUpload ) throws ProcessingException {
-        new Scraper("error uploading a file "+fileToUpload) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
+    public JNFile uploadFile( final String fileName, final String description, final FileStatus fileStatus, final File fileToUpload ) throws ProcessingException {
+        return new Scraper<JNFile>("error uploading a file "+fileToUpload) {
+            protected JNFile scrape() throws IOException, SAXException, ProcessingException {
                 if(!fileToUpload.exists() || !fileToUpload.isFile())
                     throw new IOException(fileToUpload+" is not a file");
 
@@ -248,7 +248,13 @@ public final class JNFileFolder {
                 if( r.getImageWithAltText("Alert notification")!=null )
                     // TODO: obtain the error message
                     throw new ProcessingException("error uploading a file "+fileToUpload);
-                return null;
+
+                reset();
+                parse();
+                JNFile file = getFile(fileName);
+                if(file==null)
+                    throw new ProcessingException("Unable to find the file "+fileName);
+                return file;
             }
         }.run();
     }
@@ -264,7 +270,7 @@ public final class JNFileFolder {
     public JNFileFolder createFolder(final String name, final String description) throws ProcessingException {
         return new Scraper<JNFileFolder>("failed to create a new folder "+name+" in "+name) {
             protected JNFileFolder scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
+                WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
 
                 WebForm form = response.getFormWithName("ProjectFolderAddForm");
                 form.setParameter("name",name);
@@ -288,7 +294,7 @@ public final class JNFileFolder {
         new Scraper("error deleting folder "+name) {
             protected Object scrape() throws IOException, SAXException {
                 WebResponse r = wc.getResponse(
-                    project.getURL()+"/servlets/ProjectFolderDelete?folderID="+id);
+                    project._getURL()+"/servlets/ProjectFolderDelete?folderID="+id);
 
                 r = r.getFormWithName("ProjectFolderDeleteForm").submit();
 
@@ -337,5 +343,18 @@ public final class JNFileFolder {
     /*package*/ void reset() {
         subFolders = null;
         files = null;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JNFileFolder)) return false;
+
+        final JNFileFolder that = (JNFileFolder) o;
+
+        return this.id==that.id && this.project==that.project;
+    }
+
+    public int hashCode() {
+        return id + project.hashCode()*29;
     }
 }

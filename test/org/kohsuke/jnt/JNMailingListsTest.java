@@ -1,5 +1,6 @@
 package org.kohsuke.jnt;
 
+import static org.kohsuke.jnt.SubscriptionMode.NORMAL;
 import junit.textui.TestRunner;
 
 import java.util.Collections;
@@ -18,7 +19,7 @@ public class JNMailingListsTest extends TestCaseBase {
 
         assertEquals(4,lists.getLists().size());
 
-        JNMailingList list1 = (JNMailingList) lists.getLists().get(0);
+        JNMailingList list1 = lists.getLists().get(0);
         assertEquals("cvs",list1.getName());
         assertSame(list1.getProject(),project);
     }
@@ -34,6 +35,13 @@ public class JNMailingListsTest extends TestCaseBase {
                     Collections.singletonList("kohsuke@dev.java.net"));
         assertNotNull(l);
         assertEquals("unittest",l.getName());
+
+        assertEquals(1,l.getSubscribers(NORMAL).size());
+        l.massSubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
+        assertEquals(3,l.getSubscribers(NORMAL).size());
+        l.massUnsubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
+        assertEquals(1,l.getSubscribers(NORMAL).size());
+
         l.delete();
     }
 }

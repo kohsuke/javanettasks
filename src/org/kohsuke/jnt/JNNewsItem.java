@@ -64,7 +64,7 @@ public final class JNNewsItem {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete the announcement") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
                 WebForm form = response.getFormWithName("projectnewsdeleteform");
                 if(form==null)
                     throw new ProcessingException("missing form");
@@ -85,7 +85,7 @@ public final class JNNewsItem {
      */
     public URL getURL() {
         try {
-            return new URL(project.getURL()+"/servlets/NewsItemView?newsItemID="+id);
+            return new URL(project._getURL()+"/servlets/NewsItemView?newsItemID="+id);
         } catch (MalformedURLException e) {
             // can't happen normally
             throw new IllegalStateException();

@@ -127,7 +127,7 @@ public final class JNMailingList {
      * @return
      *      read-only non-null (but possibly empty) list.
      */
-    public List getSubscribesr( SubscriptionMode mode ) throws ProcessingException {
+    public List getSubscribers( SubscriptionMode mode ) throws ProcessingException {
         if(subscribers[mode.index]==null)
             parseSubscribers(mode);
         return subscribers[mode.index];
@@ -217,7 +217,7 @@ public final class JNMailingList {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete mailing list "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/MailingListDelete?list="+name);
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/MailingListDelete?list="+name);
                 WebForm form = response.getFormWithName("MailingListDeleteForm");
                 if(form==null)
                     throw new ProcessingException("form not found");
@@ -248,7 +248,7 @@ public final class JNMailingList {
     private void parseListInfo() throws ProcessingException {
         new Scraper("Unable to parse the mailing list summary page") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/SummarizeList?listName="+name);
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/SummarizeList?listName="+name);
 
                 WebTable listInfo = response.getTableStartingWith("List address");
 
@@ -377,7 +377,7 @@ public final class JNMailingList {
         // we are going to change this
         subscribers[mode.index] = null;
 
-        Integer result = new Scraper<Integer>("Unable to mass-subscribe") {
+        return new Scraper<Integer>("Unable to mass-subscribe") {
             protected Integer scrape() throws IOException, SAXException, ProcessingException {
                 WebForm form = getListMemberForm(mode);
 
@@ -406,23 +406,19 @@ public final class JNMailingList {
                 return new Integer(numberTxt);
             }
         }.run();
-
-        return result.intValue();
     }
 
     /**
      * Gets the list member form to mass subscribe/unsubscribe addresses.
      */
     private WebForm getListMemberForm(SubscriptionMode mode) throws IOException, SAXException, ProcessingException {
-        WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/MailingListMembers?list="+name+"&group="+mode.groupName);
+        WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/MailingListMembers?list="+name+"&group="+mode.groupName);
 
-        // in this page, form[0] is the search form
-        WebForm form = response.getForms()[1];
-
-        // just making sure...
-        if (!form.getAction().equals("MailingListMembers"))
-            throw new ProcessingException("Error: this is not the Mailing List Members Form!");
-        return form;
+        for( WebForm form : response.getForms() ) {
+            if (form.getAction().equals("MailingListMembers"))
+                return form;
+        }
+        throw new ProcessingException("Error: this is not the Mailing List Members Form!");
     }
 
     private int doMassUnsubscribe(final Collection<String> addresses, final SubscriptionMode mode) throws ProcessingException {
@@ -432,7 +428,7 @@ public final class JNMailingList {
         Integer r = (Integer)new Scraper("Unable to mass-unsubscribe") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebForm form = getListMemberForm(mode);
-                form.setParameter("unsubscribeList",Util.toList(addresses,' '));
+                form.setParameter("unsubscribeList",addresses.toArray(new String[addresses.size()]));
 
                 // we must change the method, from get to post, to be able to include
                 // a large number of e-mails... The unsubscribe has the same problem

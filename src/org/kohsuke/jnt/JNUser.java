@@ -54,4 +54,8 @@ public class JNUser implements Comparable {
         JNUser that = (JNUser)obj;
         return this.name.equals(that.name);        
     }
+
+    public String toString() {
+        return name;
+    }
 }

@@ -3,11 +3,13 @@
 <body>
 <section name="Scripting java.net tasks with Groovy">
   <p>
-  	The java.net tasks library exposes a Java API for accessing java.net functionalities. While it comes with a few tools and ant tasks, often you need to do things that are bit more complicated.
+    The java.net tasks library exposes a Java API for accessing java.net functionalities. While it comes with a few tools and ant tasks, often you need to do things that are bit more complicated.
   </p>
   <p>
-  	One way to do these things easily is to use a scripting language like <a href="http://groovy.codehaus.org/">Groovy</a>. In particular, I found it quite useful to write a script by using Groovy as described in <a href="http://groovy.codehaus.org/Running">this document</a>.
+    One way to do these things easily is to use a scripting language like <a href="http://groovy.codehaus.org/">Groovy</a>. In particular, I found it quite useful to write a script by using Groovy as described in <a href="http://groovy.codehaus.org/Running">this document</a>.
   </p>
+  <p>
+    For example, if you save the following text as a filed called "myScript.groovy"
 <source>
 #!/usr/bin/env groovy -cp lib/javanettasks.jar
 import org.kohsuke.jnt.*;
@@ -18,11 +20,11 @@ System.out.println("My projects:");
 for( p : con.getMyself().getMyProjects() )
   System.out.println(p.getName());
 </source>
-	<p>
-		By doing <code>chmod u+x script.groovy</code>, you can execute this file just like a shell script.
-	</p><p>
+  <p>
+    with <code>chmod u+x myScript.groovy</code>, you can now execute this just like a shell script.
+  </p><p>
     The similar approach should work with any scripting languages for Java, such as BeanShell.
-	</p>
+  </p>
 </section>
 </body>
 </document>

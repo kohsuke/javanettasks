@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 263 2004-12-18 18:23:01Z kohsuke $
+ * $Id: JNNewsItems.java 272 2004-12-19 20:08:23Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -28,7 +28,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 263 $
+ * @version $Revision: 272 $
  */
 public final class JNNewsItems {
 
@@ -96,7 +96,7 @@ public final class JNNewsItems {
         new Scraper("Unable to submit news "+headline) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 // move to the submission page
-                String url = project.getURL()+"/servlets/ProjectNewsAdd";
+                String url = project._getURL()+"/servlets/ProjectNewsAdd";
                 WebResponse resp = wc.getResponse(url);
 
                 WebForm form = resp.getFormWithName(FORM_NAME);
@@ -186,7 +186,7 @@ public final class JNNewsItems {
 
         new Scraper("Unable to parse the announcement list") {
             protected Object scrape() throws IOException, SAXException, ParseException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectNewsList");
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectNewsList");
                 Document dom = Util.getDom4j(response);
 
                 Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");

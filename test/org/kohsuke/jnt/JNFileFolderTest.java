@@ -2,6 +2,9 @@ package org.kohsuke.jnt;
 
 import junit.textui.TestRunner;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -82,5 +85,39 @@ public class JNFileFolderTest extends TestCaseBase {
         sub.delete();
 
         assertNull(root.getSubFolder("unittest2"));
+    }
+
+    /**
+     * Create and delete a file
+     */
+    public void test3() throws ProcessingException, IOException {
+        JNProject project = con.getProject("javanettasks-test");
+        JNFileFolder root = project.getRootFolder();
+
+        File f = File.createTempFile("jnt","test");
+        f.deleteOnExit();
+        FileWriter w = new FileWriter(f);
+        w.write("abc");
+        w.close();
+
+        JNFile file = root.uploadFile("bravo","gamma",FileStatus.OBSOLETE,f);
+        assertNotNull(file);
+        assertSame(file,root.getFile("bravo"));
+
+        assertEquals("bravo",file.getName());
+        assertEquals("gamma",file.getDescription());
+        assertSame(FileStatus.OBSOLETE,file.getStatus());
+        assertSame(con.getMyself(),file.getModifiedBy());
+        long timeDiff = Math.abs(new Date().getTime()-file.getLastModified().getTime());
+        System.out.println("diff: "+timeDiff);  // just to make sure we are in the same ballpark
+        assertTrue(5*60*1000>timeDiff);
+
+//        BufferedReader in = new BufferedReader(new InputStreamReader(file.getURL().openStream()));
+//        assertEquals("abc",in.readLine());
+//        in.close();
+
+        file.delete();
+
+        assertNull(root.getFile("bravo"));
     }
 }

@@ -86,7 +86,7 @@ public final class JNForum {
      */
     public URL getURL() {
         try {
-            return new URL(project.getURL()+"/servlets/ForumMessageList?forumID="+id);
+            return new URL(project._getURL()+"/servlets/ForumMessageList?forumID="+id);
         } catch (MalformedURLException e) {
             // this shall never happen
             throw new IllegalStateException();
@@ -102,7 +102,7 @@ public final class JNForum {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete forum "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectForumDelete?forumID="+id);
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumDelete?forumID="+id);
                 WebForm form = Util.getFormWithAction(response,"ProjectForumDelete");
                 form.submit();
                 return null;

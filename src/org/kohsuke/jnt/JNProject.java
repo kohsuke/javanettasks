@@ -7,6 +7,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * Java&#x2E;net project.
@@ -22,8 +25,8 @@ import java.util.TreeSet;
  * Comparisons are based on their project names, so one can compare
  * two {@link JNProject}s from different {@link JavaNet}s.
  * 
- * @author
- *      Kohsuke Kawaguchi (kk@kohsuke.org)
+ * @author Kohsuke Kawaguchi (kk@kohsuke.org)
+ * @author Bruno Souza
  */
 public final class JNProject implements Comparable {
     /** The project name. */
@@ -82,12 +85,24 @@ public final class JNProject implements Comparable {
     private String summmary;
     private JNFileFolder rootFolder;
 
+    private String ownerMessage;
+
     protected JNProject(JavaNet net, String name) {
         this.net = net;
         this.wc = net.wc;
         this.projectName = name;
     }
-    
+
+    /**
+     * Returns the {@link JavaNet} object that this project belongs to.
+     *
+     * @return
+     *      never null.
+     */
+    public JavaNet getConnection() {
+        return net;
+    }
+
     /**
      * Parse the project index page.
      */
@@ -97,11 +112,11 @@ public final class JNProject implements Comparable {
 
         new Scraper("unable to parse the project page") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                Document dom = Util.getDom4j(wc.getResponse(getURL()+'/'));
+                Document dom = Util.getDom4j(wc.getResponse(_getURL()+'/'));
 
                 List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
                 if(as.size()==0)
-                    throw new ProcessingException("failed to parse "+getURL()+'/');
+                    throw new ProcessingException("failed to parse "+getURL());
 
                 if(as.size()>2) {
                     topLevelName = ((Element)as.get(1)).getTextTrim();
@@ -133,6 +148,16 @@ public final class JNProject implements Comparable {
                     subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
                 JNProject.this.subProjects = Collections.unmodifiableSet(subProjects);
 
+                // parse owner's message.
+                // this isn't actually too reliable, because NekoHTML changes
+                // tag names to upper cases for one thing.
+                Node node = dom.selectSingleNode("//DIV[@id='ownermessage']/P");
+                if(node!=null) {
+                    ownerMessage = node.asXML();
+                    // trim off the <P> and </P>.
+                    ownerMessage = ownerMessage.substring(3,ownerMessage.length()-4);
+                }
+
                 return null;
             }
         }.run();
@@ -161,6 +186,77 @@ public final class JNProject implements Comparable {
     }
 
     /**
+     * Gets the owner's message. This could contain HTML.
+     * <p>
+     * Generally speaking, this library cannot obtain the exact char-by-char
+     * representation of such HTML (for example, whitespace between attributes
+     * are lost.)
+     *
+     * @return
+     *      null if the owner message is not set. Otherwise non-null string.
+     *
+     * @see #getOwnerMessage2()
+     */
+    public String getOwnerMessage() throws ProcessingException {
+        parseProjectInfo();
+        return ownerMessage;
+    }
+
+    /**
+     * Gets the owner's message.
+     * <p>
+     * This is an admin-only operation, but unlike {@link #getOwnerMessage()},
+     * this method returns the exact char-by-char owner's message as currently set.
+     *
+     * @return
+     *      null if the owner message is not set. Otherwise non-null string.
+     *
+     * @see #getOwnerMessage()
+     */
+    public String getOwnerMessage2() throws ProcessingException {
+        return new Scraper<String>("Failed to get the owner message") {
+            protected String scrape() throws IOException, SAXException {
+                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
+
+                WebForm form = response.getFormWithName("ProjectEditForm");
+
+                return form.getParameterValue("status");
+            }
+        }.run();
+    }
+
+    /**
+     * Sets the owner's message.
+     * <p>
+     * This is an admin-only operation.
+     * When set, the owner's message is displayed in the project top page.
+     *
+     * @param msg
+     *      null to reset the owner message.
+     *      Otherwise the string will be set as the owner's message.
+     *      Can contain HTML.
+     *
+     * @return
+     *      the old owner's message, or null if none was set.
+     */
+    public String setOwnerMessage(final String msg) throws ProcessingException {
+        return new Scraper<String>("Failed to set the owner message") {
+            protected String scrape() throws IOException, SAXException {
+                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
+
+                WebForm form = response.getFormWithName("ProjectEditForm");
+
+                String old = form.getParameterValue("status");
+                form.setParameter("status",msg);
+
+                form.submit();
+
+                return old;
+            }
+        }.run();
+    }
+
+    /**
      * Gets the parent project.
      * 
      * @return null
@@ -185,7 +281,7 @@ public final class JNProject implements Comparable {
 
         new Scraper("Failed to reparent the project") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(getURL()+"/servlets/ProjectEdit");
+                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
 
                 WebForm form = response.getFormWithName("ProjectEditForm");
 
@@ -300,9 +396,22 @@ public final class JNProject implements Comparable {
     }
 
     /**
-     * @return "http://PROJECTNAME.dev.java.net"
+     * Returns the URL of the project top page.
+     *
+     * @return
+     *      URL that looks like "https://PROJECTNAME.dev.java.net/".
+     *      Never be null.
      */
-    protected String getURL() {
+    public URL getURL() {
+        try {
+            return new URL(_getURL());
+        } catch (MalformedURLException e) {
+            // never happen
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
+    /*package*/ String _getURL() {
         return "https://"+projectName+".dev.java.net";
     }
 
@@ -342,11 +451,13 @@ public final class JNProject implements Comparable {
 
     /**
      * Approves the project.
+     * <p>
+     * This is an admin-only operation.
      */
     public void approve() throws ProcessingException {
         new Scraper("failed to approve project "+projectName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(getURL()+"/servlets/ProjectApproval");
+                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectApproval");
 
                 WebTable table = response.getTableStartingWith("Project");
 
@@ -362,7 +473,7 @@ public final class JNProject implements Comparable {
                     if (c1.getLinks().length > 0) {
                         String link = c1.getLinks()[0].getURLString();
 
-                        if (link.equals(getURL())) {
+                        if (link.equals(_getURL())) {
                             TableCell c2 = table.getTableCell(r, 3);
                             String[] names = c2.getElementNames();
                             if (names.length > 0) {

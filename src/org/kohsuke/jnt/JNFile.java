@@ -39,7 +39,7 @@ public final class JNFile {
         this.folder = folder;
 
         Element anchor = (Element)tr.selectSingleNode("TD[1]//A");  // XPath is 1-origin
-        href = new URL(new URL(folder.project.getURL()),anchor.attributeValue("href"));
+        href = new URL(folder.project.getURL(),anchor.attributeValue("href"));
         name = anchor.getTextTrim();
 
         String statusText = ((Element) tr.elements("TD").get(1)).getTextTrim();
@@ -159,7 +159,7 @@ public final class JNFile {
         new Scraper("error deleting file "+name) {
             protected Object scrape() throws IOException, SAXException {
                 WebResponse r = folder.wc.getResponse(
-                    folder.project.getURL()+"/servlets/ProjectDocumentDelete?documentID="+id+"&maxDepth=");
+                    folder.project._getURL()+"/servlets/ProjectDocumentDelete?documentID="+id+"&maxDepth=");
 
                 r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
 
@@ -167,6 +167,20 @@ public final class JNFile {
                 return null;
             }
         }.run();
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JNFile)) return false;
+
+        final JNFile that = (JNFile) o;
+
+        return this.id == that.id && this.folder.equals(that.folder);
+
+    }
+
+    public int hashCode() {
+        return id + folder.hashCode()*29;
     }
 
     private static final DateFormat LONG_FORMAT = new SimpleDateFormat("EEEE, MMMM dd, yyyy 'at' hh:mm:ss aa",Locale.ENGLISH);

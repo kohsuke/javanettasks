@@ -57,7 +57,7 @@ public class JNMembership {
         roles = new TreeMap<JNRole,Set<JNUser>>();
 
         try {
-            WebResponse response = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
+            WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
 
             while(true) {
                 WebTable users = response.getTableStartingWithPrefix("User");
@@ -192,7 +192,7 @@ public class JNMembership {
      */
     public void grantRole( JNUser user, String roleName ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberAdd");
+            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberAdd");
             WebForm form = r.getFormWithName("ProjectMemberAddForm");
             
             if(form==null)
@@ -234,7 +234,7 @@ public class JNMembership {
      */
     public void revokeRole( JNUser user, String roleName ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
+            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
             WebForm form = r.getFormWithName("ProjectMemberListForm");
 
             if(form==null)
@@ -286,7 +286,7 @@ public class JNMembership {
      */
     public void declineRole( JNUser user, String roleName, String reason ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project.getURL()+"/servlets/ProjectMemberList");
+            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
             WebForm form = r.getFormWithName("ProjectMemberListPendingForm");
             
             if(form==null)

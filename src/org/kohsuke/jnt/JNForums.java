@@ -79,7 +79,7 @@ public final class JNForums {
     public JNForum createForum(final String name,final String description) throws ProcessingException {
         return new Scraper<JNForum>("Failed to create forum "+name) {
             protected JNForum scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectForumAdd");
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumAdd");
 
                 WebForm form = Util.getFormWithAction(response,"/servlets/ProjectForumAdd");
 
@@ -112,7 +112,7 @@ public final class JNForums {
 
         new Scraper("Unable to parse the forum view page") {
             protected Object scrape() throws IOException, SAXException {
-                WebResponse response = project.wc.getResponse(project.getURL()+"/servlets/ProjectForumView");
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumView");
                 Document dom = Util.getDom4j(response);
 
                 Element table = (Element)dom.selectSingleNode("//DIV[@id='ProjectForumView']/TABLE");
