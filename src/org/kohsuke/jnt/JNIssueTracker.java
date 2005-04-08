@@ -7,6 +7,8 @@ import java.util.WeakHashMap;
 import java.util.TreeMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
@@ -61,6 +63,7 @@ public final class JNIssueTracker {
         for( int id : ids ) {
             JNIssue v = issues.get(id);
             if(v!=null)     r.put(id,v);
+            else            fetch.add(id);
         }
 
         if(!fetch.isEmpty())
@@ -70,8 +73,10 @@ public final class JNIssueTracker {
         return r;
     }
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
+
     /**
-     * Gets all the issues updated during the specified month.
+     * Gets all the issues updated during the specified time span.
      *
      * <p>
      * This wraps
@@ -80,32 +85,17 @@ public final class JNIssueTracker {
      *      the map is from the id to {@link JNIssue}. It contains entries for
      *      all the specified IDs.
      */
-    public Map<Integer,JNIssue> getUpdatedIssues(int year, int month) throws ProcessingException {
+    public Map<Integer,JNIssue> getUpdatedIssues(Calendar start,Calendar end) throws ProcessingException {
         return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
-                zeroPad(year,4)+'-'+zeroPad(month,2)));
+                "ts="+dateFormat.format(start.getTime())+"&ts_end="+dateFormat.format(end.getTime())));
     }
 
-    /**
-     * Gets all the issues updated during the specified day.
-     *
-     * <p>
-     * This wraps
-     *
-     * @return
-     *      the map is from the id to {@link JNIssue}. It contains entries for
-     *      all the specified IDs.
-     */
-    public Map<Integer,JNIssue> getUpdatedIssues(int year, int month, int dayOfMonth) throws ProcessingException {
-        return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
-                zeroPad(year,4)+'-'+zeroPad(month,2)));
-    }
-
-    private static String zeroPad(int value,int width) {
-        // efficiency? what's that?
-        String r = Integer.toString(value);
-        while(r.length()<width) {
-            r = '0'+r;
-        }
-        return r;
-    }
+//    private static String zeroPad(int value,int width) {
+//        // efficiency? what's that?
+//        String r = Integer.toString(value);
+//        while(r.length()<width) {
+//            r = '0'+r;
+//        }
+//        return r;
+//    }
 }

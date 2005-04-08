@@ -2,7 +2,7 @@
 <body>
 <section name="JavaNetNews">
 	<p>
-		This task creates a news item in the News section of java.net.
+		The &lt;javaNetNews> task creates a news item in the News section of java.net.
 	</p>
 	<section name="Parameter Attributes">
 		<table border="1">
@@ -88,7 +88,7 @@
 		</p>
 	</section>
 	<div align="right" style="font-size: smaller">
-	$Id: news.xml 68 2003-12-17 21:45:28Z ryan_shoemaker $
+	$Id: news.xml 330 2005-04-08 22:26:24Z kohsuke $
 	</div>
 </section>
 </body></document>

@@ -5,7 +5,7 @@
 <body>
 <section name="Description">
 	<p>
-		This task elets a file to the file sharing section of java.net. Just like the delete task, The task will <em>not</em> cause the build to fail even if the specified file is not present.
+		The &lt;javaNetDelete> task elets a file to the file sharing section of java.net. Just like the delete task, The task will <em>not</em> cause the build to fail even if the specified file is not present.
 	</p>
 </section>
 <section name="Parameter Attributes">
@@ -57,7 +57,7 @@
 		none.
 	</p>
 	<div align="right" style="font-size: smaller">
-		$Id: delete.xml 59 2003-12-17 06:20:07Z kohsuke $
+		$Id: delete.xml 330 2005-04-08 22:26:24Z kohsuke $
 	</div>
 </section>
 </body></document>

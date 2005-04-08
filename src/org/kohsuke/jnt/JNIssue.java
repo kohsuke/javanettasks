@@ -39,13 +39,42 @@ public class JNIssue {
         this.rawData = rawData;
     }
 
+    /**
+     * Returns the raw XML data that describes this issue.
+     *
+     * <p>
+     * See https://javanettasks.dev.java.net/issues/issuezilla.dtd for the format.
+     *
+     * @return
+     *      the "issue" element.
+     */
+    public Element getRawData() {
+        return rawData;
+    }
+
+    /**
+     * Gets the issue ID.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Gets the priority of this issue.
+     */
+    public Priority getPriority() {
+        return Priority.valueOf(rawData.elementTextTrim("priority"));
+    }
+
+
+
     static Map<Integer,JNIssue> bulkCreate(JNProject project, Document doc) throws ProcessingException {
         Map<Integer,JNIssue> r = new TreeMap<Integer, JNIssue>();
 
         for( Element issue : (List<Element>)doc.getRootElement().elements("issue") ) {
             // make sure that the issue id is correct
             int id = Integer.parseInt(issue.elementTextTrim("issue_id"));
-            if(issue.attributeValue("status_code").equals("200"))
+            if(!issue.attributeValue("status_code").equals("200"))
                 throw new ProcessingException("bad status code for "+id+" : "+issue.attributeValue("status_message"));
             r.put(id,project.getIssueTracker().getOrCreate(id,issue));
         }
@@ -80,36 +109,9 @@ public class JNIssue {
     static Document bulkUpdateFetch(final JNProject project,final String queryParam) throws ProcessingException {
         return new Scraper<Document>("fetching the details of the issue xmlupdate.cgi "+queryParam) {
             public Document scrape() throws IOException, SAXException {
-                WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xmlupdate.cgi?ts="+queryParam);
+                WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xmlupdate.cgi?"+queryParam);
                 return Util.getDom4j(rsp);
             }
         }.run();
-    }
-
-    /**
-     * Returns the raw XML data that describes this issue.
-     *
-     * <p>
-     * See https://javanettasks.dev.java.net/issues/issuezilla.dtd for the format.
-     *
-     * @return
-     *      the "issue" element.
-     */
-    public Element getRawData() {
-        return rawData;
-    }
-
-    /**
-     * Gets the issue ID.
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Gets the priority of this issue.
-     */
-    public Priority getPriority() {
-        return Priority.valueOf(rawData.elementTextTrim("priority"));
     }
 }

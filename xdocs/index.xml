@@ -42,12 +42,12 @@
 				Task References
 			</li><ul>
 				<li>
-					<a href="ref/upload.html">FileUpload task</a>
+					<a href="ref/upload.html">javaNetUpload task</a>
 				</li><li>
-					<a href="ref/delete.html">FileDelete task</a>
+					<a href="ref/delete.html">javaNetDelete task</a>
 				</li>
 				<li>
-					<a href="ref/news.html">NewsItem task</a>
+					<a href="ref/news.html">javaNetNews task</a>
 				</li>
 			</ul>
 		</ul><li>
