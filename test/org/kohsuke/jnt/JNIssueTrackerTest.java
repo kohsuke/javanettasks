@@ -32,10 +32,8 @@ public class JNIssueTrackerTest extends TestCaseBase {
         // test update listing
         map = it.getUpdatedIssues(new GregorianCalendar(2005,02,01),new GregorianCalendar(2005,02,07));
         System.out.println(map.size());
-        assertEquals(3,map.size());
-        assertTrue(map.containsKey(20));
+        assertEquals(1,map.size());
         assertTrue(map.containsKey(41));
-        assertTrue(map.containsKey(42));
     }
 
 }

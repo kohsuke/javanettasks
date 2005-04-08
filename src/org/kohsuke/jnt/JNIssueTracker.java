@@ -80,6 +80,7 @@ public final class JNIssueTracker {
      *
      * <p>
      * This wraps
+     * http://www.jini.org/nonav/docs/ProjectOwnerIssues.html#xml
      *
      * @return
      *      the map is from the id to {@link JNIssue}. It contains entries for
