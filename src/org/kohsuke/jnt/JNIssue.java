@@ -66,6 +66,17 @@ public class JNIssue {
         return Priority.valueOf(rawData.elementTextTrim("priority"));
     }
 
+    /**
+     * Gets the short description of this issue.
+     *
+     * A "short description" is a summary of the issue. For example,
+     * the short description of https://java-ws-xml-incubator.dev.java.net/issues/show_bug.cgi?id=1
+     * is "Please graduate me... I have grown up now..."
+     *
+     */
+    public String getShortDescription() {
+        return rawData.elementText("short_desc");
+    }
 
 
     static Map<Integer,JNIssue> bulkCreate(JNProject project, Document doc) throws ProcessingException {
