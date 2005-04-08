@@ -204,7 +204,7 @@ public class JavaNet {
      * @return
      *      always return a non-null object.
      */
-    public JNUser getUser(String userName) throws ProcessingException {
+    public JNUser getUser(String userName) {
         JNUser u = users.get(userName);
         if(u==null) {
             u = new JNUser(this,userName);

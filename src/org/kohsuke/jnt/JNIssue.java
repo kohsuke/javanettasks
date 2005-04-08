@@ -10,17 +10,63 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Collections;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.GregorianCalendar;
+import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 /**
  * An issue.
  *
  * @author Kohsuke Kawaguchi
  */
-public class JNIssue {
+public final class JNIssue {
     private final JNProject project;
     private final int id;
 
     private final Element rawData;
+
+    /**
+     * Lazily created list of {@link Description}s.
+     */
+    private List<Description> descriptions;
+
+    /**
+     * A comment added to an issue.
+     */
+    public final class Description {
+        /**
+         * The 'long_desc' element.
+         */
+        private final Element e;
+
+        Description(Element e) {
+            this.e = e;
+        }
+
+        /**
+         * Gets the user who added this comment.
+         */
+        public JNUser getAuthor() {
+            return project.net.getUser(e.elementText("who"));
+        }
+
+        /**
+         * Gets the timestamp when this comment was added.
+         */
+        public Calendar getTimestamp() {
+            return formatDate(creationDateFormat, e.elementText("issue_when"));
+        }
+
+        /**
+         * Gets the actual comment text.
+         */
+        public String getText() {
+            return e.elementText("thetext");
+        }
+    }
 
     JNIssue(JNProject project, int id) throws ProcessingException {
         this(project,id,null);
@@ -77,6 +123,95 @@ public class JNIssue {
     public String getShortDescription() {
         return rawData.elementText("short_desc");
     }
+
+    /**
+     * Gets the reporter of this issue.
+     */
+    public JNUser getReporter() {
+        return project.net.getUser(rawData.elementText("reporter"));
+    }
+
+    /**
+     * Gets the current status of this issue.
+     */
+    public IssueStatus getStatus() {
+        return IssueStatus.valueOf(rawData.elementText("issue_status"));
+    }
+
+    /**
+     * Gets the resolution of this issue.
+     */
+    public IssueResolution getResolution() {
+        return IssueResolution.valueOf(rawData.elementText("resolution"));
+    }
+
+    /**
+     * Gets the component to which this issue belongs to.
+     */
+    public IssueVersion getComponent() {
+        return new IssueVersion(rawData.elementText("version"));
+    }
+
+    public String _getPlatform() {
+        return rawData.elementText("platform");
+    }
+
+    /**
+     * Gets the type of the issue.
+     */
+    public IssueType getType() {
+        return IssueType.valueOf(rawData.elementText("issue_type"));
+    }
+
+    private static final SimpleDateFormat lastModifiedFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    static {
+        // assume GMT. We have no clue what the time zone of java.net is, actually.
+        lastModifiedFormat.setTimeZone(GMT);
+        creationDateFormat.setTimeZone(GMT);
+    }
+
+    /**
+     * Gets the last modified date of this issue.
+     */
+    public Calendar getLastModified() {
+        return formatDate(lastModifiedFormat,rawData.elementText("delta_ts"));
+    }
+
+    /**
+     * Gets the timestamp when this issue was created.
+     */
+    public Calendar getCreationDate() {
+        return formatDate(creationDateFormat,rawData.elementText("creation_ts"));
+    }
+
+    /**
+     * Gets the description of issues (AKA "additional comments")
+     *
+     * @return
+     *      can be an empty list but never null.
+     */
+    public List<Description> getDescriptions() {
+        if(descriptions==null) {
+            descriptions = new ArrayList<Description>();
+            for( Element e : (List<Element>)rawData.elements("long_desc") )
+                descriptions.add(new Description(e));
+        }
+        return descriptions;
+    }
+
+    private Calendar formatDate(SimpleDateFormat f, String text) {
+        try {
+            long t = f.parse(text).getTime();
+            GregorianCalendar c = new GregorianCalendar(GMT);
+            c.setTimeInMillis(t);
+            return c;
+        } catch (ParseException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
 
 
     static Map<Integer,JNIssue> bulkCreate(JNProject project, Document doc) throws ProcessingException {
