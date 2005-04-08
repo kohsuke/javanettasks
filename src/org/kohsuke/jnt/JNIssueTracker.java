@@ -1,5 +1,7 @@
 package org.kohsuke.jnt;
 
+import org.dom4j.Element;
+
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.TreeMap;
@@ -31,9 +33,13 @@ public final class JNIssueTracker {
      * to use {@link #get(int...)}
      */
     public JNIssue get(int id) throws ProcessingException {
+        return getOrCreate(id,null);
+    }
+
+    final JNIssue getOrCreate(int id,Element rawData) throws ProcessingException {
         JNIssue r = issues.get(id);
         if(r==null) {
-            r = new JNIssue(project,id);
+            r = new JNIssue(project,id,rawData);
             issues.put(id,r);
         }
         return r;
@@ -59,8 +65,47 @@ public final class JNIssueTracker {
 
         if(!fetch.isEmpty())
             // fetch the rest
-            r.putAll(JNIssue.bulkCreate(project,fetch));
+            r.putAll(JNIssue.bulkCreate(project,JNIssue.bulkFetch(project,fetch)));
 
+        return r;
+    }
+
+    /**
+     * Gets all the issues updated during the specified month.
+     *
+     * <p>
+     * This wraps
+     *
+     * @return
+     *      the map is from the id to {@link JNIssue}. It contains entries for
+     *      all the specified IDs.
+     */
+    public Map<Integer,JNIssue> getUpdatedIssues(int year, int month) throws ProcessingException {
+        return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
+                zeroPad(year,4)+'-'+zeroPad(month,2)));
+    }
+
+    /**
+     * Gets all the issues updated during the specified day.
+     *
+     * <p>
+     * This wraps
+     *
+     * @return
+     *      the map is from the id to {@link JNIssue}. It contains entries for
+     *      all the specified IDs.
+     */
+    public Map<Integer,JNIssue> getUpdatedIssues(int year, int month, int dayOfMonth) throws ProcessingException {
+        return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
+                zeroPad(year,4)+'-'+zeroPad(month,2)));
+    }
+
+    private static String zeroPad(int value,int width) {
+        // efficiency? what's that?
+        String r = Integer.toString(value);
+        while(r.length()<width) {
+            r = '0'+r;
+        }
         return r;
     }
 }

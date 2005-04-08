@@ -32,16 +32,14 @@ public class JNIssue {
 
         if(rawData==null) {
             // fetch now
-            Document doc = fetch(project,Collections.singletonList(id) );
+            Document doc = bulkFetch(project,Collections.singletonList(id) );
             rawData = doc.getRootElement().element("issue");
         }
 
         this.rawData = rawData;
     }
 
-    public static Map<Integer,JNIssue> bulkCreate(JNProject project, List<Integer> ids) throws ProcessingException {
-        Document doc = fetch(project,ids);
-
+    static Map<Integer,JNIssue> bulkCreate(JNProject project, Document doc) throws ProcessingException {
         Map<Integer,JNIssue> r = new TreeMap<Integer, JNIssue>();
 
         for( Element issue : (List<Element>)doc.getRootElement().elements("issue") ) {
@@ -49,7 +47,7 @@ public class JNIssue {
             int id = Integer.parseInt(issue.elementTextTrim("issue_id"));
             if(issue.attributeValue("status_code").equals("200"))
                 throw new ProcessingException("bad status code for "+id+" : "+issue.attributeValue("status_message"));
-            r.put(id,new JNIssue(project,id,issue));
+            r.put(id,project.getIssueTracker().getOrCreate(id,issue));
         }
         return r;
     }
@@ -57,7 +55,7 @@ public class JNIssue {
     /**
      * Fetchs the XML for all the specified issues.
      */
-    private static Document fetch(final JNProject project, List<Integer> ids) throws ProcessingException {
+    static Document bulkFetch(final JNProject project, List<Integer> ids) throws ProcessingException {
         StringBuffer buf = new StringBuffer();
         for( int i : ids ) {
             if(buf.length()>0)
@@ -70,6 +68,19 @@ public class JNIssue {
         return new Scraper<Document>("fetching the details of the issue "+idList) {
             public Document scrape() throws IOException, SAXException {
                 WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xml.cgi?id="+idList);
+                return Util.getDom4j(rsp);
+            }
+        }.run();
+    }
+
+    /**
+     * Fetches the XML for issues updated during the specified time span.
+     * See https://jaxb.dev.java.net/issues/xmlupdate.cgi
+     */
+    static Document bulkUpdateFetch(final JNProject project,final String queryParam) throws ProcessingException {
+        return new Scraper<Document>("fetching the details of the issue xmlupdate.cgi "+queryParam) {
+            public Document scrape() throws IOException, SAXException {
+                WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xmlupdate.cgi?ts="+queryParam);
                 return Util.getDom4j(rsp);
             }
         }.run();
