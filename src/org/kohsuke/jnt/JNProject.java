@@ -42,6 +42,7 @@ public final class JNProject implements Comparable {
     private JNMembership membership;
     private JNForums forums;
     private JNMailingLists mailingLists;
+    private JNIssueTracker issueTracker;
 
     /**
      * News item section.s
@@ -454,6 +455,15 @@ public final class JNProject implements Comparable {
         if(forums==null)
             forums = new JNForums(this);
         return forums;
+    }
+
+    /**
+     * Obtains the object that represents the issue tracker section.
+     */
+    public JNIssueTracker getIssueTracker() {
+        if(issueTracker==null)
+            issueTracker = new JNIssueTracker(this);
+        return issueTracker;
     }
 
     /**
