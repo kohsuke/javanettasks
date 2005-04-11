@@ -12,7 +12,8 @@
    <menu name="Overview">
       <item name="Home"                    href="/index.html"/>
       <item name="Download"                href="https://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105"/>
-      <item name="Change Log"              href="/changelog-report.html"/>
+      <item name="Javadoc"                 href="/apidocs/" />
+      <!--item name="Change Log"              href="/changelog-report.html"/-->
       <item name="Ant tasks">
         <item name="javaNetUpload"         href="/ref/upload.html"/>
         <item name="javaNetDelete"         href="/ref/delete.html"/>
