@@ -146,14 +146,14 @@ public final class JNIssue {
     }
 
     /**
-     * Gets the component to which this issue belongs to.
+     * Gets the version to which this issue belongs to.
      */
-    public IssueVersion getComponent() {
+    public IssueVersion getVersion() {
         return new IssueVersion(rawData.elementText("version"));
     }
 
     public String _getPlatform() {
-        return rawData.elementText("platform");
+        return rawData.elementText("rep_platform");
     }
 
     /**
@@ -164,12 +164,14 @@ public final class JNIssue {
     }
 
     private static final SimpleDateFormat lastModifiedFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
+    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final TimeZone PST = TimeZone.getTimeZone("PST");
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     static {
-        // assume GMT. We have no clue what the time zone of java.net is, actually.
-        lastModifiedFormat.setTimeZone(GMT);
-        creationDateFormat.setTimeZone(GMT);
+        // apparently java.net servers are in PST,
+        // and when they send time stamps they send local time
+        lastModifiedFormat.setTimeZone(PST);
+        creationDateFormat.setTimeZone(PST);
     }
 
     /**
@@ -204,6 +206,8 @@ public final class JNIssue {
     private Calendar formatDate(SimpleDateFormat f, String text) {
         try {
             long t = f.parse(text).getTime();
+            // when returning a calendar, set the time zone to GMT
+            // so that user applications won't be affected by the server's timezone.
             GregorianCalendar c = new GregorianCalendar(GMT);
             c.setTimeInMillis(t);
             return c;
