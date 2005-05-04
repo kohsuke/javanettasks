@@ -20,7 +20,7 @@ public class JNMailingListsTest extends TestCaseBase {
         assertEquals(5,lists.getLists().size());
 
         JNMailingList list1 = lists.getLists().get(0);
-        assertEquals("cvs",list1.getName());
+        assertEquals("dev",list1.getName());
         assertSame(list1.getProject(),project);
     }
 
