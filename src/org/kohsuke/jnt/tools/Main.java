@@ -29,6 +29,12 @@ public class Main {
     }
 
     public static int run(String[] args) throws Exception {
+        try {
+            System.setProperty("java.net.useSystemProxies","true");
+        } catch (SecurityException e) {
+            ; // failing to set this property isn't fatal
+        }
+
         JavaNet connection = JavaNet.connect();
 
         if(args.length>0) {
