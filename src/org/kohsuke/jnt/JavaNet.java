@@ -152,8 +152,8 @@ public class JavaNet {
      */
     public static JavaNet connect( String userName, String password, String proxyServer, int proxyPort ) throws ProcessingException {
         JavaNet session = new JavaNet();
-        session.login(userName,password);
         session.setProxyServer(proxyServer,proxyPort);
+        session.login(userName,password);
         return session;
     }
 
