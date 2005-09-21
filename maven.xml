@@ -17,7 +17,6 @@
       
       <manifest file="${maven.jar.manifest}" mode="update">
         <attribute name="Class-Path" value="${classpath}"/>
-        <attribute name="Main-Class" value="org.kohsuke.jnt.tools.Main"/>
       </manifest>
     </define:tag>
   </define:taglib>
