@@ -115,7 +115,7 @@ public final class JNMailingList {
     public int getTotalMessages() throws ProcessingException {
         if(totalMessages==null)
             parseListInfo();
-        return totalMessages.intValue();
+        return totalMessages;
     }
 
     /**
@@ -263,7 +263,7 @@ public final class JNMailingList {
                 messagesPerMonth = new ArrayList();
 
                 if(monthInfo==null) {
-                    if(totalMessages.intValue()==0)
+                    if(totalMessages==0)
                         return null; //this is to be expected
                     else
                         throw new ProcessingException("month table not found, even though the total message count isn't 0");
@@ -273,8 +273,8 @@ public final class JNMailingList {
 
                 // we start at row 1, since the row 0 is the header
                 for (int r = 1; r < numRows; r++) {
-                    String month = monthInfo.getCellAsText(r,0);
-                    String messages = monthInfo.getCellAsText(r,1);
+                    String month = monthInfo.getCellAsText(r,0).trim();
+                    String messages = monthInfo.getCellAsText(r,1).trim();
                     messagesPerMonth.add( new MessagePerMonth(month,Integer.parseInt(messages)) );
                 }
 
