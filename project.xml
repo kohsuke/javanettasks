@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>java.net tasks</name>
   <id>javanettasks</id>
-  <currentVersion>1.0.3</currentVersion>
+  <currentVersion>1.0.4-SNAPSHOT</currentVersion>
   
   <organization>
     <name>Kohsuke Kawaguchi</name>
@@ -135,7 +135,6 @@
   
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <unitTestSourceDirectory>test</unitTestSourceDirectory>
 
     <!-- Resources that are packaged up inside the JAR file -->
     <resources>
@@ -148,6 +147,7 @@
     </resources>
     
     <!-- Unit test classes -->
+    <unitTestSourceDirectory>test</unitTestSourceDirectory>
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
