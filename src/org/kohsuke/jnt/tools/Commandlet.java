@@ -1,7 +1,5 @@
 package org.kohsuke.jnt.tools;
 
-import org.kohsuke.jnt.JavaNet;
-
 import java.io.PrintStream;
 
 /**
