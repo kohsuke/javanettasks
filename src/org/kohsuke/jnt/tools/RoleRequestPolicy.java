@@ -6,6 +6,9 @@
  */
 package org.kohsuke.jnt.tools;
 
+import org.kohsuke.jnt.JavaNet;
+import org.kohsuke.jnt.ProcessingException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,9 +16,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.kohsuke.jnt.JavaNet;
-import org.kohsuke.jnt.ProcessingException;
 
 /**
  * @author kk122374

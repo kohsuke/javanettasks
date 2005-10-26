@@ -1,8 +1,8 @@
 package org.kohsuke.jnt.tools;
 
-import java.io.PrintStream;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 /**
  * @author Kohsuke Kawaguchi

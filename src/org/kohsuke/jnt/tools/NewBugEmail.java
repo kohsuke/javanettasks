@@ -1,16 +1,16 @@
 package org.kohsuke.jnt.tools;
 
+import org.kohsuke.jnt.JNProject;
+import org.kohsuke.jnt.JNUser;
+import org.kohsuke.jnt.JavaNet;
+import org.kohsuke.jnt.ProcessingException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.kohsuke.jnt.JNProject;
-import org.kohsuke.jnt.JavaNet;
-import org.kohsuke.jnt.ProcessingException;
-import org.kohsuke.jnt.JNUser;
 
 /**
  * Represents the notification e-mail from BugZilla about a new bug.

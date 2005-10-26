@@ -6,6 +6,9 @@
  */
 package org.kohsuke.jnt.tools;
 
+import org.kohsuke.jnt.JavaNet;
+import org.kohsuke.jnt.ProcessingException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,9 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.kohsuke.jnt.JavaNet;
-import org.kohsuke.jnt.ProcessingException;
 
 /**
  * A notification message sent from java.net when someone requests a role.

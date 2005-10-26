@@ -1,11 +1,11 @@
 package org.kohsuke.jnt.tools;
 
-import org.kohsuke.jnt.JNFileFolder;
-import org.kohsuke.jnt.JNFile;
 import org.kohsuke.jnt.FileStatus;
+import org.kohsuke.jnt.JNFile;
+import org.kohsuke.jnt.JNFileFolder;
 
-import java.io.PrintStream;
 import java.io.File;
+import java.io.PrintStream;
 
 /**
  * @author Kohsuke Kawaguchi
