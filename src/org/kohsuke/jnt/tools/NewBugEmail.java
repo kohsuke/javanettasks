@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
+import org.kohsuke.jnt.JNUser;
 
 /**
  * Represents the notification e-mail from BugZilla about a new bug.
@@ -18,26 +19,26 @@ import org.kohsuke.jnt.ProcessingException;
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
 public class NewBugEmail {
-    
+
     private static Pattern PATTERN_REPORTED_BY = Pattern.compile(" *Reported By: (.*)");
     private static Pattern PATTERN_COMPONENT   = Pattern.compile(" *Component: (.*)");
-    
+
     /**
      * User name who reported the problem.
      */
-    public final String reportedBy; 
-    
+    public final JNUser reportedBy;
+
     /**
      * Project to which this bug is reported.
      */
     public final JNProject project;
-    
+
     public NewBugEmail( JavaNet connection, Reader mail ) throws IOException, ParseException, ProcessingException {
         BufferedReader r = new BufferedReader(mail);
-        
+
         String rb=null;
         String prj=null;
-        
+
         String line;
         while((line=r.readLine())!=null) {
             Matcher m = PATTERN_REPORTED_BY.matcher(line);
@@ -49,11 +50,11 @@ public class NewBugEmail {
                 prj = m.group(1);
             }
         }
-        
+
         if(rb==null)
             throw new ParseException("unable to find the reported-by field",0);
-        this.reportedBy = rb;
-        
+        this.reportedBy = connection.getUser(rb);
+
         if(prj==null)
             throw new ParseException("unable to find the component field",0);
         this.project = connection.getProject(prj);
