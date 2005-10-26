@@ -137,16 +137,16 @@ public final class JNProject implements Comparable {
 
                 // parse owners
                 Set<JNUser> owners = new TreeSet<JNUser>();
-                List os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
-                for( int i=0; i<os.size(); i++ )
-                    owners.add( net.getUser( ((Element)os.get(i)).getTextTrim() ) );
+                List<Element> os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
+                for (Element o : os)
+                    owners.add(net.getUser(o.getTextTrim()));
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
 
                 // parse sub-projects
                 Set<JNProject> subProjects = new TreeSet<JNProject>();
-                List sp = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
-                for( int i=0; i<sp.size(); i++ )
-                    subProjects.add( net.getProject( ((Element)sp.get(i)).getTextTrim() ) );
+                List<Element> sps = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
+                for (Element sp : sps)
+                    subProjects.add(net.getProject(sp.getTextTrim()));
                 JNProject.this.subProjects = Collections.unmodifiableSet(subProjects);
 
                 // parse owner's message.
@@ -329,7 +329,7 @@ public final class JNProject implements Comparable {
     public boolean isCommunity() throws ProcessingException {
        if( isCommunity==null )
            parseProjectInfo();
-       return isCommunity.booleanValue();
+       return isCommunity;
     }
     
     /**
