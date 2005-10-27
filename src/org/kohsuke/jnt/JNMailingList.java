@@ -136,9 +136,34 @@ public final class JNMailingList {
     /**
      * Subscribes yourself.
      */
-    public void subscribe( SubscriptionMode mode ) throws ProcessingException {
-        // TODO: implement this method later
-        throw new UnsupportedOperationException();
+    public void subscribe( final SubscriptionMode mode ) throws ProcessingException {
+        new Scraper<Void>("Unable to subscribe to "+name) {
+            protected Void scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectMailingListList");
+                for (WebForm form : response.getForms()) {
+                    if(!form.getName().equals("ProjectMailingListListForm"))
+                        continue;
+                    if(!form.getParameterValue("listName").equals(name))
+                        continue;
+
+                    // found the form
+                    SubmitButton sb = form.getSubmitButtons()[0];
+                    if(!sb.getValue().equals("Subscribe"))
+                        throw new ProcessingException("Found "+sb.getValue()+" but expected Subscribe");
+
+                    // set the mode
+                    form.setParameter("subtype",mode.getNameAsWord());
+
+                    WebResponse r = form.submit(sb);
+
+                    if(r.getResponseCode()!=200)
+                        throw new ProcessingException("request failed "+r.getResponseMessage());
+                    return null;
+                }
+
+                throw new ProcessingException("no subscription form found");
+            }
+        }.run();
     }
 
     /**
