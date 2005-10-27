@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>java.net tasks</name>
   <id>javanettasks</id>
-  <currentVersion>1.0.4-SNAPSHOT</currentVersion>
+  <currentVersion>1.0.4</currentVersion>
   
   <organization>
     <name>Kohsuke Kawaguchi</name>
@@ -31,6 +31,10 @@
   <siteAddress>javanettasks.dev.java.net</siteAddress>
   <siteDirectory>/</siteDirectory>
 
+  <organization>
+    <url>http://www.java.net/</url>
+    <logo>https://dalma.dev.java.net/maven/images/java.net-logo.png</logo>
+  </organization>
 
   <repository>
     <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks</connection>
