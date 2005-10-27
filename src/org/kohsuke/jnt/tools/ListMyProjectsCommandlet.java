@@ -14,6 +14,7 @@ public class ListMyProjectsCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: listMyProjects");
+        out.println("List all projects that you belong to.");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {

@@ -14,6 +14,7 @@ public class ProcessRoleCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: processRole <policyFile>");
+        out.println("See https://javanettasks.dev.java.net/nonav/maven/tools/processRole.html");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {

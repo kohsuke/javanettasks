@@ -16,7 +16,14 @@ public class UploadFileCommandlet extends Commandlet {
     }
 
     public void printUsage(PrintStream out) {
-        System.out.println("Usage: uploadFile <projectName> <filePath on server> <description> <status> <source file>");
+        out.println("Usage: uploadFile <projectName> <filePath on server> <description> <status> <source file>");
+        out.println("Upload a file to java.net document&files section");
+        out.println("  projectName : the java.net project name to which the file is uploaded");
+        out.println("  filePath    : the filepath in documents&files section, such as /releases/foo.zip");
+        out.println("                or /bar.txt");
+        out.println("  description : Human-readable file description. Can contain spaces, but no HTML.");
+        out.println("  status      : one of the file status (draft/reviewed/baselined/stable/archival/obsolete)");
+        out.println("  source file : the file on your file system to be uploaded");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {

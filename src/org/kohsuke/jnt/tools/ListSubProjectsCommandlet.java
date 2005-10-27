@@ -15,6 +15,7 @@ public class ListSubProjectsCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: listSubProjects [-r] <project> ... ");
+        out.println("List all the subprojects of a given project(s)");
         out.println("  -r : list subprojects recursively");
     }
 

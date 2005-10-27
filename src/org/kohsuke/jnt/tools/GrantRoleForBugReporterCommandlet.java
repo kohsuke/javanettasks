@@ -13,6 +13,7 @@ public class GrantRoleForBugReporterCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: grantRoleForBugReporter <projectName> <roleName>");
+        out.println("See https://javanettasks.dev.java.net/nonav/maven/tools/grantRoleForBugReporter.html");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {

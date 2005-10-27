@@ -12,6 +12,12 @@ public class DeclineRoleCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: declineRole <project> <user> <role> <reason>");
+        out.println("Deny a pending role request");
+        out.println("  project : the name of the project in which the request is denied");
+        out.println("  user    : the user who is requesting the role");
+        out.println("  role    : the role to be declined, such as 'Observer'");
+        out.println("  reason  : this text will show in the e-mail that the user will receive");
+        out.println("            give some reasons why his/her role request was denied");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {
