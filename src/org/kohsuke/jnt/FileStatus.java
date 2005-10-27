@@ -37,13 +37,13 @@ public enum FileStatus {
      *      if the name is unrecognized.
      */
     public static FileStatus parse(String name) {
-        FileStatus r = index.get(name);
+        FileStatus r = index.get(name.toLowerCase());
         if(r==null) throw new IllegalArgumentException("Unrecognized file status: "+name);
         return r;
     }
 
     static {
         for( FileStatus fs : FileStatus.values() )
-            index.put(fs.name,fs);
+            index.put(fs.name.toLowerCase(),fs);
     }
 }

@@ -28,7 +28,7 @@ public class UploadFileCommandlet extends Commandlet {
         String projectName = args[0];
         String folderPath = args[1];
         String description = args[2];
-        String status = args[3];
+        FileStatus status = FileStatus.parse(args[3]);
         File src = new File(args[4]);
         if(!src.isFile() || !src.exists()) {
             System.err.println("File "+src+" does not exist");
@@ -50,7 +50,7 @@ public class UploadFileCommandlet extends Commandlet {
             file.delete();
         }
 
-        folder.uploadFile(fileName,description, FileStatus.valueOf(status),src);
+        folder.uploadFile(fileName,description,status,src);
         return 0;
     }
 }
