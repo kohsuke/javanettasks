@@ -7,37 +7,44 @@
 	</p>
 	<ol>
 		<li>
-			a Java library that provides programatic access to the web interface of java.net
+			tools to help automate various simple java.net related tasks.
 		</li><li>
 			a set of <a href="http://ant.apache.org/">Ant</a> tasks on top of it.
 		</li><li>
-			other tools to help automate various simple mindless jobs
+			a Java object model that provides programatic access to the web interface of java.net
 		</li>
 	</ol>
 	<p>
-		For example, with Ant tasks, one can post a new file to the file sharing section as a part of your nightly automated build process, or adding e-mail addresses to a particular mailing list, and etc.
+		With the library, you can build your own application or tools that work with java.net. For example, the <a href="https://logger.dev.java.net/">logger project</a> uses this library underneath.
 	</p><p>
-		Another example is to combine one of the tools to <a href="www.procmail.org">procmail</a> so that you can automatically approve/decline new role requests based on pre-defined rules.
+		With the Ant tasks, you can easily automate some the common java.net tasks (like releasing files) in your build script. For example, the <a href="https://maven-javanet-plugin.dev.java.net/">maven java.net plugin</a> uses those ant tasks.
+	</p><p>
+		With the tools, many of the common tasks (such as approving a role request, or subscribing to the mailing list) can be done from command line, and you no longer have to wait for slow java.net pages to load.
 	</p>
 </section>
 
 <section name="Contents">
-	<ul>
-		<li>
-			<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
-    </li><li>
-      Using java.net tasks
-    </li><ul>
-      <li>
-        <a href="apidocs/index.html">Javadoc</a>
-      </li><li>
-        <a href="groovy.html">Scripting java.net tasks with Groovy</a>
-      </li>
-    </ul><li>
-      Ant Tasks
-		</li><ul>
+	<subsection name="For tool uesrs">
+		<ul>
 			<li>
-				<a href="install.html">Installation</a> and <a href="config.html">Account info set up</a>
+				<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
+			</li><li>
+				<a href="config.html">Account info set up</a>
+			</li><li>
+				<a href="tools/index.html">Tools Reference Manual</a>
+			</li>
+		</ul>
+	</subsection>
+	<subsection name="For Ant task users">
+		<ul>
+			<li>
+				<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
+			</li><li>
+				<a href="config.html">Account info set up</a>
+			</li><li>
+				Ant Tasks
+			</li><li>
+				<a href="install.html">Declaring the tasks</a>
 			</li><li>
 				Task References
 			</li><ul>
@@ -50,20 +57,19 @@
 					<a href="ref/news.html">javaNetNews task</a>
 				</li>
 			</ul>
-		</ul><li>
-			Tools Reference Manual
-		</li><ul>
+		</ul>
+	</subsection>
+	<subsection name="For developers building on top of the java.net OM">
+		<ul>
 			<li>
-				<a href="config.html">Setting up your account info</a>
+				<a href="http://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105">Download the latest version</a>
 			</li><li>
-        <a href="tools/processRole.html">role request processor</a>
-      </li><li>
-        <a href="tools/grantRoleForBugReporter.html">BugReporter request processor</a>
-      </li><li>
-        <a href="tools/listSubProjects.html">Sub-projects lister</a>
+				<a href="apidocs/index.html">Javadoc</a>
+			</li><li>
+				<a href="groovy.html">Scripting java.net tasks with Groovy</a>
 			</li>
 		</ul>
-	</ul>
+	</subsection>
 </section>
 </body>
 </document>

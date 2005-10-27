@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0"?>
 <project name="java.net tasks">
 
   <title>java.net tasks</title>
@@ -12,17 +12,19 @@
    <menu name="Overview">
       <item name="Home"                    href="/index.html"/>
       <item name="Download"                href="https://javanettasks.dev.java.net/servlets/ProjectDocumentList?folderID=105"/>
-      <item name="Javadoc"                 href="/apidocs/" />
       <!--item name="Change Log"              href="/changelog-report.html"/-->
+      <item name="java.net tools"            href="/tools/index.html">
+        <item name="processRole"             href="/tools/processRole.html"/>
+        <item name="grantRoleForBugReporter" href="/tools/grantRoleForBugReporter.html"/>
+      </item>
       <item name="Ant tasks">
         <item name="javaNetUpload"         href="/ref/upload.html"/>
         <item name="javaNetDelete"         href="/ref/delete.html"/>
         <item name="javaNewItem"           href="/ref/news.html"/>
       </item>
-      <item name="tools">
-        <item name="processRole"             href="/tools/processRole.html"/>
-        <item name="grantRoleForBugReporter" href="/tools/grantRoleForBugReporter.html"/>
-        <item name="listSubProjects"         href="/tools/listSubProjects.html"/>
+      <item name="java.net OM">
+        <item name="Javadoc"                 href="/apidocs/" />
+        <item name="Scripting with Groovy"   href="/groovy.html" />
       </item>
     </menu>
   </body>

@@ -1,0 +1,52 @@
+<document>
+	<body>
+		<section name="java.net tools">
+		<p>
+			Run the program as follows:
+		</p>
+		<pre>$ java -jar javanettasks.jar</pre>
+		<p>
+			And you'll see the help screen that lists available sub-commands.
+		</p>
+<pre>
+Usage: java -jar javanettasks.jar &lt;command>
+where command can be ...
+  help
+    display help about a particular command
+  uploadFile
+    upload a file to java.net
+  grantRole
+    grant a role to an user on a project
+  declineRole
+    decline a pending role request
+  processRole
+    process a role request automatically according to a policy file
+  listMyProjects
+    list all projects that you belong to.
+  listSubProjects
+    list all the subprojects of a given project(s)
+  interactive
+    launches a shell where you can type multiple commands
+</pre>
+		<p>
+			Use the help command to see the details about the task:
+		</p>
+<pre><![CDATA[
+% java -jar javanettasks.jar help uploadFile
+Usage: uploadFile <projectName> <filePath on server> <description> <status> <source file>
+]]></pre>
+		<p>
+			Some of the commands are complex, and documentation for those are provided separately below:
+		</p>
+		<ul>
+			<li>
+				<a href="../config.html">Setting up your account info</a>
+			</li><li>
+				<a href="processRole.html">role request processor</a>
+			</li><li>
+				<a href="grantRoleForBugReporter.html">BugReporter request processor</a>
+			</li>
+		</ul>
+	</section>
+</body>
+</document>
