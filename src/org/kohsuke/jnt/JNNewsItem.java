@@ -15,13 +15,14 @@ import java.util.Date;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class JNNewsItem {
+public final class JNNewsItem extends JNObject {
     private final Date timestamp;
     private final String headline;
     private final JNProject project;
     private final int id;
 
     JNNewsItem(JNProject owner, int id, Date timestamp, String headline) {
+        super(owner);
         this.project = owner;
         this.id = id;
         this.timestamp = timestamp;
@@ -64,14 +65,14 @@ public final class JNNewsItem {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete the announcement") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
                 WebForm form = response.getFormWithName("projectnewsdeleteform");
                 if(form==null)
                     throw new ProcessingException("missing form");
                 SubmitButton submit = form.getSubmitButton("Button","Confirm delete");
                 if(submit==null)
                     throw new ProcessingException("no submit button");
-                form.submit(submit);
+                checkError(form.submit(submit));
 
                 return null;
             }

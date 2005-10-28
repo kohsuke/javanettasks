@@ -4,7 +4,6 @@ import com.meterware.httpunit.HTMLSegment;
 import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.SubmitButton;
 import com.meterware.httpunit.TableCell;
-import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
@@ -28,10 +27,9 @@ import java.util.TreeSet;
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  * @author Bruno Souza
  */
-public class JNMembership {
+public class JNMembership extends JNObject {
     
     private final JNProject project;
-    private final WebConversation wc;
 
     /**
      * Lazily created. {@link JNUser} to sets of {@link JNRole}s in this project.
@@ -46,7 +44,7 @@ public class JNMembership {
     private Map<JNRole,Set<JNUser>> roles;
 
     protected JNMembership(JNProject project) {
-        this.wc = project.wc;
+        super(project);
         this.project = project;
     }
 
@@ -57,7 +55,7 @@ public class JNMembership {
         roles = new TreeMap<JNRole,Set<JNUser>>();
 
         try {
-            WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
+            WebResponse response = goTo(project._getURL()+"/servlets/ProjectMemberList");
 
             while(true) {
                 WebTable users = response.getTableStartingWithPrefix("User");
@@ -85,7 +83,7 @@ public class JNMembership {
                 //          and the groups as members.
 
                 for (int r = 1; r < numRows-1; r++) {
-                    JNUser user = project.net.getUser(users.getCellAsText(r,0).trim());
+                    JNUser user = root.getUser(users.getCellAsText(r,0).trim());
 
                     // when there are more then one role for a single user, the
                     // roleList are separated by commas. This is new layout
@@ -95,7 +93,7 @@ public class JNMembership {
                     while(roleList.hasMoreTokens()) {
                         String roleName = roleList.nextToken().trim();
                         if(roleName.length()==0)    continue;
-                        JNRole role = project.net.getRole(roleName);
+                        JNRole role = root.getRole(roleName);
                         ra.add(role);
 
                         Set<JNUser> l = roles.get(role);
@@ -192,7 +190,7 @@ public class JNMembership {
      */
     public void grantRole( JNUser user, String roleName ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberAdd");
+            WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberAdd");
             WebForm form = r.getFormWithName("ProjectMemberAddForm");
             
             if(form==null)
@@ -205,7 +203,8 @@ public class JNMembership {
             if(submitButton==null)
                 throw new IllegalStateException("no grant role button");
             r = form.submit(submitButton);
-            
+            checkError(r);
+
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful
             
@@ -225,7 +224,7 @@ public class JNMembership {
      * @see #grantRole(JNUser, String)
      */
     public void grantRole( String userName, String roleName ) throws ProcessingException {
-        grantRole( project.net.getUser(userName), roleName );
+        grantRole( root.getUser(userName), roleName );
     }
 
 
@@ -234,7 +233,7 @@ public class JNMembership {
      */
     public void revokeRole( JNUser user, String roleName ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
+            WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberList");
             WebForm form = r.getFormWithName("ProjectMemberListForm");
 
             if(form==null)
@@ -253,6 +252,7 @@ public class JNMembership {
             if(submitButton==null)
                 throw new IllegalStateException("no submit button");
             r = form.submit(submitButton);
+            checkError(r);
 
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful
@@ -275,7 +275,7 @@ public class JNMembership {
      * @see #declineRole(JNUser, String, String)
      */
     public void declineRole( String userName, String roleName, String reason ) throws ProcessingException {
-        declineRole( project.net.getUser(userName), roleName, reason );
+        declineRole( root.getUser(userName), roleName, reason );
     }
     
     /**
@@ -286,7 +286,7 @@ public class JNMembership {
      */
     public void declineRole( JNUser user, String roleName, String reason ) throws ProcessingException {
         try {
-            WebResponse r = wc.getResponse(project._getURL()+"/servlets/ProjectMemberList");
+            WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberList");
             WebForm form = r.getFormWithName("ProjectMemberListPendingForm");
             
             if(form==null)
@@ -316,7 +316,7 @@ public class JNMembership {
             
             form.setParameter("disapprovalReason",reason);
             
-            form.submit(form.getSubmitButton("Button","Submit"));
+            checkError(form.submit(form.getSubmitButton("Button","Submit")));
             
         } catch( IOException e ) {
             throw new ProcessingException("error revoking role from "+user.getName(),e);

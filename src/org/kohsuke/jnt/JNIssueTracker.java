@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class JNIssueTracker {
+public final class JNIssueTracker extends JNObject {
 
     private final JNProject project;
 
@@ -25,6 +25,7 @@ public final class JNIssueTracker {
     private final Map<Integer,JNIssue> issues = new WeakHashMap<Integer, JNIssue>();
 
     JNIssueTracker(JNProject project) {
+        super(project);
         this.project = project;
     }
 

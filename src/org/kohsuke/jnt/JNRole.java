@@ -7,13 +7,11 @@ package org.kohsuke.jnt;
  *
  * @author Kohsuke Kawaguchi
  */
-public class JNRole implements Comparable {
-    protected final JavaNet net;
-
+public class JNRole extends JNObject implements Comparable {
     private final String name;
 
     protected JNRole( JavaNet net, String name ) {
-        this.net = net;
+        super(net);
         this.name = name;
     }
 

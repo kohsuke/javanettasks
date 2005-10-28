@@ -34,23 +34,22 @@ public class JNMyself extends JNUser {
         new Scraper("failed to parse the personal info page") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 // obtain current user information
-                Document dom = Util.getDom4j(wc.getResponse("https://www.dev.java.net/servlets/StartPage"));
+                Document dom = Util.getDom4j(goTo("https://www.dev.java.net/servlets/StartPage"));
 
                 // parse my projects
                 Set<JNProject> myProjects = new HashSet<JNProject>();
                 while(true) {// repeat while we have next pages
 
-                    List projects = dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
-                    for( int i=0; i<projects.size(); i++) {
-                        Element e = (Element)projects.get(i);
-                        myProjects.add(net.getProject(e.getText()));
+                    List<Element> projects = (List<Element>)dom.selectNodes("//DIV[@id='myprojects']//TR/TD[1]/A");
+                    for (Element project : projects) {
+                        myProjects.add(root.getProject(project.getText()));
                     }
 
                     Element nextLink = (Element)dom.selectSingleNode("//DIV[@id='startpage']//P[@class='paginate']/A[text()='Next']");
                     if(nextLink==null)
                         break;
 
-                    dom = Util.getDom4j(wc.getResponse(nextLink.attributeValue("href")));
+                    dom = Util.getDom4j(goTo(nextLink.attributeValue("href")));
                 }
 
                 JNMyself.this.myProjects = Collections.unmodifiableSet(myProjects);

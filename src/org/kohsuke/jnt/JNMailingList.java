@@ -20,7 +20,7 @@ import java.util.List;
  * @author Bruno Souza
  * @author Kohsuke Kawaguchi
  */
-public final class JNMailingList {
+public final class JNMailingList extends JNObject {
     private final JNProject project;
     private final String name;
 
@@ -59,6 +59,7 @@ public final class JNMailingList {
 
 
     JNMailingList(JNProject project, String name) {
+        super(project);
         this.project = project;
         this.name = name;
     }
@@ -139,7 +140,7 @@ public final class JNMailingList {
     public void subscribe( final SubscriptionMode mode ) throws ProcessingException {
         new Scraper<Void>("Unable to subscribe to "+name) {
             protected Void scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectMailingListList");
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectMailingListList");
                 for (WebForm form : response.getForms()) {
                     if(!form.getName().equals("ProjectMailingListListForm"))
                         continue;
@@ -155,9 +156,7 @@ public final class JNMailingList {
                     form.setParameter("subtype",mode.getNameAsWord());
 
                     WebResponse r = form.submit(sb);
-
-                    if(r.getResponseCode()!=200)
-                        throw new ProcessingException("request failed "+r.getResponseMessage());
+                    checkError(r);
                     return null;
                 }
 
@@ -242,11 +241,11 @@ public final class JNMailingList {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete mailing list "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/MailingListDelete?list="+name);
+                WebResponse response = goTo(project._getURL()+"/servlets/MailingListDelete?list="+name);
                 WebForm form = response.getFormWithName("MailingListDeleteForm");
                 if(form==null)
                     throw new ProcessingException("form not found");
-                form.submit();
+                checkError(form.submit());
                 return null;
             }
         }.run();
@@ -273,7 +272,7 @@ public final class JNMailingList {
     private void parseListInfo() throws ProcessingException {
         new Scraper("Unable to parse the mailing list summary page") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/SummarizeList?listName="+name);
+                WebResponse response = goTo(project._getURL()+"/servlets/SummarizeList?listName="+name);
 
                 WebTable listInfo = response.getTableStartingWith("List address");
 
@@ -418,7 +417,9 @@ public final class JNMailingList {
                     throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
                 // check the response
-                String text = form.submit(subscribeBt).getText();
+                WebResponse r = form.submit(subscribeBt);
+                checkError(r);
+                String text = r.getText();
 
                 int start = text.indexOf("<p>New members subscribed:");
                 int end = text.indexOf("</p>", start);
@@ -437,7 +438,7 @@ public final class JNMailingList {
      * Gets the list member form to mass subscribe/unsubscribe addresses.
      */
     private WebForm getListMemberForm(SubscriptionMode mode) throws IOException, SAXException, ProcessingException {
-        WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/MailingListMembers?list="+name+"&group="+mode.groupName);
+        WebResponse response = goTo(project._getURL()+"/servlets/MailingListMembers?list="+name+"&group="+mode.groupName);
 
         for( WebForm form : response.getForms() ) {
             if (form.getAction().equals("MailingListMembers"))
@@ -465,7 +466,9 @@ public final class JNMailingList {
                 if (subscribeBt == null)
                     throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
-                String text = form.submit(subscribeBt).getText();
+                WebResponse r = form.submit(subscribeBt);
+                checkError(r);
+                String text = r.getText();
 
                 int start = text.indexOf("<p>Members unsubscribed:");
                 int end = text.indexOf("</p>", start);

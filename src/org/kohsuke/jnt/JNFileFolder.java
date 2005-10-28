@@ -1,7 +1,6 @@
 package org.kohsuke.jnt;
 
 import com.meterware.httpunit.UploadFileSpec;
-import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
@@ -10,8 +9,8 @@ import org.dom4j.Element;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -31,10 +30,9 @@ import java.util.TreeMap;
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public final class JNFileFolder {
+public final class JNFileFolder extends JNObject {
     
     /*package*/ final JNProject project;
-    /*package*/ final WebConversation wc;
     private final String url;
 
     private final int id;
@@ -57,7 +55,7 @@ public final class JNFileFolder {
     private final JNFileFolder parent;
 
     protected JNFileFolder(JNProject project, JNFileFolder parent, String name, int id) {
-        this.wc = project.wc;
+        super(project);
         this.project = project;
         this.parent = parent;
         this.name = name;
@@ -93,7 +91,7 @@ public final class JNFileFolder {
     private void parse() throws ProcessingException {
         new Scraper("Failed to parse the documents&files section") {
             protected Object scrape() throws IOException, SAXException, ProcessingException, ParseException {
-                WebResponse response = wc.getResponse(url);
+                WebResponse response = goTo(url);
                 Document dom = Util.getDom4j(response);
 
                 // find the current folder
@@ -226,7 +224,7 @@ public final class JNFileFolder {
 
                 setCurrentPage();
 
-                WebResponse r = wc.getCurrentPage();
+                WebResponse r = getCurrentPage();
 
                 WebLink addFileLink = r.getLinkWith("Add new file");
                 if(addFileLink==null) {
@@ -247,6 +245,7 @@ public final class JNFileFolder {
                     // new UploadFileSpec(fileToUpload)});
                 r = form.submit();
 
+                checkError(r);
                 if( r.getImageWithAltText("Alert notification")!=null )
                     // TODO: obtain the error message
                     throw new ProcessingException("error uploading a file "+fileToUpload);
@@ -265,7 +264,7 @@ public final class JNFileFolder {
         "application/x-zip-compressed", ".zip", null
     };
 
-    private static final String guessContentType(File f) {
+    private static String guessContentType(File f) {
         String name = f.getName().toLowerCase();
 
         String type = null;
@@ -296,12 +295,14 @@ public final class JNFileFolder {
     public JNFileFolder createFolder(final String name, final String description) throws ProcessingException {
         return new Scraper<JNFileFolder>("failed to create a new folder "+name+" in "+name) {
             protected JNFileFolder scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
 
                 WebForm form = response.getFormWithName("ProjectFolderAddForm");
                 form.setParameter("name",name);
                 form.setParameter("description",description);
                 response = form.submit();
+
+                checkError(response);
 
                 // make sure there's no error
                 if(response.getText().indexOf("Validation error")!=-1)
@@ -318,11 +319,11 @@ public final class JNFileFolder {
      */
     public void delete() throws ProcessingException {
         new Scraper("error deleting folder "+name) {
-            protected Object scrape() throws IOException, SAXException {
-                WebResponse r = wc.getResponse(
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse r = goTo(
                     project._getURL()+"/servlets/ProjectFolderDelete?folderID="+id);
 
-                r = r.getFormWithName("ProjectFolderDeleteForm").submit();
+                checkError(r.getFormWithName("ProjectFolderDeleteForm").submit());
 
                 parent.reset();
                 return null;
@@ -357,10 +358,10 @@ public final class JNFileFolder {
     /**
      * Moves to the URL of the folder if necessary
      */
-    private void setCurrentPage() throws IOException, SAXException {
-        if( wc.getCurrentPage().getURL().toExternalForm().equals(url) )
+    private void setCurrentPage() throws IOException, SAXException, ProcessingException {
+        if( getCurrentPage().getURL().toExternalForm().equals(url) )
             return;
-        wc.getResponse(url);
+        goTo(url);
     }
 
     /**

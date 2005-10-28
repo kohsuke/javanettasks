@@ -17,7 +17,7 @@ import java.util.List;
  * @author Bruno Souza
  * @author Kohsuke Kawaguchi
  */
-public final class JNForums {
+public final class JNForums extends JNObject {
     private final JNProject project;
 
     /**
@@ -26,6 +26,7 @@ public final class JNForums {
     private List<JNForum> forums;
 
     JNForums(JNProject parent) {
+        super(parent);
         this.project = parent;
     }
 
@@ -79,16 +80,14 @@ public final class JNForums {
     public JNForum createForum(final String name,final String description) throws ProcessingException {
         return new Scraper<JNForum>("Failed to create forum "+name) {
             protected JNForum scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumAdd");
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectForumAdd");
 
                 WebForm form = Util.getFormWithAction(response,"/servlets/ProjectForumAdd");
 
                 form.setParameter("name", name);
                 form.setParameter("description", description);
 
-                form.submit();
-
-                // TODO: parse the output to check errors
+                checkError(form.submit());
 
                 forums = null;
                 parse();
@@ -111,8 +110,8 @@ public final class JNForums {
         forums = new ArrayList<JNForum>();
 
         new Scraper("Unable to parse the forum view page") {
-            protected Object scrape() throws IOException, SAXException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumView");
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectForumView");
                 Document dom = Util.getDom4j(response);
 
                 Element table = (Element)dom.selectSingleNode("//DIV[@id='ProjectForumView']/TABLE");

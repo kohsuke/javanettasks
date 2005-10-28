@@ -5,7 +5,7 @@
   <taskdef resource="org/kohsuke/javanettasks.properties">
     <classpath>
       <pathelement path="target/classes" />
-      <fileset dir="target/javanettasks-1.0.2-SNAPSHOT/bin" includes="**/*.jar" />
+      <fileset dir="target/javanettasks-1.0.5-SNAPSHOT/bin" includes="**/*.jar" />
     </classpath>
   </taskdef>
   
@@ -29,5 +29,12 @@
     <javaNetDelete
       projectName="javanettasks-test"
       file="/xyz/test.txt" />
+  </target>
+
+  <target name='test.addmember'>
+    <javaNetAddMember
+      projectName="jaxb-architecture-document"
+      user="kohsuke_agent"
+      role="Observer" />
   </target>
 </project>

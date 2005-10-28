@@ -1,7 +1,6 @@
 package org.kohsuke.jnt;
 
 import com.meterware.httpunit.TableCell;
-import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
@@ -28,14 +27,10 @@ import java.net.MalformedURLException;
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  * @author Bruno Souza
  */
-public final class JNProject implements Comparable {
+public final class JNProject extends JNObject implements Comparable {
     /** The project name. */
     protected final String projectName;
-    
-    protected final WebConversation wc;
 
-    final JavaNet net;
-    
     //
     // lazily created
     //
@@ -89,8 +84,7 @@ public final class JNProject implements Comparable {
     private String ownerMessage;
 
     protected JNProject(JavaNet net, String name) {
-        this.net = net;
-        this.wc = net.wc;
+        super(net);
         this.projectName = name;
     }
 
@@ -101,7 +95,7 @@ public final class JNProject implements Comparable {
      *      never null.
      */
     public JavaNet getConnection() {
-        return net;
+        return root;
     }
 
     /**
@@ -113,7 +107,7 @@ public final class JNProject implements Comparable {
 
         new Scraper("unable to parse the project page of "+projectName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                Document dom = Util.getDom4j(wc.getResponse(_getURL()+'/'));
+                Document dom = Util.getDom4j(goTo(_getURL()+'/'));
 
                 List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
                 if(as.size()==0)
@@ -139,14 +133,14 @@ public final class JNProject implements Comparable {
                 Set<JNUser> owners = new TreeSet<JNUser>();
                 List<Element> os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
                 for (Element o : os)
-                    owners.add(net.getUser(o.getTextTrim()));
+                    owners.add(root.getUser(o.getTextTrim()));
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
 
                 // parse sub-projects
                 Set<JNProject> subProjects = new TreeSet<JNProject>();
                 List<Element> sps = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
                 for (Element sp : sps)
-                    subProjects.add(net.getProject(sp.getTextTrim()));
+                    subProjects.add(root.getProject(sp.getTextTrim()));
                 JNProject.this.subProjects = Collections.unmodifiableSet(subProjects);
 
                 // parse owner's message.
@@ -220,8 +214,8 @@ public final class JNProject implements Comparable {
      */
     public String getOwnerMessage2() throws ProcessingException {
         return new Scraper<String>("Failed to get the owner message") {
-            protected String scrape() throws IOException, SAXException {
-                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
+            protected String scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
                 WebForm form = response.getFormWithName("ProjectEditForm");
 
@@ -246,15 +240,15 @@ public final class JNProject implements Comparable {
      */
     public String setOwnerMessage(final String msg) throws ProcessingException {
         return new Scraper<String>("Failed to set the owner message") {
-            protected String scrape() throws IOException, SAXException {
-                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
+            protected String scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
                 WebForm form = response.getFormWithName("ProjectEditForm");
 
                 String old = form.getParameterValue("status");
                 form.setParameter("status",msg);
 
-                form.submit();
+                checkError(form.submit());
 
                 return old;
             }
@@ -271,7 +265,7 @@ public final class JNProject implements Comparable {
     public JNProject getParent() throws ProcessingException {
         parseProjectInfo();
         if( parentProject==null )   return null;
-        return net.getProject(parentProject); 
+        return root.getProject(parentProject);
     }
 
     /**
@@ -286,13 +280,13 @@ public final class JNProject implements Comparable {
 
         new Scraper("Failed to reparent the project") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectEdit");
+                WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
                 WebForm form = response.getFormWithName("ProjectEditForm");
 
                 form.setParameter("parent", Util.getOptionValueFor(form,"parent",newParent.getName()));
 
-                form.submit();
+                checkError(form.submit());
 
                 return null;
             }
@@ -312,7 +306,7 @@ public final class JNProject implements Comparable {
      */
     public JNProject getOwnerCommunity() throws ProcessingException {
         parseProjectInfo();
-        JNProject p = net.getProject(topLevelName);
+        JNProject p = root.getProject(topLevelName);
         if(p.isCommunity())
             return p;
         else
@@ -474,7 +468,7 @@ public final class JNProject implements Comparable {
     public void approve() throws ProcessingException {
         new Scraper("failed to approve project "+projectName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = wc.getResponse(_getURL()+"/servlets/ProjectApproval");
+                WebResponse response = goTo(_getURL()+"/servlets/ProjectApproval");
 
                 WebTable table = response.getTableStartingWith("Project");
 
@@ -510,7 +504,7 @@ public final class JNProject implements Comparable {
 
                 form.setParameter(approveElementName, "Approve");
 
-                response = form.submit();
+                checkError(form.submit());
 
                 // TODO: need to treat errors here, if something goes wrong.
                 return null;

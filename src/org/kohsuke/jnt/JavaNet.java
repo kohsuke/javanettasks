@@ -21,9 +21,9 @@ import java.util.Properties;
  * 
  * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public class JavaNet {
+public class JavaNet extends JNObject {
     protected final WebConversation wc;
-    
+
     private final Map<String,JNProject> projects = new HashMap<String,JNProject>();
     private final Map<String,JNUser> users = new HashMap<String,JNUser>();
     private final Map<String,JNRole> roles = new HashMap<String,JNRole>();
@@ -38,6 +38,7 @@ public class JavaNet {
     }
 
     private JavaNet(WebConversation wc) {
+        super(null);
         this.wc = wc;
         // java.net security certificate cause a problem. So avoid it by disabling certificate validation.
         SSLTrustAllManager.install();
@@ -72,7 +73,7 @@ public class JavaNet {
 
                 form.setParameter("loginID",userName);
                 form.setParameter("password",password);
-                form.submit(form.getSubmitButton("Login"));
+                checkError(form.submit(form.getSubmitButton("Login")));
 
                 // check if the login was successful
                 if( wc.getCurrentPage().getURL().toExternalForm().indexOf("TLogin")!=-1)

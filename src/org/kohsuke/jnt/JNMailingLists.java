@@ -1,7 +1,6 @@
 package org.kohsuke.jnt;
 
 import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
@@ -20,9 +19,8 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  * @author Bruno Souza
  */
-public final class JNMailingLists {
+public final class JNMailingLists extends JNObject {
     private final JNProject project;
-    private final WebConversation wc;
 
     /**
      * List of {@link JNMailingList}. Lazily parsed.
@@ -30,7 +28,7 @@ public final class JNMailingLists {
     private List<JNMailingList> lists;
 
     protected JNMailingLists(JNProject project) {
-        this.wc = project.wc;
+        super(project);
         this.project = project;
     }
 
@@ -61,9 +59,8 @@ public final class JNMailingLists {
     public JNMailingList get(String name) throws ProcessingException {
         if(lists==null)
             parse();
-        for( int i=0; i<lists.size(); i++ ) {
-            JNMailingList f = lists.get(i);
-            if(f.getName().equals(name))
+        for (JNMailingList f : lists) {
+            if (f.getName().equals(name))
                 return f;
         }
         return null;
@@ -73,7 +70,7 @@ public final class JNMailingLists {
         lists = new ArrayList<JNMailingList>();
 
         try {
-            WebResponse response = wc.getResponse(project._getURL()+"/servlets/ProjectMailingListList");
+            WebResponse response = goTo(project._getURL()+"/servlets/ProjectMailingListList");
 
             for( WebLink link : response.getLinks() ) {
                 String linkTxt = link.getURLString();
@@ -134,7 +131,7 @@ public final class JNMailingLists {
                                 Collection moderators ) throws ProcessingException {
 
         try {
-            WebResponse response = wc.getResponse(project._getURL()+"/servlets/MailingListAdd");
+            WebResponse response = goTo(project._getURL()+"/servlets/MailingListAdd");
 
             WebForm form = response.getFormWithName("MailingListAddForm");
 
@@ -151,7 +148,9 @@ public final class JNMailingLists {
             if(moderators!=null)
                 form.setParameter("moderators", Util.toList(moderators,'\n'));
 
-            String result = form.submit().getText();
+            WebResponse r = form.submit();
+            checkError(r);
+            String result = r.getText();
 
             // TODO: need to handle list creation erros here.
             // the errors we should handle are:

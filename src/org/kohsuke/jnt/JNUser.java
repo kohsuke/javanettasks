@@ -1,27 +1,19 @@
 package org.kohsuke.jnt;
 
-import com.meterware.httpunit.WebConversation;
-
 /**
  * An user of java&#x2E;net.
  * 
  * @author
  *      Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class JNUser implements Comparable {
-    protected final JavaNet net;
-
-    protected final WebConversation wc;
-    
-    
+public class JNUser extends JNObject implements Comparable {
     private final String name;
-    
+
     protected JNUser( JavaNet net, String name ) {
-        this.net = net;
-        this.wc = net.wc;
+        super(net);
         this.name = name;
     }
-    
+
     /**
      * Obtains the user name.
      * 
@@ -31,7 +23,7 @@ public class JNUser implements Comparable {
     public final String getName() {
         return name;
     }
-    
+
     /**
      * Returns the e-mail address of the user.
      */
@@ -52,7 +44,7 @@ public class JNUser implements Comparable {
         if(!(obj instanceof JNUser))
             return false;
         JNUser that = (JNUser)obj;
-        return this.name.equals(that.name);        
+        return this.name.equals(that.name);
     }
 
     public String toString() {

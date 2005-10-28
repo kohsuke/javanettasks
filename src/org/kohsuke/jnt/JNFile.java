@@ -21,7 +21,7 @@ import com.meterware.httpunit.WebResponse;
  * @author Kohsuke Kawaguchi
  * @author Bruno Souza
  */
-public final class JNFile {
+public final class JNFile extends JNObject {
     private final JNFileFolder folder;
     private final String name;
     private final URL href;
@@ -36,6 +36,7 @@ public final class JNFile {
      * Parses the information from the TR element.
      */
     protected JNFile( JNFileFolder folder, Element tr ) throws ProcessingException, ParseException, MalformedURLException {
+        super(folder);
         this.folder = folder;
 
         Element anchor = (Element)tr.selectSingleNode("TD[1]//A");  // XPath is 1-origin
@@ -50,7 +51,7 @@ public final class JNFile {
 
         Element td2 = (Element) tr.elements("TD").get(2);
 
-        modifiedBy = folder.project.net.getUser( td2.element("A").getTextTrim() );
+        modifiedBy = root.getUser( td2.element("A").getTextTrim() );
 
         lastModified = LONG_FORMAT.parse(td2.getTextTrim().substring(3));   // trim off the first "on "
 
@@ -157,11 +158,11 @@ public final class JNFile {
      */
     public void delete() throws ProcessingException {
         new Scraper("error deleting file "+name) {
-            protected Object scrape() throws IOException, SAXException {
-                WebResponse r = folder.wc.getResponse(
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse r = goTo(
                     folder.project._getURL()+"/servlets/ProjectDocumentDelete?documentID="+id+"&maxDepth=");
 
-                r = r.getFormWithName("ProjectDocumentDeleteForm").submit();
+                checkError(r.getFormWithName("ProjectDocumentDeleteForm").submit());
 
                 folder.reset();
                 return null;

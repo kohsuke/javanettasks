@@ -52,7 +52,7 @@ public abstract class AbstractJavaNetTask extends Task {
                 run(cmd);
                 return;
             } catch( ProcessingException e ) {
-                err = new BuildException(e);
+                BuildException err = new BuildException(e);
                 count++;
                 if(count<retry) {
                     err.printStackTrace();

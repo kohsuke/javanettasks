@@ -14,7 +14,7 @@ import com.meterware.httpunit.WebForm;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class JNForum {
+public final class JNForum extends JNObject {
     private final JNProject project;
     private final String name;
     private final int id;
@@ -22,6 +22,7 @@ public final class JNForum {
     private final String description;
 
     public JNForum(JNProject project, String name, int id, int messageCount, String description) {
+        super(project);
         this.project = project;
         this.name = name;
         this.id = id;
@@ -102,9 +103,9 @@ public final class JNForum {
     public void delete() throws ProcessingException {
         new Scraper("Unable to delete forum "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectForumDelete?forumID="+id);
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectForumDelete?forumID="+id);
                 WebForm form = Util.getFormWithAction(response,"ProjectForumDelete");
-                form.submit();
+                checkError(form.submit());
                 return null;
             }
         }.run();

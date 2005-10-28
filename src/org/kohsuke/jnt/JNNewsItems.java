@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 272 2004-12-19 20:08:23Z kohsuke $
+ * $Id: JNNewsItems.java 475 2005-10-28 18:12:16Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -28,15 +28,12 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 272 $
+ * @version $Revision: 475 $
  */
-public final class JNNewsItems {
+public final class JNNewsItems extends JNObject {
 
     // parent project reference
     private final JNProject project;
-
-    // web conversation objects used to interact with the news item form
-    private final WebConversation wc;
 
     /**
      * List of {@link JNNewsItem}s.
@@ -56,7 +53,7 @@ public final class JNNewsItems {
     private static final String FORM_BUTTON = "Button";
 
     protected JNNewsItems(JNProject project) {
-        this.wc = project.wc;
+        super(project);
         this.project = project;
         //System.out.println("1: " + url);
     }
@@ -97,7 +94,7 @@ public final class JNNewsItems {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 // move to the submission page
                 String url = project._getURL()+"/servlets/ProjectNewsAdd";
-                WebResponse resp = wc.getResponse(url);
+                WebResponse resp = goTo(url);
 
                 WebForm form = resp.getFormWithName(FORM_NAME);
                 SubmitButton submitButton =
@@ -137,7 +134,7 @@ public final class JNNewsItems {
                 }
 
                 // submit the news item
-                form.submit(submitButton);
+                checkError(form.submit(submitButton));
 
                 return null;
             }
@@ -185,8 +182,8 @@ public final class JNNewsItems {
         newsItems = new ArrayList<JNNewsItem>();
 
         new Scraper("Unable to parse the announcement list") {
-            protected Object scrape() throws IOException, SAXException, ParseException {
-                WebResponse response = project.wc.getResponse(project._getURL()+"/servlets/ProjectNewsList");
+            protected Object scrape() throws IOException, SAXException, ParseException, ProcessingException {
+                WebResponse response = goTo(project._getURL()+"/servlets/ProjectNewsList");
                 Document dom = Util.getDom4j(response);
 
                 Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");

@@ -22,7 +22,7 @@ import java.text.ParseException;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class JNIssue {
+public final class JNIssue extends JNObject {
     private final JNProject project;
     private final int id;
 
@@ -50,7 +50,7 @@ public final class JNIssue {
          * Gets the user who added this comment.
          */
         public JNUser getAuthor() {
-            return project.net.getUser(e.elementText("who"));
+            return root.getUser(e.elementText("who"));
         }
 
         /**
@@ -73,6 +73,7 @@ public final class JNIssue {
     }
 
     JNIssue(JNProject _project, int _id, Element rawData) throws ProcessingException {
+        super(_project);
         this.project = _project;
         this.id = _id;
 
@@ -128,7 +129,7 @@ public final class JNIssue {
      * Gets the reporter of this issue.
      */
     public JNUser getReporter() {
-        return project.net.getUser(rawData.elementText("reporter"));
+        return root.getUser(rawData.elementText("reporter"));
     }
 
     /**
@@ -245,8 +246,8 @@ public final class JNIssue {
         final String idList = buf.toString();
 
         return new Scraper<Document>("fetching the details of the issue "+idList) {
-            public Document scrape() throws IOException, SAXException {
-                WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xml.cgi?id="+idList);
+            public Document scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse rsp = project.goTo(project.getURL()+"/issues/xml.cgi?id="+idList);
                 return Util.getDom4j(rsp);
             }
         }.run();
@@ -258,8 +259,8 @@ public final class JNIssue {
      */
     static Document bulkUpdateFetch(final JNProject project,final String queryParam) throws ProcessingException {
         return new Scraper<Document>("fetching the details of the issue xmlupdate.cgi "+queryParam) {
-            public Document scrape() throws IOException, SAXException {
-                WebResponse rsp = project.wc.getResponse(project.getURL()+"/issues/xmlupdate.cgi?"+queryParam);
+            public Document scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse rsp = project.goTo(project.getURL()+"/issues/xmlupdate.cgi?"+queryParam);
                 return Util.getDom4j(rsp);
             }
         }.run();
