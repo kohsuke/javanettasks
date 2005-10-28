@@ -27,6 +27,10 @@ where command can be ...
     list all the subprojects of a given project(s)
   interactive
     launches a shell where you can type multiple commands
+  approveProject
+    approves a project
+  moveProject
+    change the parent of a project
 </pre>
 		<p>
 			Use the help command to see the details about the task:
