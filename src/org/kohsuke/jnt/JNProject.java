@@ -283,8 +283,21 @@ public final class JNProject extends JNObject implements Comparable {
                 WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
                 WebForm form = response.getFormWithName("ProjectEditForm");
+                String parentName = newParent.getName();
+                boolean found = false;
 
-                form.setParameter("parent", Util.getOptionValueFor(form,"parent",newParent.getName()));
+                String[] options = form.getOptions("parent");
+                for (int i = 0; i < options.length; i++) {
+                    String optionText = options[i].replace((char) 0xA0, ' ');
+                    if( optionText.equals(parentName) || optionText.startsWith(parentName+' ')) {
+                        form.setParameter("parent",form.getOptionValues("parent")[i]);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                    throw new ProcessingException("No such projcet " + parentName);
 
                 checkError(form.submit());
 
@@ -484,7 +497,7 @@ public final class JNProject extends JNObject implements Comparable {
                     if (c1.getLinks().length > 0) {
                         String link = c1.getLinks()[0].getURLString();
 
-                        if (link.equals(_getURL())) {
+                        if (link.equals(_getURL()+'/')) {
                             TableCell c2 = table.getTableCell(r, 3);
                             String[] names = c2.getElementNames();
                             if (names.length > 0) {

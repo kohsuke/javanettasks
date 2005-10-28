@@ -16,6 +16,8 @@ public abstract class Commandlet {
         new ListSubProjectsCommandlet(),
         new SubscribeListCommandlet(),
         new InteractiveCommandlet(),
+        new ApproveProjectCommandlet(),
+        new MoveProjectCommandlet(),
     };
 
 
