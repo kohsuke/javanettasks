@@ -19,31 +19,50 @@ public abstract class AbstractJavaNetTask extends Task {
     /** Account information. */
     private String userName;
     private String password;
-    
+
+    /** Number of retries. */
+    protected int retry = 1;
+
     public void setUserName( String value ) {
         this.userName = value;
     }
     public void setPassword( String value ) {
         this.password = value;
     }
-    
+    public void setRetry(int retry) {
+        this.retry = retry;
+    }
+
     public void execute() throws BuildException {
-        // do the job
-        try {
-            JavaNet cmd;
-            
-            if (userName != null && userName.length()!=0) {
-                log("authenticating", Project.MSG_VERBOSE);
-                cmd = JavaNet.connect(userName,password);
-            } else {
-                log("using user default setting", Project.MSG_VERBOSE);
-                cmd = JavaNet.connect();
+        int count = 0;
+
+        while(true) {
+            // do the job
+            try {
+                JavaNet cmd;
+
+                if (userName != null && userName.length()!=0) {
+                    log("authenticating", Project.MSG_VERBOSE);
+                    cmd = JavaNet.connect(userName,password);
+                } else {
+                    log("using user default setting", Project.MSG_VERBOSE);
+                    cmd = JavaNet.connect();
+                }
+
+                run(cmd);
+                return;
+            } catch( ProcessingException e ) {
+                err = new BuildException(e);
+                count++;
+                if(count<retry) {
+                    err.printStackTrace();
+                    // retry
+                } else {
+                    throw err;
+                }
             }
-        
-            run(cmd);
-        } catch( ProcessingException e ) {
-            throw new BuildException(e);
         }
+
     }
     
     /**

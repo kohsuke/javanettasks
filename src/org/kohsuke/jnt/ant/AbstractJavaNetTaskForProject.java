@@ -15,7 +15,7 @@ public abstract class AbstractJavaNetTaskForProject extends AbstractJavaNetTask 
     
     /** Name of the project. Such as "java-ws-xml" or "msv". */
     private String projectName;
-    
+
     public void setProjectName( String value ) {
         this.projectName = value;
     }
