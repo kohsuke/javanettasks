@@ -37,7 +37,7 @@ public final class JNMailingList extends JNObject {
      * Subscribers as {@link String}s. Lazily parsed.
      * When non-null, eachc {@link List} is unmodifiable.
      */
-    private final List[] subscribers = new List[2];
+    private final List<String>[] subscribers = new List[SubscriptionMode.values().length];
 
     /**
      * The number of messages posted per month.
@@ -55,7 +55,7 @@ public final class JNMailingList extends JNObject {
     /**
      * List of {@link MessagePerMonth}. Lazily parsed.
      */
-    private ArrayList messagesPerMonth;
+    private List<MessagePerMonth> messagesPerMonth;
 
 
     JNMailingList(JNProject project, String name) {
@@ -128,7 +128,7 @@ public final class JNMailingList extends JNObject {
      * @return
      *      read-only non-null (but possibly empty) list.
      */
-    public List getSubscribers( SubscriptionMode mode ) throws ProcessingException {
+    public List<String> getSubscribers( SubscriptionMode mode ) throws ProcessingException {
         if(subscribers[mode.index]==null)
             parseSubscribers(mode);
         return subscribers[mode.index];
@@ -263,7 +263,7 @@ public final class JNMailingList extends JNObject {
      * @return
      *      always non-null (but possibly empty) list of {@link MessagePerMonth}.
      */
-    public List getMessagesPerMonth() throws ProcessingException {
+    public List<MessagePerMonth> getMessagesPerMonth() throws ProcessingException {
         if(messagesPerMonth==null)  parseListInfo();
         return Collections.unmodifiableList(messagesPerMonth);
     }
@@ -284,7 +284,7 @@ public final class JNMailingList extends JNObject {
 
                 WebTable monthInfo = response.getTableStartingWith("Month");
 
-                messagesPerMonth = new ArrayList();
+                messagesPerMonth = new ArrayList<MessagePerMonth>();
 
                 if(monthInfo==null) {
                     if(totalMessages==0)

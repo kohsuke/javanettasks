@@ -14,7 +14,19 @@ public enum SubscriptionMode {
     /**
      * Digest subscription mode. One e-mail per a day.
      */
-    DIGEST("digest","Digest+Subscribers",1);
+    DIGEST("digest","Digest+Subscribers",1),
+
+    /**
+     * List moderators.
+     */
+    MODERATOR("moderator","Moderators",2),
+
+    /**
+     * Allowed posters.
+     *
+     * Those who can post messages but don't receive e-mails.
+     */
+    ALLOWED_POSTERS("allowed posters","Allowed+Posters",3);
 
     private final String name;
 

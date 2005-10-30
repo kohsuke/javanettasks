@@ -173,6 +173,9 @@ public class JavaNet extends JNObject {
      * <p>
      * A successful completion of this method does not
      * guarantee that the project actually exists.
+     *
+     * @return
+     *      always non-null, even if no such project exists.
      */
     public JNProject getProject(String projectName) throws ProcessingException {
         projectName = projectName.toLowerCase();
