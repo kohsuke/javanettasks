@@ -21,6 +21,7 @@
         <item name="javaNetUpload"         href="/ref/upload.html"/>
         <item name="javaNetDelete"         href="/ref/delete.html"/>
         <item name="javaNewItem"           href="/ref/news.html"/>
+        <item name="javaNetAddMember"      href="/ref/addmember.html"/>
       </item>
       <item name="java.net OM">
         <item name="Javadoc"                 href="/apidocs/" />

@@ -1,0 +1,70 @@
+<document>
+<properties>
+	<title>javaNetAddMember task</title>
+</properties>
+<body>
+<section name="Description">
+	<p>
+		The &lt;javaNetAddMember> task grants a role to an user on a project.
+	</p>
+</section>
+<section name="Parameter Attributes">
+	<table border="1">
+		<thead>
+			<tr>
+				<td>Attribute</td>
+				<td>Description</td>
+				<td>Required</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>projectName</td>
+				<td>
+					The name of the project to which a file is uploaded.
+					(e.g., "javanettasks")
+				</td>
+				<td>Yes</td>
+			</tr>
+			<tr>
+				<td>userName</td>
+				<td>
+					The account name. Uploading a file requires an account with a proper permission.
+					(e.g., "kohsuke")
+				</td>
+				<td>No</td>
+			</tr>
+			<tr>
+				<td>password</td>
+				<td>
+					The password of the account.
+				</td>
+				<td>No</td>
+			</tr>
+			
+			<tr>
+				<td>user</td>
+				<td>
+					The user name to which the role is granted.
+				</td>
+				<td>Yes</td>
+			</tr>
+			<tr>
+				<td>role</td>
+				<td>
+					The role name that the user will receive.
+				</td>
+				<td>Yes</td>
+			</tr>
+		</tbody>
+	</table>
+</section>
+<section name="Nested Parameter Elements">
+	<p>
+		none.
+	</p>
+	<div align="right" style="font-size: smaller">
+	$Id: addmember.xml 499 2005-10-31 07:56:17Z kohsuke $
+	</div>
+</section>
+</body></document>
