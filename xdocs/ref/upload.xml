@@ -5,7 +5,7 @@
 <body>
 <section name="Description">
 	<p>
-		The &lt;javaNetUload> task uploads a file to the file sharing section of java.net.
+		The &lt;javaNetUpload> task uploads a file to the file sharing section of java.net.
 	</p>
 </section>
 <section name="Parameter Attributes">
@@ -85,7 +85,7 @@
 		none.
 	</p>
 	<div align="right" style="font-size: smaller">
-	$Id: upload.xml 330 2005-04-08 22:26:24Z kohsuke $
+	$Id: upload.xml 513 2005-12-07 07:59:26Z kohsuke $
 	</div>
 </section>
 </body></document>
