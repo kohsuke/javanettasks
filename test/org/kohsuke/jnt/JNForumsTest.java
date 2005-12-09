@@ -19,7 +19,7 @@ public class JNForumsTest extends TestCaseBase {
         JNProject project = con.getProject("java-net");
         JNForums forums = project.getForums();
 
-        assertEquals(9,forums.getForums().size());
+        assertEquals(10,forums.getForums().size());
 
         JNForum forum = forums.getForum("Wish List");
         assertNotNull(forum);
