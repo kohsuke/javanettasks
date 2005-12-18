@@ -82,6 +82,7 @@ public final class JNProject extends JNObject implements Comparable {
     private JNFileFolder rootFolder;
 
     private String ownerMessage;
+    private JNVCS vcs;
 
     protected JNProject(JavaNet net, String name) {
         super(net);
@@ -157,6 +158,15 @@ public final class JNProject extends JNObject implements Comparable {
                     ownerMessage = ownerMessage.substring(3,ownerMessage.length()-4);
                 }
 
+                // is this CVS, or Subversion based?
+                Node vcslink = dom.selectSingleNode("//DIV[@id='projecttools']//A[@href='https://" + projectName + ".dev.java.net/source/browse/" + projectName + "/']");
+                if(vcslink==null)
+                    throw new ProcessingException("Version control link not found");
+                if(vcslink.getText().indexOf("CVS")>0)
+                    vcs = JNVCS.CVS;
+                else
+                    vcs = JNVCS.SVN;
+
                 return null;
             }
         }.run();
@@ -170,6 +180,17 @@ public final class JNProject extends JNObject implements Comparable {
      */
     public String getName() {
         return projectName;
+    }
+
+    /**
+     * Gets the version control system this project uses.
+     *
+     * @return
+     *      always non-null.
+     */
+    public JNVCS getVersionControl() throws ProcessingException {
+        parseProjectInfo();
+        return vcs;
     }
 
     /**
