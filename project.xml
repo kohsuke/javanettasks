@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>java.net tasks</name>
   <id>javanettasks</id>
-  <currentVersion>1.0.5</currentVersion>
+  <currentVersion>1.0.6</currentVersion>
   
   <organization>
     <name>Kohsuke Kawaguchi</name>
