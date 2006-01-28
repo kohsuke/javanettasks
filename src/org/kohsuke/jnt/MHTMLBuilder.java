@@ -6,17 +6,12 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import sun.misc.BASE64Encoder;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,71 +25,64 @@ import java.util.regex.Pattern;
  * @author Kohsuke Kawaguchi
  */
 public class MHTMLBuilder {
-    Set<URL> resources = new HashSet<URL>();
-    List<URL> queue = new ArrayList<URL>();
-    String boundary = "==mhtml-archiver"; // ."+System.currentTimeMillis();
+    private final Set<URL> resources = new HashSet<URL>();
+    private final List<URL> queue = new ArrayList<URL>();
+    private String boundary = "==mhtml-archiver_"+System.currentTimeMillis();
+
+    public static void produce(WebConversation cnv, URL url, OutputStream os) throws Exception {
+        new MHTMLBuilder().run(cnv,url,os);
+    }
 
     private void addResource(URL url) {
         if(resources.add(url))
             queue.add(url);
     }
 
-    public void produce(WebConversation cnv, URL url, OutputStream os) throws Exception {
+    private void run(WebConversation cnv, URL url, OutputStream os) throws Exception {
         queue.add(url);
         PrintStream out = new PrintStream(os);
+
+        out.println("Content-Type: multipart/related; boundary=\""+boundary+"\"; type=\"text/html\"");
+        out.println();
+
         while(!queue.isEmpty()) {
             url = queue.remove(queue.size() - 1);
-            URLConnection con = url.openConnection();
-            con.connect();
+            WebResponse r = cnv.getResponse(url.toExternalForm());
+            //URLConnection con = url.openConnection();
+            //con.connect();
             out.println("--"+boundary);
-            String contentType = con.getContentType();
-            out.println("Content-Type: "+contentType);
+            out.println("Content-Type: "+r.getHeaderField("Content-type"));
+            out.println("Content-Location: "+r.getURL());
 
-            if(contentType.startsWith("text/html")) {
-                con.getInputStream().close();
-                WebResponse r = cnv.getResponse(url.toExternalForm());
-                out.println("Content-Location: "+r.getURL());
+            String contentType = r.getContentType();
+            if(contentType.equals("text/html")) {
                 out.println();
                 produceHTML(r,out);
                 continue;
             }
 
-            out.println("Content-Location: "+url);
-
             if(contentType.startsWith("text/css")) {
                 out.println();
-                produceCSS(con,out);
-                continue;
+                findInCSS(r.getText(),r.getURL());
             }
 
-            // otherwise treat this as BLOB
-            out.println("Content-Transfer-Encoding: base64");
+            boolean binary = !contentType.startsWith("text");
+
+            // just dump the data
+            if(binary)
+                out.println("Content-Transfer-Encoding: base64");
             out.println();
 
-            new BASE64Encoder().encode(con.getInputStream(),out);
+            if(binary)
+                new BASE64Encoder().encode(r.getInputStream(),out);
+            else
+                copyStream(r.getInputStream(),out);
+
             out.println();
             out.println();
         }
         // all done
         out.println("--"+boundary+"--");
-    }
-
-    private void produceCSS(URLConnection con, PrintStream out) throws IOException {
-        // TODO: check encoding
-        InputStream in = con.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copyStream(in,baos);
-        byte[] image = baos.toByteArray();
-
-        BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(image)));
-        String line;
-
-        while((line=r.readLine())!=null) {
-            findInCSS(line, con.getURL());
-        }
-
-        out.write(image);
-        out.println();
     }
 
     public void produceHTML(WebResponse r, PrintStream out) throws Exception {
@@ -141,6 +129,6 @@ public class MHTMLBuilder {
         while((sz=i.read(buf))>0)
             o.write(buf,0,sz);
         i.close();
-        o.close();
+        //o.close();
     }
 }
