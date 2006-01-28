@@ -202,8 +202,7 @@ public class JNMembership extends JNObject {
             SubmitButton submitButton = form.getSubmitButton("Button");
             if(submitButton==null)
                 throw new IllegalStateException("no grant role button");
-            r = form.submit(submitButton);
-            checkError(r);
+            r = checkError(form.submit(submitButton));
 
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful
@@ -251,8 +250,7 @@ public class JNMembership extends JNObject {
             SubmitButton submitButton = form.getSubmitButton("Button");
             if(submitButton==null)
                 throw new IllegalStateException("no submit button");
-            r = form.submit(submitButton);
-            checkError(r);
+            r = checkError(form.submit(submitButton));
 
             if( r.getURL().toExternalForm().endsWith("ProjectMemberList") )
                 return; // successful

@@ -148,9 +148,7 @@ public final class JNMailingLists extends JNObject {
             if(moderators!=null)
                 form.setParameter("moderators", Util.toList(moderators,'\n'));
 
-            WebResponse r = form.submit();
-            checkError(r);
-            String result = r.getText();
+            String result = checkError(form.submit()).getText();
 
             // TODO: need to handle list creation erros here.
             // the errors we should handle are:

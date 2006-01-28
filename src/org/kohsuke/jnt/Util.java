@@ -5,6 +5,8 @@ import org.dom4j.io.DOMReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
+import org.cyberneko.html.parsers.DOMParser;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
@@ -13,6 +15,8 @@ import com.meterware.httpunit.WebResponse;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.io.StringReader;
+import java.io.IOException;
 
 /**
  * Utility code.
@@ -42,7 +46,7 @@ class Util {
         }
         throw new ProcessingException("No such option:"+displayString);
     }
-    
+
     /**
      * Finds a hyper-link that has the specified text and whose
      * target URL starts with the given prefix.
@@ -54,18 +58,20 @@ class Util {
                 continue;
             if( !links[i].getURLString().startsWith(urlPrefix))
                 continue;
-                
+
             return links[i];
         }
-        
+
         throw new ProcessingException("no link found for '"+text+'\'');
     }
-    
+
     /**
      * Obtains the HTML of the response as a dom4j document.
      */
-    static Document getDom4j( WebResponse wr ) throws SAXException {
-        return new DOMReader().read(wr.getDOM());
+    static Document getDom4j( WebResponse wr ) throws SAXException, IOException {
+        DOMParser domParser = new DOMParser();
+        domParser.parse(new InputSource(new StringReader(wr.getText())));
+        return new DOMReader().read(domParser.getDocument());
     }
 
     /**

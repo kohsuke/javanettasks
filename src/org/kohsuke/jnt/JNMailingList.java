@@ -155,8 +155,7 @@ public final class JNMailingList extends JNObject {
                     // set the mode
                     form.setParameter("subtype",mode.getNameAsWord());
 
-                    WebResponse r = form.submit(sb);
-                    checkError(r);
+                    checkError(form.submit(sb));
                     return null;
                 }
 
@@ -417,8 +416,7 @@ public final class JNMailingList extends JNObject {
                     throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
                 // check the response
-                WebResponse r = form.submit(subscribeBt);
-                checkError(r);
+                WebResponse r = checkError(form.submit(subscribeBt));
                 String text = r.getText();
 
                 int start = text.indexOf("<p>New members subscribed:");
@@ -466,8 +464,7 @@ public final class JNMailingList extends JNObject {
                 if (subscribeBt == null)
                     throw new ProcessingException("Error: submit button not found! This is probably the wrong page...");
 
-                WebResponse r = form.submit(subscribeBt);
-                checkError(r);
+                WebResponse r = checkError(form.submit(subscribeBt));
                 String text = r.getText();
 
                 int start = text.indexOf("<p>Members unsubscribed:");

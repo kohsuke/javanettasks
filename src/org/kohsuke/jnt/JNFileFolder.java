@@ -243,9 +243,8 @@ public final class JNFileFolder extends JNObject {
                     new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
                     // this version somehow posts the full file name to the server, which often confuses it.
                     // new UploadFileSpec(fileToUpload)});
-                r = form.submit();
+                r = checkError(form.submit());
 
-                checkError(r);
                 if( r.getImageWithAltText("Alert notification")!=null )
                     // TODO: obtain the error message
                     throw new ProcessingException("error uploading a file "+fileToUpload);
@@ -300,9 +299,7 @@ public final class JNFileFolder extends JNObject {
                 WebForm form = response.getFormWithName("ProjectFolderAddForm");
                 form.setParameter("name",name);
                 form.setParameter("description",description);
-                response = form.submit();
-
-                checkError(response);
+                response = checkError(form.submit());
 
                 // make sure there's no error
                 if(response.getText().indexOf("Validation error")!=-1)

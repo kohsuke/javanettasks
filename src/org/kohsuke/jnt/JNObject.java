@@ -29,15 +29,13 @@ abstract class JNObject {
      * Jumps to the specified page.
      */
     protected WebResponse goTo(String url) throws IOException, SAXException, ProcessingException {
-        WebResponse response = root.wc.getResponse(url);
-        checkError(response);
-        return response;
+        return checkError(root.wc.getResponse(url));
     }
 
     /**
      * Checks if the response contains any error message.
      */
-    protected final WebResponse checkError(WebResponse resp) throws SAXException, ProcessingException {
+    protected final WebResponse checkError(WebResponse resp) throws SAXException, ProcessingException, IOException {
         if(resp.getResponseCode()!=200)
             throw new ProcessingException("request failed "+resp.getResponseMessage());
 
