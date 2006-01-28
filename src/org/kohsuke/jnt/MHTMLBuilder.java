@@ -4,6 +4,7 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.xml.sax.SAXException;
 import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
@@ -20,7 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Creates an MHTML package from {@link WebResponse}.
+ * Creates an <a href="http://en.wikipedia.org/wiki/MHTML">MHTML package</a>
+ * from a {@link URL}.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -29,7 +31,7 @@ public class MHTMLBuilder {
     private final List<URL> queue = new ArrayList<URL>();
     private String boundary = "==mhtml-archiver_"+System.currentTimeMillis();
 
-    public static void produce(WebConversation cnv, URL url, OutputStream os) throws Exception {
+    public static void produce(WebConversation cnv, URL url, OutputStream os) throws IOException, SAXException {
         new MHTMLBuilder().run(cnv,url,os);
     }
 
@@ -38,7 +40,7 @@ public class MHTMLBuilder {
             queue.add(url);
     }
 
-    private void run(WebConversation cnv, URL url, OutputStream os) throws Exception {
+    private void run(WebConversation cnv, URL url, OutputStream os) throws IOException, SAXException {
         queue.add(url);
         PrintStream out = new PrintStream(os);
 
@@ -85,7 +87,7 @@ public class MHTMLBuilder {
         out.println("--"+boundary+"--");
     }
 
-    public void produceHTML(WebResponse r, PrintStream out) throws Exception {
+    public void produceHTML(WebResponse r, PrintStream out) throws IOException, SAXException {
         out.println();
 
         Document tree = Util.getDom4j(r);
