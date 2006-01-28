@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * The current logged-in user in java&#x2E;net.
@@ -22,11 +23,11 @@ public class JNMyself extends JNUser {
      * Never null.
      */
     private Set<JNProject> myProjects;
-    
+
     protected JNMyself(JavaNet net,String userName) {
         super(net,userName);
     }
-    
+
     private void parseStartPage() throws ProcessingException {
         if( myProjects!=null )
             return;     // already parsed
@@ -58,7 +59,7 @@ public class JNMyself extends JNUser {
             }
         }.run();
     }
-    
+
     /**
      * Set of {@link JNProject} to which the current user belongs.
      * 
@@ -68,5 +69,13 @@ public class JNMyself extends JNUser {
     public final Set<JNProject> getMyProjects() throws ProcessingException {
         parseStartPage();
         return myProjects;
+    }
+
+    /**
+     * The same as {@link #getMyProjects()}.
+     */
+    @Override
+    public Collection<JNProject> getProjects() throws ProcessingException {
+        return getMyProjects();
     }
 }
