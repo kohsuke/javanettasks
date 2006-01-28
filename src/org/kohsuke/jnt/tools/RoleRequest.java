@@ -41,17 +41,23 @@ public class RoleRequest {
     
     /**
      * Parses the notification e-mail and constructs this object.
+     *
+     * @param message
+     *      The {@link Reader} that reads an e-mail. This could be just the content
+     *      of an e-mail, or the whole message including MIME headers.
+     * @throws ParseException
+     *      if the text isn't a role request e-mail.
      */
     public RoleRequest( Reader message ) throws IOException, ParseException {
         BufferedReader in = new BufferedReader(message);
         
         // read all the lines for easier processing.
-        List lineList = new ArrayList();
+        List<String> lineList = new ArrayList<String>();
         String line;
         while((line=in.readLine())!=null) {
             lineList.add(line);
         }
-        String[] lines = (String[]) lineList.toArray(new String[lineList.size()]);
+        String[] lines = lineList.toArray(new String[lineList.size()]);
 
         // look for the meat
         String interest = "";
@@ -80,12 +86,12 @@ public class RoleRequest {
     
     /** Grants this request. */
     public void grant( JavaNet javanet ) throws ProcessingException {
-        javanet.getProject(projectName).getMembership().grantRole(userName,roleName);
+        javanet.getProject(projectName).getMembership().grantRole(javanet.getUser(userName),roleName);
     }
     
     /** Declines this request. */
     public void decline( JavaNet javanet, String reason ) throws ProcessingException {
-        javanet.getProject(projectName).getMembership().declineRole(userName,roleName,reason);
+        javanet.getProject(projectName).getMembership().declineRole(javanet.getUser(userName),roleName,reason);
     }
     
     public String toString() {
@@ -96,7 +102,7 @@ public class RoleRequest {
     
     private static final Pattern regexp = Pattern.compile(
         "User (\\S+) has requested the (.+) role in the (\\S+) project\\. ");
-    
+
     
     public static void main(String[] args) throws IOException, ParseException {
         // test
