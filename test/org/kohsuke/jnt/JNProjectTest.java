@@ -28,4 +28,9 @@ public class JNProjectTest extends TestCaseBase {
         assertTrue(
             con.getProject("javanettasks").getSubProjects().contains(con.getProject("javanettasks-test")));
     }
+
+    public void test4() throws ProcessingException {
+        assertTrue(!con.getProject("nosuchprojectexists").exists());
+        assertTrue(con.getProject("jaxb"));
+    }
 }

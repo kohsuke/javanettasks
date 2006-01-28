@@ -38,6 +38,7 @@ public final class JNProject extends JNObject implements Comparable {
     private JNForums forums;
     private JNMailingLists mailingLists;
     private JNIssueTracker issueTracker;
+    private Boolean exists;
 
     /**
      * News item section.s
@@ -106,6 +107,8 @@ public final class JNProject extends JNObject implements Comparable {
         if(topLevelName!=null)
             return; // already parsed.
 
+        exists = false;
+
         new Scraper("unable to parse the project page of "+projectName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 Document dom = Util.getDom4j(goTo(_getURL()+'/'));
@@ -166,6 +169,8 @@ public final class JNProject extends JNObject implements Comparable {
                     vcs = JNVCS.CVS;
                 else
                     vcs = JNVCS.SVN;
+
+                exists = true;
 
                 return null;
             }
@@ -402,6 +407,18 @@ public final class JNProject extends JNObject implements Comparable {
     public Set<JNProject> getSubProjects() throws ProcessingException {
         parseProjectInfo();
         return subProjects;
+    }
+
+    public boolean exists() throws ProcessingException {
+        if(exists==null)
+            try {
+                parseProjectInfo();
+            } catch (ProcessingException e) {
+                if(e.getMessage().contains("The dev.java.net domain contains no project named"))
+                    return false;
+                throw e;
+            }
+        return exists;
     }
 
     /**
