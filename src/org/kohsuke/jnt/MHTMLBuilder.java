@@ -1,26 +1,28 @@
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
-
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.MalformedURLException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-import sun.misc.BASE64Encoder;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import sun.misc.BASE64Encoder;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Creates an MHTML package from {@link WebResponse}.
@@ -28,117 +30,117 @@ import org.dom4j.Element;
  * @author Kohsuke Kawaguchi
  */
 public class MHTMLBuilder {
-    Map<URL,String> resources = new HashMap<URL,String>();
-    Set<String> names = new HashSet<String>();
+    Set<URL> resources = new HashSet<URL>();
+    List<URL> queue = new ArrayList<URL>();
+    String boundary = "==mhtml-archiver"; // ."+System.currentTimeMillis();
 
-    private String getName(URL url) {
-        String name = resources.get(url);
-        if(name==null) {
-            Integer retry = null;
-
-            do {
-                name = url.getPath();
-                name = name.substring(name.lastIndexOf('/')+1);
-                int idx = name.indexOf('.');
-                if(idx<0) {
-                    if(retry==null) {
-                        retry = 2;
-                    } else {
-                        name += retry;
-                        retry++;
-                    }
-                } else {
-                    String base = name.substring(0,idx);
-                    String ext = name.substring(idx);
-                    if(retry==null) {
-                        retry = 2;
-                    } else {
-                        base += retry;
-                        retry++;
-                    }
-                    name = base+ext;
-                }
-            } while(names.contains(name));
-
-            resources.put(url,name);
-        }
-        return "cid:"+name;
+    private void addResource(URL url) {
+        if(resources.add(url))
+            queue.add(url);
     }
 
-    public void produce(WebResponse r, OutputStream os) throws Exception {
-        String boundary = "==mhtml-archiver"; // ."+System.currentTimeMillis();
-
+    public void produce(WebConversation cnv, URL url, OutputStream os) throws Exception {
+        queue.add(url);
         PrintStream out = new PrintStream(os);
-        out.println("--"+boundary);
-        out.println("Content-Type: text/html; charset="+r.getCharacterSet());
-        out.println();
-
-
-        Writer w = new OutputStreamWriter(os,r.getCharacterSet());
-        Document tree = Util.getDom4j(r);
-
-        rewrite(tree, r,"//IMG|//SCRIPT", "src");
-        rewrite(tree, r,"//LINK", "href");
-
-        // replpace @import in CSS
-        for( Element style : (List<Element>)tree.selectNodes("//STYLE") ) {
-            String text = style.getText();
-            List<Integer> range = new ArrayList<Integer>();
-            Matcher matcher = IMPORT_PATTERN.matcher(text);
-            while(matcher.find()) {
-                range.add(matcher.start(1));
-                range.add(matcher.end(1));
-            }
-
-            for( int i=range.size()-2; i>=0; i-=2 ) {
-                Integer s = range.get(i);
-                Integer e = range.get(i + 1);
-                String newName = getName(new URL(r.getURL(), unquote(text.substring(s,e))));
-                text = text.substring(0,s)+quote(newName)+text.substring(e);
-            }
-            style.setText(text);
-        }
-
-        tree.write(w);
-        out.println();
-
-        for (Map.Entry<URL, String> e : resources.entrySet()) {
-            URL url = e.getKey();
+        while(!queue.isEmpty()) {
+            url = queue.remove(queue.size() - 1);
             URLConnection con = url.openConnection();
             con.connect();
             out.println("--"+boundary);
-            out.println("Content-ID: <"+e.getValue()+">");
-            out.println("Content-Type: "+con.getContentType());
+            String contentType = con.getContentType();
+            out.println("Content-Type: "+contentType);
+
+            if(contentType.startsWith("text/html")) {
+                con.getInputStream().close();
+                WebResponse r = cnv.getResponse(url.toExternalForm());
+                out.println("Content-Location: "+r.getURL());
+                out.println();
+                produceHTML(r,out);
+                continue;
+            }
+
+            out.println("Content-Location: "+url);
+
+            if(contentType.startsWith("text/css")) {
+                out.println();
+                produceCSS(con,out);
+                continue;
+            }
+
+            // otherwise treat this as BLOB
             out.println("Content-Transfer-Encoding: base64");
-            out.println("Content-Disposition: inline; filename=\""+e.getValue()+"\"");
             out.println();
 
             new BASE64Encoder().encode(con.getInputStream(),out);
             out.println();
+            out.println();
         }
+        // all done
         out.println("--"+boundary+"--");
+    }
+
+    private void produceCSS(URLConnection con, PrintStream out) throws IOException {
+        // TODO: check encoding
+        InputStream in = con.getInputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(in,baos);
+        byte[] image = baos.toByteArray();
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(image)));
+        String line;
+
+        while((line=r.readLine())!=null) {
+            findInCSS(line, con.getURL());
+        }
+
+        out.write(image);
+        out.println();
+    }
+
+    public void produceHTML(WebResponse r, PrintStream out) throws Exception {
+        out.println();
+
+        Document tree = Util.getDom4j(r);
+
+        find(tree, r,"//IMG|//SCRIPT", "src");
+        find(tree, r,"//LINK", "href");
+
+        // replpace @import in CSS
+        for( Element style : (List<Element>)tree.selectNodes("//STYLE") ) {
+            String text = style.getText();
+            findInCSS(text, r.getURL());
+        }
+        out.print(r.getText());
+        out.println();
+    }
+
+    private void findInCSS(String text, URL baseURL) throws MalformedURLException {
+        Matcher matcher = IMPORT_PATTERN.matcher(text);
+        while(matcher.find()) {
+            addResource(new URL(baseURL, unquote(matcher.group(1))));
+        }
     }
 
     private String unquote(String s) {
         return s.substring(1,s.length()-1);
     }
 
-    private String quote(String s) {
-        return '"'+s+'"';
-    }
-
     private final Pattern IMPORT_PATTERN = Pattern.compile("@import (\"[^\"]+\"|'[^']+');");
 
-    private void rewrite(Document tree, WebResponse r, String xpath, String attr) throws MalformedURLException {
+    private void find(Document tree, WebResponse r, String xpath, String attr) throws MalformedURLException {
         for( Element e : (List<Element>)tree.selectNodes(xpath) ) {
             String src = e.attributeValue(attr);
             if(src==null)   continue;
-
-            String name = getName(new URL(r.getURL(), src));
-            e.addAttribute(attr,name);
+            addResource(new URL(r.getURL(), src));
         }
     }
 
-    // TODO: MHTML format. Outlook and IE supports it, but what else?
-    // See Content-Location header. No mangling necessary.
+    private void copyStream(InputStream i, OutputStream o) throws IOException {
+        byte[] buf = new byte[256];
+        int sz;
+        while((sz=i.read(buf))>0)
+            o.write(buf,0,sz);
+        i.close();
+        o.close();
+    }
 }
