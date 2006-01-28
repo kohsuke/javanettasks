@@ -37,7 +37,7 @@ abstract class JNObject {
     /**
      * Checks if the response contains any error message.
      */
-    protected final void checkError(WebResponse resp) throws SAXException, ProcessingException {
+    protected final WebResponse checkError(WebResponse resp) throws SAXException, ProcessingException {
         if(resp.getResponseCode()!=200)
             throw new ProcessingException("request failed "+resp.getResponseMessage());
 
@@ -47,5 +47,7 @@ abstract class JNObject {
             // this happens for example when you request "http://nosuchproject.dev.java.net/"
             throw new ProcessingException(errorNode.getStringValue().trim());
         }
+
+        return resp;
     }
 }
