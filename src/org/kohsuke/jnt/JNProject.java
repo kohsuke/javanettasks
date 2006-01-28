@@ -560,4 +560,8 @@ public final class JNProject extends JNObject implements Comparable {
         JNProject that = (JNProject) o;
         return this.projectName.compareTo(that.projectName);
     }
+
+    public String toString() {
+        return projectName+" project";
+    }
 }
