@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>java.net tasks</name>
   <id>javanettasks</id>
-  <currentVersion>1.0.6</currentVersion>
+  <currentVersion>1.0.7</currentVersion>
   
   <organization>
     <name>Kohsuke Kawaguchi</name>
@@ -24,8 +24,6 @@
   
   <url>http://javanettasks.dev.java.net/</url>
 
-  <cvsWebUrl>https://javanettasks.dev.java.net/source/browse/javanettasks/</cvsWebUrl>
-  <cvsModule>javanettasks</cvsModule>
   <issueTrackingUrl>https://javanettasks.dev.java.net/servlets/ProjectIssues</issueTrackingUrl>
 
   <siteAddress>javanettasks.dev.java.net</siteAddress>
@@ -105,7 +103,7 @@
 
     <dependency>
       <id>nekohtml</id>
-      <version>0.7.7</version>
+      <version>0.9.5</version>
     </dependency>
 
     <dependency>

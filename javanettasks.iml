@@ -52,15 +52,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/nekohtml/jars/nekohtml-0.7.7.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/ant/jars/ant-1.5.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -89,6 +80,15 @@
       <library>
         <CLASSES>
           <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/junit/jars/junit-3.8.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/nekohtml/jars/nekohtml-0.9.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
