@@ -18,6 +18,11 @@ import java.util.Properties;
 
 /**
  * Root of java&#x2E;net.
+ *
+ * <p>
+ * Start with one of the {@link #connect() connect} method, which gives you
+ * an instance of {@link JavaNet}. The rest of the java.net object model
+ * can be traversed from this object.
  * 
  * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
