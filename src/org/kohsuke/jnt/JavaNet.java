@@ -88,14 +88,20 @@ public class JavaNet extends JNObject {
         }.run();
     }
     
-    
-
     /**
      * obtains the connection info from ~/.java.net and returns the connected {@link JavaNet} object.
      */
     public static JavaNet connect() throws ProcessingException {
-        File accountFile = getPropertyFile();
+        return connect(getDefaultAccountFile());
+    }
 
+    /**
+     * obtains the connection info from the given file and returns the connected {@link JavaNet} object.
+     *
+     * @param accountFile
+     *      The property file that stores the connection information.
+     */
+    public static JavaNet connect(File accountFile) throws ProcessingException {
         Properties accountInfo = new Properties();
         
         try {
@@ -126,9 +132,9 @@ public class JavaNet extends JNObject {
     }
 
     /**
-     * Gets the ".java.net" config property file.
+     * Gets the default ".java.net" config property file.
      */
-    private static File getPropertyFile() {
+    private static File getDefaultAccountFile() {
         // look for the system property that points to the file first
         String p = System.getProperty(".java.net");
         if(p!=null)
