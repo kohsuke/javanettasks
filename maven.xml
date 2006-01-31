@@ -1,4 +1,4 @@
-<project xmlns:j="jelly:core" xmlns:u="jelly:util">
+<project xmlns:j="jelly:core" xmlns:u="jelly:util" xmlns:m="jelly:maven">
   
   <!-- define a tag that generates -->
   <define:taglib uri="manifest-builder" xmlns:define="jelly:define">
@@ -9,10 +9,11 @@
       </j:forEach>
       
       <!-- check if the user specified manifest file is available -->
-      <available property="maven.jar.manifest.available2" file="${maven.jar.manifest}"/>
-      <j:if test="${maven.jar.manifest.available2}">
+      <available property="hasManifest" file="${maven.jar.manifest}"/>
+      <j:if test="${!hasManifest}">
+        <echo>Using new manifest</echo>
         <j:set var="maven.jar.manifest" value="${maven.build.dir}/MANIFEST.MF"/>
-        <property name="maven.jar.manifest" value="${maven.jar.manifest}"/>
+        <m:set plugin="maven-jar-plugin" property="maven.jar.manifest" value="${maven.build.dir}/MANIFEST.MF" />
       </j:if>
       
       <manifest file="${maven.jar.manifest}" mode="update">

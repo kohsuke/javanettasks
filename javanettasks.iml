@@ -98,7 +98,9 @@
   </component>
   <component name="org.mevenide.idea.module.ModuleSettings">
     <favoriteGoals>
-      <list size="0" />
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="jar:install" />
+      </list>
     </favoriteGoals>
   </component>
 </module>

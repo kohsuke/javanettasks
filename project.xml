@@ -76,6 +76,11 @@
   <dependencies>
 
     <dependency>
+      <id>nekohtml</id>
+      <version>0.9.5</version>
+    </dependency>
+
+    <dependency>
       <id>httpunit</id>
       <version>1.5.4</version>
     </dependency>
@@ -99,11 +104,6 @@
     <dependency>
       <id>jtidy</id>
       <version>4aug2000r7-dev</version>
-    </dependency>
-
-    <dependency>
-      <id>nekohtml</id>
-      <version>0.9.5</version>
     </dependency>
 
     <dependency>

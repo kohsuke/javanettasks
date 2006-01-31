@@ -1,11 +1,11 @@
 <document>
 <properties>
-	<title>javaNetAddMember task</title>
+	<title>javaNetCheckMember task</title>
 </properties>
 <body>
 <section name="Description">
 	<p>
-		The &lt;javaNetAddMember> task grants a role to an user on a project.
+		The &lt;javaNetCheckMember> task checks if an user has any (or specific) role in a given project.
 	</p>
 </section>
 <section name="Parameter Attributes">
@@ -21,7 +21,7 @@
 			<tr>
 				<td>projectName</td>
 				<td>
-					The name of the project in which the role is approved.
+					The name of the project to which a role is checked
 					(e.g., "javanettasks")
 				</td>
 				<td>Yes</td>
@@ -30,7 +30,7 @@
 				<td>userName</td>
 				<td>
 					The account name that performs the role grant operation. This account needs
-					to have a permission to grant roles to other people in the given project.
+					to have a permission to view roles in the given project.
 					(e.g., "kohsuke")
 				</td>
 				<td>No</td>
@@ -46,16 +46,17 @@
 			<tr>
 				<td>user</td>
 				<td>
-					The user name to which the role is granted.
+					The user name whose role is checked.
 				</td>
 				<td>Yes</td>
 			</tr>
 			<tr>
 				<td>role</td>
 				<td>
-					The role name that the user will receive.
+					If specified, the task checks if the user has this role, and sets a property only when it's true.
+					If not specified, the task checks if the user has any role at all, and sets a property only when he has any.
 				</td>
-				<td>Yes</td>
+				<td>No</td>
 			</tr>
 		</tbody>
 	</table>
@@ -65,7 +66,7 @@
 		none.
 	</p>
 	<div align="right" style="font-size: smaller">
-	$Id: addmember.xml 550 2006-01-31 15:45:55Z kohsuke $
+	$Id: checkmember.xml 550 2006-01-31 15:45:55Z kohsuke $
 	</div>
 </section>
 </body></document>
