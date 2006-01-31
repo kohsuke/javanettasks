@@ -36,7 +36,7 @@ public class CheckMemberTask extends AbstractJavaNetTaskForProject {
 
         boolean r;
         if(role!=null)
-            r = roles.contains(role);
+            r = roles.contains(conn.getRole(role));
         else
             r = !roles.isEmpty();
 
