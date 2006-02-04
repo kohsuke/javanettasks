@@ -10,12 +10,12 @@ import org.dom4j.Node;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 /**
  * Java&#x2E;net project.
@@ -517,50 +517,18 @@ public final class JNProject extends JNObject implements Comparable {
      * This is an admin-only operation.
      */
     public void approve() throws ProcessingException {
-        new Scraper("failed to approve project "+projectName) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = goTo(_getURL()+"/servlets/ProjectApproval");
+        new ProjectApprover(true,null).run();
+    }
 
-                WebTable table = response.getTableStartingWith("Project");
-
-                int rows = table.getRowCount();
-
-                boolean found = false;
-
-                String approveElementName = null;
-
-                for (int r = 1; r < rows && !found; r++ ) {
-                    TableCell c1 = table.getTableCell(r, 0);
-
-                    if (c1.getLinks().length > 0) {
-                        String link = c1.getLinks()[0].getURLString();
-
-                        if (link.equals(_getURL()+'/')) {
-                            TableCell c2 = table.getTableCell(r, 3);
-                            String[] names = c2.getElementNames();
-                            if (names.length > 0) {
-                                approveElementName = names[0];
-                                found = true;
-                            }
-                        }
-                    }
-                }
-
-                if (!found)
-                    throw new ProcessingException("Unable to find project "+projectName+" in the approval page");
-
-                // we already have the info we need to approve the project, now, do it
-
-                WebForm form = response.getFormWithName("ProjectApprovalForm");
-
-                form.setParameter(approveElementName, "Approve");
-
-                checkError(form.submit());
-
-                // TODO: need to treat errors here, if something goes wrong.
-                return null;
-            }
-        }.run();
+    /**
+     * Disapproves the project.
+     * <p>
+     * This is an admin-only operation.
+     */
+    public void disapprove(String reason) throws ProcessingException {
+        if(reason==null)
+            throw new IllegalArgumentException();
+        new ProjectApprover(false,reason).run();
     }
 
     public int hashCode() {
@@ -580,5 +548,62 @@ public final class JNProject extends JNObject implements Comparable {
 
     public String toString() {
         return projectName+" project";
+    }
+
+    private class ProjectApprover extends Scraper {
+        private boolean approve;
+        private String reason;
+
+        public ProjectApprover(boolean approve, String reason) {
+            super(
+                approve ?
+                "failed to approve project " + projectName :
+                "failed to disapprove project "+projectName);
+
+            this.approve = approve;
+            this.reason = reason;
+        }
+
+        protected Object scrape() throws IOException, SAXException, ProcessingException {
+            WebResponse response = goTo(_getURL()+"/servlets/ProjectApproval");
+
+            WebTable table = response.getTableStartingWith("Project");
+
+            int rows = table.getRowCount();
+
+            boolean found = false;
+
+            String approveElementName = null;
+
+            for (int r = 1; r < rows && !found; r++ ) {
+                TableCell c1 = table.getTableCell(r, 0);
+
+                if (c1.getLinks().length > 0) {
+                    String link = c1.getLinks()[0].getURLString();
+
+                    if (link.equals(_getURL()+'/')) {
+                        TableCell c2 = table.getTableCell(r, 3);
+                        String[] names = c2.getElementNames();
+                        if (names.length > 0) {
+                            approveElementName = names[0];
+                            found = true;
+                        }
+                    }
+                }
+            }
+
+            if (!found)
+                throw new ProcessingException("Unable to find project "+projectName+" in the approval page");
+
+            // we already have the info we need to approve the project, now, do it
+            WebForm form = response.getFormWithName("ProjectApprovalForm");
+
+            form.setParameter(approveElementName, approve ? "Approve" : "Disapprove");
+            form.setParameter("disapprovalReason",reason);
+
+            checkError(form.submit());
+
+            return null;
+        }
     }
 }
