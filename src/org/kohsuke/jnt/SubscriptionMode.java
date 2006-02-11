@@ -57,6 +57,6 @@ public enum SubscriptionMode {
      * Gets either "Normal" or "Digest". Used in the form.
      */
     public String getNameAsWord() {
-        return Character.toUpperCase(name.indexOf(0))+name.substring(1);
+        return Character.toUpperCase(name.charAt(0))+name.substring(1);
     }
 }
