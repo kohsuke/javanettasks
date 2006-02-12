@@ -1,22 +1,21 @@
 package org.kohsuke.jnt;
 
-import org.dom4j.Document;
-import org.dom4j.io.DOMReader;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.cyberneko.html.parsers.DOMParser;
-
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
+import org.cyberneko.html.parsers.SAXParser;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
-import java.io.StringReader;
-import java.io.IOException;
 
 /**
  * Utility code.
@@ -68,10 +67,14 @@ class Util {
     /**
      * Obtains the HTML of the response as a dom4j document.
      */
-    static Document getDom4j( WebResponse wr ) throws SAXException, IOException {
-        DOMParser domParser = new DOMParser();
-        domParser.parse(new InputSource(new StringReader(wr.getText())));
-        return new DOMReader().read(domParser.getDocument());
+    static Document getDom4j( WebResponse wr ) throws IOException, SAXException {
+        try {
+            return new SAXReader(new SAXParser()).read(new StringReader(wr.getText()));
+        } catch (DocumentException e) {
+            SAXException se = new SAXException(e);
+            se.initCause(e);
+            throw se;
+        }
     }
 
     /**

@@ -454,7 +454,7 @@ public final class JNProject extends JNObject implements Comparable {
      */
     public URL getURL() {
         try {
-            return new URL(_getURL());
+            return new URL(_getURL()+'/');
         } catch (MalformedURLException e) {
             // never happen
             throw new IllegalStateException(e.getMessage());
