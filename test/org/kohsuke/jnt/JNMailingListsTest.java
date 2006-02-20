@@ -17,7 +17,7 @@ public class JNMailingListsTest extends TestCaseBase {
         JNProject project = con.getProject("jaxb");
         JNMailingLists lists = project.getMailingLists();
 
-        assertEquals(5,lists.getLists().size());
+        assertEquals(6,lists.getLists().size());
 
         JNMailingList list1 = lists.getLists().get(0);
         assertEquals("dev",list1.getName());
