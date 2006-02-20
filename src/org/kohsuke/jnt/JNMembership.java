@@ -238,12 +238,10 @@ public class JNMembership extends JNObject {
             if(form==null)
                 throw new IllegalStateException("form not found in "+r.getURL());
 
-            char nbsp = 160;
-
             // starts-with is necesasry because someone fails to handle &nbsp; correctly
             String propName  = (String)Util.getDom4j(r).selectObject(
-                "string(//FORM[@name='ProjectMemberListForm']//TR[normalize-space(TD[1])='"+user.getName()+"']/TD[3]/text()[normalize-space(.)='"+roleName+nbsp+nbsp+"']/preceding-sibling::INPUT[1]/@name)");
-            if(propName==null)
+                "string(//FORM[@name='ProjectMemberListForm']//TR[normalize-space(TD[1])='"+user.getName()+"']/TD[3]/text()[normalize-space(.)='"+roleName+"']/preceding-sibling::INPUT[1]/@name)");
+            if(propName==null || propName.length()==0)
                 throw new ProcessingException("Unable to find the user "+user.getName()+" or the role "+roleName);
             form.toggleCheckbox(propName);
 

@@ -3,19 +3,20 @@ package org.kohsuke.jnt;
 import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.io.DOMReader;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.Collections;
-import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.GregorianCalendar;
-import java.util.ArrayList;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
+import java.util.TreeMap;
 
 /**
  * An issue.
@@ -81,6 +82,8 @@ public final class JNIssue extends JNObject {
             // fetch now
             Document doc = bulkFetch(project,Collections.singletonList(id) );
             rawData = doc.getRootElement().element("issue");
+            if(rawData==null)
+                throw new IllegalArgumentException("No such issue. Id="+id);
         }
 
         this.rawData = rawData;
@@ -247,8 +250,8 @@ public final class JNIssue extends JNObject {
 
         return new Scraper<Document>("fetching the details of the issue "+idList) {
             public Document scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse rsp = project.goTo(project.getURL()+"/issues/xml.cgi?id="+idList);
-                return Util.getDom4j(rsp);
+                WebResponse rsp = project.goTo(project.getURL()+"issues/xml.cgi?id="+idList);
+                return new DOMReader().read(rsp.getDOM());
             }
         }.run();
     }
@@ -260,8 +263,8 @@ public final class JNIssue extends JNObject {
     static Document bulkUpdateFetch(final JNProject project,final String queryParam) throws ProcessingException {
         return new Scraper<Document>("fetching the details of the issue xmlupdate.cgi "+queryParam) {
             public Document scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse rsp = project.goTo(project.getURL()+"/issues/xmlupdate.cgi?"+queryParam);
-                return Util.getDom4j(rsp);
+                WebResponse rsp = project.goTo(project.getURL()+"issues/xmlupdate.cgi?"+queryParam);
+                return new DOMReader().read(rsp.getDOM());
             }
         }.run();
     }
