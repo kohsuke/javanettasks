@@ -190,8 +190,10 @@ public class JNMembership extends JNObject {
      */
     public void grantRole( JNUser user, String roleName ) throws ProcessingException {
         try {
-            WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberAdd");
-            WebForm form = r.getFormWithName("ProjectMemberAddForm");
+            String url = project._getURL() + "/servlets/ProjectMemberAdd";
+            WebResponse r = goTo(url);
+            WebForm[] forms = r.getForms();
+            WebForm form = forms[forms.length-1];   // last one is it
             
             if(form==null)
                 throw new IllegalStateException("form not found in "+r.getURL());

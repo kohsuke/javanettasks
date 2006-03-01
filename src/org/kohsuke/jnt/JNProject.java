@@ -131,11 +131,11 @@ public final class JNProject extends JNObject implements Comparable {
                     isCommunity=Boolean.FALSE;
 
                 // parse summary
-                summmary = dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[TH/text()='Summary']/TD").getText();
+                summmary = dom.selectSingleNode("//TABLE[@class='axial']/TR[TH/text()='Summary']/TD").getText();
 
                 // parse owners
                 Set<JNUser> owners = new TreeSet<JNUser>();
-                List<Element> os = dom.selectNodes("//DIV[@class='axial']/TABLE/TR[TH/text()='Owner(s)']/TD/A");
+                List<Element> os = dom.selectNodes("//TAVKE[@class='axial']/TR[TH/text()='Owner(s)']/TD/A");
                 for (Element o : os)
                     owners.add(root.getUser(o.getTextTrim()));
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
@@ -162,7 +162,7 @@ public final class JNProject extends JNObject implements Comparable {
                 }
 
                 // is this CVS, or Subversion based?
-                Node vcslink = dom.selectSingleNode("//DIV[@id='projecttools']//A[@href='https://" + projectName + ".dev.java.net/source/browse/" + projectName + "/']");
+                Node vcslink = dom.selectSingleNode("//DL[@id='projecttools']//A[@href='https://" + projectName + ".dev.java.net/source/browse/" + projectName + "/']");
                 if(vcslink==null)
                     throw new ProcessingException("Version control link not found");
                 if(vcslink.getText().indexOf("CVS")>0)
