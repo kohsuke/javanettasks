@@ -235,7 +235,7 @@ public class JNMembership extends JNObject {
     public void revokeRole( JNUser user, String roleName ) throws ProcessingException {
         try {
             WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberList");
-            WebForm form = r.getFormWithName("ProjectMemberListForm");
+            WebForm form = Util.getFormWithAction(r,"ProjectMemberList");
 
             if(form==null)
                 throw new IllegalStateException("form not found in "+r.getURL());

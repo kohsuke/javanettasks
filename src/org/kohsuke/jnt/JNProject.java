@@ -125,7 +125,7 @@ public final class JNProject extends JNObject implements Comparable {
                     parentProject = null;
                 }
 
-                if( dom.selectSingleNode("//DIV[@class='axial']/TABLE/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
+                if( dom.selectSingleNode("//TABLE[@class='axial']/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
                     isCommunity=Boolean.TRUE;
                 else
                     isCommunity=Boolean.FALSE;
@@ -135,14 +135,14 @@ public final class JNProject extends JNObject implements Comparable {
 
                 // parse owners
                 Set<JNUser> owners = new TreeSet<JNUser>();
-                List<Element> os = dom.selectNodes("//TAVKE[@class='axial']/TR[TH/text()='Owner(s)']/TD/A");
+                List<Element> os = dom.selectNodes("//TABLE[@class='axial']/TR[TH/text()='Owner(s)']/TD/A");
                 for (Element o : os)
                     owners.add(root.getUser(o.getTextTrim()));
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
 
                 // parse sub-projects
                 Set<JNProject> subProjects = new TreeSet<JNProject>();
-                List<Element> sps = dom.selectNodes("//H3[text()='Subprojects']/following::*[1]/TR/TD/A");
+                List<Element> sps = dom.selectNodes("//H2[text()='Subprojects']/following::*[1]/TR/TD/A");
                 for (Element sp : sps)
                     subProjects.add(root.getProject(sp.getTextTrim()));
                 JNProject.this.subProjects = Collections.unmodifiableSet(subProjects);
