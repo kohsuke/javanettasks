@@ -3,7 +3,6 @@ package org.kohsuke.jnt;
 import junit.textui.TestRunner;
 
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -17,8 +16,7 @@ public class JNNewsItemsTest extends TestCaseBase {
         JNProject project = con.getProject("javanettasks-test");
         JNNewsItems newsItems = project.getNewsItems();
 
-        for (Iterator itr = newsItems.getNewsItems().iterator(); itr.hasNext();) {
-            JNNewsItem item = (JNNewsItem) itr.next();
+        for (JNNewsItem item : newsItems.getNewsItems()) {
             item.delete();
         }
 
