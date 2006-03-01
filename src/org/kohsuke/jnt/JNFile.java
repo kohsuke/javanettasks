@@ -162,7 +162,7 @@ public final class JNFile extends JNObject {
                 WebResponse r = goTo(
                     folder.project._getURL()+"/servlets/ProjectDocumentDelete?documentID="+id+"&maxDepth=");
 
-                checkError(r.getFormWithName("ProjectDocumentDeleteForm").submit());
+                checkError(Util.getFormWithAction(r,"ProjectDocumentDelete").submit());
 
                 folder.reset();
                 return null;

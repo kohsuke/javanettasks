@@ -102,6 +102,8 @@ public final class JNFileFolder extends JNObject {
                 for( Element anchor : (List<Element>)current.selectNodes("UL/LI/A[SPAN]") ) {
                     // https://jaxb.dev.java.net/servlets/ProjectDocumentList?folderID=1747&expandFolder=1747
                     String name = anchor.getTextTrim();
+                    // trim the trailing (n)
+                    name = name.substring(0,name.lastIndexOf(0xA0/*NBSP*/));
                     String href = anchor.attributeValue("href");
                     int sidx = href.indexOf("?folderID=");
                     int eidx = href.indexOf("&expandFolder=");
@@ -232,7 +234,7 @@ public final class JNFileFolder extends JNObject {
                 }
                 r = addFileLink.click();
 
-                WebForm form = r.getFormWithName("ProjectDocumentAddForm");
+                WebForm form = r.getFormWithID("ProjectDocumentAddForm");
                 form.setParameter("name",fileName);
                 if( fileStatus!=null )
                     form.setParameter("status",fileStatus.toString());
@@ -296,7 +298,7 @@ public final class JNFileFolder extends JNObject {
             protected JNFileFolder scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(project._getURL()+"/servlets/ProjectFolderAdd?folderID="+id);
 
-                WebForm form = response.getFormWithName("ProjectFolderAddForm");
+                WebForm form = Util.getFormWithAction(response, "ProjectFolderAdd");
                 form.setParameter("name",name);
                 form.setParameter("description",description);
                 response = checkError(form.submit());
@@ -320,7 +322,7 @@ public final class JNFileFolder extends JNObject {
                 WebResponse r = goTo(
                     project._getURL()+"/servlets/ProjectFolderDelete?folderID="+id);
 
-                checkError(r.getFormWithName("ProjectFolderDeleteForm").submit());
+                checkError(Util.getFormWithAction(r,"ProjectFolderDelete").submit());
 
                 parent.reset();
                 return null;
