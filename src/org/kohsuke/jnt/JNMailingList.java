@@ -241,7 +241,7 @@ public final class JNMailingList extends JNObject {
         new Scraper("Unable to delete mailing list "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(project._getURL()+"/servlets/MailingListDelete?list="+name);
-                WebForm form = response.getFormWithName("MailingListDeleteForm");
+                WebForm form = Util.getFormWithAction(response,"MailingListDelete");
                 if(form==null)
                     throw new ProcessingException("form not found");
                 checkError(form.submit());

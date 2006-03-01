@@ -133,7 +133,7 @@ public final class JNMailingLists extends JNObject {
         try {
             WebResponse response = goTo(project._getURL()+"/servlets/MailingListAdd");
 
-            WebForm form = response.getFormWithName("MailingListAddForm");
+            WebForm form = Util.getFormWithAction(response,"MailingListAdd");
 
             form.setParameter("listName", listName);
             form.setParameter("description", description);
