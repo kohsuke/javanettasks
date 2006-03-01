@@ -74,7 +74,7 @@ public class JavaNet extends JNObject {
         new Scraper("unable to log in as user "+userName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse r = wc.getResponse("https://www.dev.java.net/servlets/TLogin");
-                WebForm form = r.getFormWithName("loginform");
+                WebForm form = r.getFormWithID("loginform");
 
                 form.setParameter("loginID",userName);
                 form.setParameter("password",password);
