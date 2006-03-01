@@ -66,7 +66,7 @@ public final class JNNewsItem extends JNObject {
         new Scraper("Unable to delete the announcement") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(project._getURL()+"/servlets/ProjectNewsDelete?newsItemID="+id);
-                WebForm form = response.getFormWithName("projectnewsdeleteform");
+                WebForm form = Util.getFormWithAction(response,"ProjectNewsDelete");
                 if(form==null)
                     throw new ProcessingException("missing form");
                 SubmitButton submit = form.getSubmitButton("Button","Confirm delete");
