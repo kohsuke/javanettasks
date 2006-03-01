@@ -114,7 +114,7 @@ public final class JNForums extends JNObject {
                 WebResponse response = goTo(project._getURL()+"/servlets/ProjectForumView");
                 Document dom = Util.getDom4j(response);
 
-                Element table = (Element)dom.selectSingleNode("//DIV[@id='ProjectForumView']/TABLE");
+                Element table = (Element)dom.selectSingleNode("//DIV[@id='projectforumview']/TABLE");
 
                 if (table == null)
                     // theres no forum.
