@@ -1,11 +1,10 @@
 /*
- * $Id: JNNewsItems.java 475 2005-10-28 18:12:16Z kohsuke $
+ * $Id: JNNewsItems.java 573 2006-03-01 20:23:12Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
 
 import com.meterware.httpunit.SubmitButton;
-import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
@@ -28,7 +27,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 475 $
+ * @version $Revision: 573 $
  */
 public final class JNNewsItems extends JNObject {
 
@@ -96,7 +95,7 @@ public final class JNNewsItems extends JNObject {
                 String url = project._getURL()+"/servlets/ProjectNewsAdd";
                 WebResponse resp = goTo(url);
 
-                WebForm form = resp.getFormWithName(FORM_NAME);
+                WebForm form = Util.getFormWithAction(resp,"ProjectNewsAdd");
                 SubmitButton submitButton =
                     form.getSubmitButton(FORM_BUTTON, "Add new announcement");
                 if(submitButton==null)
@@ -186,7 +185,7 @@ public final class JNNewsItems extends JNObject {
                 WebResponse response = goTo(project._getURL()+"/servlets/ProjectNewsList");
                 Document dom = Util.getDom4j(response);
 
-                Element table = (Element)dom.selectSingleNode("//FORM[@name='ProjectNewsListForm']/TABLE");
+                Element table = (Element)dom.selectSingleNode("//FORM[@action='ProjectNewsList']/TABLE");
 
                 if (table== null) {
                     // theres no news table.
