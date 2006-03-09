@@ -72,14 +72,14 @@ public class JNUser extends JNObject implements Comparable {
             protected Integer scrape() throws IOException, SAXException, ProcessingException {
                 // parse ID
                 WebResponse r = goTo("https://www.dev.java.net/servlets/UserList");
-                WebForm form = r.getFormWithName("UserListFilterForm");
+                WebForm form = Util.getFormWithAction(r,"https://www.dev.java.net/servlets/UserList"); //r.getFormWithName("UserListFilterForm");
                 form.setParameter("field","LoginName");
                 form.setParameter("matchType","equals");
                 form.setParameter("matchValue",name);
                 r = checkError(form.submit());
 
                 Document dom = Util.getDom4j(r);
-                Element a = (Element)dom.selectSingleNode("//DIV[@id='userlist']/TABLE//TR[2]//A");
+                Element a = (Element)dom.selectSingleNode("//DIV[@id='userlist']//TABLE//TR[2]//A");
                 String anchor = a.attributeValue("href");
                 Matcher m = USERID_PATTERN.matcher(anchor);
                 if(!m.matches())
