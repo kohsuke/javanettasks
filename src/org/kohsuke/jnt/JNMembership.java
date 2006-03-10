@@ -285,7 +285,8 @@ public class JNMembership extends JNObject {
     public void declineRole( JNUser user, String roleName, String reason ) throws ProcessingException {
         try {
             WebResponse r = goTo(project._getURL()+"/servlets/ProjectMemberList");
-            WebForm form = r.getFormWithName("ProjectMemberListPendingForm");
+            WebForm[] forms = r.getForms();
+            WebForm form = forms[forms.length-1];
             
             if(form==null)
                 throw new ProcessingException("form not found");

@@ -243,7 +243,7 @@ public final class JNProject extends JNObject implements Comparable {
             protected String scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
-                WebForm form = response.getFormWithName("ProjectEditForm");
+                WebForm form = Util.getFormWithAction(response,"ProjectEdit");
 
                 return form.getParameterValue("status");
             }
@@ -269,7 +269,7 @@ public final class JNProject extends JNObject implements Comparable {
             protected String scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
-                WebForm form = response.getFormWithName("ProjectEditForm");
+                WebForm form = Util.getFormWithAction(response,"ProjectEdit");
 
                 String old = form.getParameterValue("status");
                 form.setParameter("status",msg);
@@ -308,7 +308,7 @@ public final class JNProject extends JNObject implements Comparable {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(_getURL()+"/servlets/ProjectEdit");
 
-                WebForm form = response.getFormWithName("ProjectEditForm");
+                WebForm form = Util.getFormWithAction(response,"ProjectEdit");
                 String parentName = newParent.getName();
                 boolean found = false;
 
@@ -596,7 +596,7 @@ public final class JNProject extends JNObject implements Comparable {
                 throw new ProcessingException("Unable to find project "+projectName+" in the approval page");
 
             // we already have the info we need to approve the project, now, do it
-            WebForm form = response.getFormWithName("ProjectApprovalForm");
+            WebForm form = Util.getFormWithAction(response,"ProjectApproval");
 
             form.setParameter(approveElementName, approve ? "Approve" : "Disapprove");
             form.setParameter("disapprovalReason",reason);
