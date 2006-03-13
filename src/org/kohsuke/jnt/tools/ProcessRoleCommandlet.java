@@ -23,7 +23,7 @@ public class ProcessRoleCommandlet extends Commandlet {
             return -1;
         }
 
-        RoleRequestPolicy policy = new RoleRequestPolicy(new File(args[1]));
+        RoleRequestPolicy policy = new RoleRequestPolicy(new File(args[0]));
         RoleRequest request = new RoleRequest(new InputStreamReader(System.in));
 
         RoleRequestPolicy.Action action = policy.determineAction(request);
