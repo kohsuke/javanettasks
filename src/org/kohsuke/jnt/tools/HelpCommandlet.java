@@ -12,6 +12,7 @@ public class HelpCommandlet extends Commandlet {
 
     public void printUsage(PrintStream out) {
         out.println("Usage: help <command>");
+        out.println(" Or run the program with no option to see the list of commands");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {
