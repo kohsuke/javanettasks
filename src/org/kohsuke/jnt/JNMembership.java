@@ -130,7 +130,7 @@ public class JNMembership extends JNObject {
      * @return
      *      the set can be empty, but always non-null. The set is read-only.
      */
-    public Set getMembers() throws ProcessingException {
+    public Set<JNUser> getMembers() throws ProcessingException {
         if(members==null)
             parseMembershipInfo();
         return Collections.unmodifiableSet(members.keySet());
@@ -142,7 +142,7 @@ public class JNMembership extends JNObject {
      * @return
      *      the set can be empty, but always non-null. The set is read-only.
      */
-    public Set getRoles() throws ProcessingException {
+    public Set<JNRole> getRoles() throws ProcessingException {
         if(roles==null)
             parseMembershipInfo();
         return Collections.unmodifiableSet(roles.keySet());
