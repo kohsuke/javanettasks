@@ -82,13 +82,13 @@ public class JNMembership extends JNObject {
                 //          incorrect results, since it will count the "User" header
                 //          and the groups as members.
 
-                for (int r = 1; r < numRows-1; r++) {
+                for (int r = 1; r < numRows; r++) {
                     JNUser user = root.getUser(users.getCellAsText(r,0).trim());
 
                     // when there are more then one role for a single user, the
                     // roleList are separated by commas. This is new layout
                     String cell = users.getCellAsText(r, 2);
-                    StringTokenizer roleList = new StringTokenizer(cell,"\n");
+                    StringTokenizer roleList = new StringTokenizer(cell,",");
                     Set<JNRole> ra = new TreeSet<JNRole>();
                     while(roleList.hasMoreTokens()) {
                         String roleName = roleList.nextToken().trim();
