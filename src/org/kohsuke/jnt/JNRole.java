@@ -5,6 +5,9 @@ package org.kohsuke.jnt;
 /**
  * An role on java&#x2E;net.
  *
+ * <p>
+ * Instance of this can be obtained from {@link JavaNet#getRole(String)}.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class JNRole extends JNObject implements Comparable {
