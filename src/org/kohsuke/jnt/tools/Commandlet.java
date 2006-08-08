@@ -14,6 +14,7 @@ public abstract class Commandlet {
         new ProcessRoleCommandlet(),
         new ListMyProjectsCommandlet(),
         new ListSubProjectsCommandlet(),
+        new ListUserCommandlet(),
         new SubscribeListCommandlet(),
         new InteractiveCommandlet(),
         new ApproveProjectCommandlet(),
