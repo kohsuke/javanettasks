@@ -10,6 +10,7 @@ public abstract class Commandlet {
         new HelpCommandlet(),
         new MkdirCommandlet(),
         new UploadFileCommandlet(),
+        new LinkUrlCommandlet(),
         new GrantRoleCommandlet(),
         new DeclineRoleCommandlet(),
         new ProcessRoleCommandlet(),

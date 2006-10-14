@@ -1,0 +1,15 @@
+<document>
+  <properties>
+    <title>javanettasks changes</title>
+    <author email="kk@kohsuke.org">Kohsuke Kawaguchi</author>
+  </properties>
+  <body>
+    <!-- type can be 'fix' or 'add' -->
+    <release version="1.0.10" date="2006-10/13" description="Feature enhancements">
+      <action dev="kohsuke" type="add">Implemented an ability to create a link in docs&amp;files section.</action>
+      <action dev="kohsuke" type="add">Added the 'announce' command to the CLI.</action>
+      <action dev="kohsuke" type="add">Added the 'mkdir' command to the CLI.</action>
+      <action dev="kohsuke" type="add">Added the 'linkFile' command to the CLI.</action>
+    </release>
+  </body>
+</document>

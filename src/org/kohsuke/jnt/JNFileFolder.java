@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -212,18 +213,13 @@ public final class JNFileFolder extends JNObject {
         uploadFile(fileName,description,FileStatus.parse(fileStatus),fileToUpload);
     }
 
-    /**
-     * Uploads a file to the folder.
-     * 
-     * @param fileStatus
-     *      can be null.
-     */
-    public JNFile uploadFile( final String fileName, final String description, final FileStatus fileStatus, final File fileToUpload ) throws ProcessingException {
-        return new Scraper<JNFile>("error uploading a file "+fileToUpload) {
-            protected JNFile scrape() throws IOException, SAXException, ProcessingException {
-                if(!fileToUpload.exists() || !fileToUpload.isFile())
-                    throw new IOException(fileToUpload+" is not a file");
+    private interface DocumentAddFormActor {
+        void act(WebForm form) throws IOException;
+    }
 
+    private JNFile _upload( final String errorMessage, final String fileName, final String description, final FileStatus fileStatus, final DocumentAddFormActor actor ) throws ProcessingException {
+        return new Scraper<JNFile>(errorMessage) {
+            protected JNFile scrape() throws IOException, SAXException, ProcessingException {
                 setCurrentPage();
 
                 WebResponse r = getCurrentPage();
@@ -240,25 +236,54 @@ public final class JNFileFolder extends JNObject {
                     form.setParameter("status",fileStatus.toString());
                 form.setParameter("description",description);
 
-                form.setParameter("type","file");
-                form.setParameter("file",new UploadFileSpec[]{
-                    new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
-                    // this version somehow posts the full file name to the server, which often confuses it.
-                    // new UploadFileSpec(fileToUpload)});
+                actor.act(form);
                 r = checkError(form.submit());
 
                 if( r.getImageWithAltText("Alert notification")!=null )
                     // TODO: obtain the error message
-                    throw new ProcessingException("error uploading a file "+fileToUpload);
+                    throw new ProcessingException(errorMessage);
 
                 reset();
                 parse();
                 JNFile file = getFile(fileName);
                 if(file==null)
-                    throw new ProcessingException("Unable to find the file "+fileName);
+                    throw new ProcessingException(errorMessage);
                 return file;
             }
         }.run();
+    }
+
+    /**
+     * Uploads a file to the folder.
+     * 
+     * @param fileStatus
+     *      can be null.
+     */
+    public JNFile uploadFile( String fileName, String description, FileStatus fileStatus, final File fileToUpload ) throws ProcessingException {
+        return _upload("error uploading a file "+fileToUpload,fileName,description,fileStatus,new DocumentAddFormActor() {
+            public void act(WebForm form) throws IOException {
+                if(!fileToUpload.exists() || !fileToUpload.isFile())
+                    throw new IOException(fileToUpload+" is not a file");
+
+                form.setParameter("type","file");
+                form.setParameter("file",new UploadFileSpec[]{
+                    new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
+                    // this version somehow posts the full file name to the server, which often confuses it.
+                    // new UploadFileSpec(fileToUpload)});
+            }
+        });
+    }
+
+    /**
+     * Creates a link to an URL.
+     */
+    public JNFile linkUrl(String fileName, String description, FileStatus status, final URL link) throws ProcessingException {
+        return _upload("error creating a link to "+link,fileName,description,status,new DocumentAddFormActor() {
+            public void act(WebForm form) throws IOException {
+                form.setParameter("type","link");
+                form.setParameter("url",link.toString());
+            }
+        });
     }
 
     private static final String[] MIME_TYPE_TABLE = new String[] {
