@@ -8,6 +8,7 @@ import java.io.PrintStream;
 public abstract class Commandlet {
     public static final Commandlet[] ALL = {
         new HelpCommandlet(),
+        new MkdirCommandlet(),
         new UploadFileCommandlet(),
         new GrantRoleCommandlet(),
         new DeclineRoleCommandlet(),
