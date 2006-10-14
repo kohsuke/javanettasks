@@ -9,7 +9,7 @@
       <action dev="kohsuke" type="add">Implemented an ability to create a link in docs&amp;files section.</action>
       <action dev="kohsuke" type="add">Added the 'announce' command to the CLI.</action>
       <action dev="kohsuke" type="add">Added the 'mkdir' command to the CLI.</action>
-      <action dev="kohsuke" type="add">Added the 'linkFile' command to the CLI.</action>
+      <action dev="kohsuke" type="add">Added the 'linkUrl' command to the CLI.</action>
     </release>
   </body>
 </document>
