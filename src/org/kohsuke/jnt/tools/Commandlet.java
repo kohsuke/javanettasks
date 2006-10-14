@@ -19,7 +19,8 @@ public abstract class Commandlet {
         new InteractiveCommandlet(),
         new ApproveProjectCommandlet(),
         new MoveProjectCommandlet(),
-        new InstallAutoResponderCommandlet()
+        new InstallAutoResponderCommandlet(),
+        new AnnounceCommandlet()
     };
 
 
