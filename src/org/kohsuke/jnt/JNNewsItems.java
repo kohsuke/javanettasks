@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 573 2006-03-01 20:23:12Z kohsuke $
+ * $Id: JNNewsItems.java 671 2006-11-08 19:25:27Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -27,7 +27,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 573 $
+ * @version $Revision: 671 $
  */
 public final class JNNewsItems extends JNObject {
 
@@ -114,10 +114,10 @@ public final class JNNewsItems extends JNObject {
                     // menu contains month names
                     form.setParameter(
                         FORM_MONTH,
-                        String.valueOf(date.get(Calendar.MONTH) + 1));
+                        pad(String.valueOf(date.get(Calendar.MONTH) + 1),2));
                     form.setParameter(
                         FORM_DAY,
-                        String.valueOf(date.get(Calendar.DAY_OF_MONTH)));
+                        pad(String.valueOf(date.get(Calendar.DAY_OF_MONTH)),2));
                 }
 
                 if (body != null) {
@@ -227,5 +227,11 @@ public final class JNNewsItems extends JNObject {
      */
     void resetNewsItems() {
         newsItems = null;
+    }
+
+    private String pad(String s,int width) {
+        while(s.length()<width)
+            s = '0'+s;
+        return s;
     }
 }
