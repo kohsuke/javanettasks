@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
@@ -268,6 +269,27 @@ public final class JNFileFolder extends JNObject {
                 form.setParameter("type","file");
                 form.setParameter("file",new UploadFileSpec[]{
                     new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
+                    // this version somehow posts the full file name to the server, which often confuses it.
+                    // new UploadFileSpec(fileToUpload)});
+            }
+        });
+    }
+
+    /**
+     * Uploads a file from a source other than {@link File}.
+     *
+     * @param data
+     *      The {@link InputStream} uploaded as a file.
+     * @param contentType
+     *      The MIME type of the file to be uploaded, such as "text/plain" or "application/x-zip-compressed".
+     *      java.net server doesn't seem to be using this information, so it could be just "application/octet-stream". 
+     */
+    public JNFile uploadFile( final String fileName, String description, FileStatus fileStatus, final InputStream data, final String contentType ) throws ProcessingException {
+        return _upload("error uploading a file "+fileName,fileName,description,fileStatus,new DocumentAddFormActor() {
+            public void act(WebForm form) throws IOException {
+                form.setParameter("type","file");
+                form.setParameter("file",new UploadFileSpec[]{
+                    new UploadFileSpec(fileName,data,contentType)});
                     // this version somehow posts the full file name to the server, which often confuses it.
                     // new UploadFileSpec(fileToUpload)});
             }
