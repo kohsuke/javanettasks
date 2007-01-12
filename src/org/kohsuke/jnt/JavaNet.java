@@ -6,6 +6,7 @@ package org.kohsuke.jnt;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.cookies.CookieProperties;
 import org.xml.sax.SAXException;
 
@@ -40,11 +41,18 @@ public class JavaNet extends JNObject {
     
     private JavaNet() {
         this(new WebConversation());
+
+        // disable scripting support
+        HttpUnitOptions.setScriptingEnabled(false);
     }
 
     private JavaNet(WebConversation wc) {
         super(null);
         this.wc = wc;
+
+        // disable scripting support
+        HttpUnitOptions.setScriptingEnabled(false);
+
         // java.net security certificate cause a problem. So avoid it by disabling certificate validation.
         SSLTrustAllManager.install();
 
