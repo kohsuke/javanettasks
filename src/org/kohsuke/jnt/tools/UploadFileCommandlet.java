@@ -33,7 +33,8 @@ public class UploadFileCommandlet extends AbstractFileUploadCommandlet {
             System.err.println("File "+src+" does not exist");
             return 1;
         }
-        folder.uploadFile(fileName,description,status,src);
+        JNFile file = folder.uploadFile(fileName, description, status, src);
+        System.out.println("Posted "+file.getURL());
         return 0;
     }
 }
