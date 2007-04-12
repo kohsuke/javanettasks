@@ -468,6 +468,8 @@ public final class JNProject extends JNObject implements Comparable {
     /**
      * Obtains the top folder in the file sharing section.
      *
+     * @param folderPathName
+     *      String like "/folder1/subfolder"
      * @return
      *      if the folder is not found, return null.
      */
