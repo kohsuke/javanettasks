@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.io.IOException;
 
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebForm;
 
 /**
  * File in the documents &amp; files section.
@@ -165,6 +166,27 @@ public final class JNFile extends JNObject {
                 checkError(Util.getFormWithAction(r,"ProjectDocumentDelete").submit());
 
                 folder.reset();
+                return null;
+            }
+        }.run();
+    }
+
+    /**
+     * Move this file to another folder
+     */
+    public void moveTo(final JNFileFolder newFolder) throws ProcessingException {
+        new Scraper("error moving file "+name+" to "+newFolder.getName()) {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse r = goTo(
+                    folder.project._getURL()+"/servlets/ProjectDocumentEdit?documentID="+id);
+
+                WebForm f = Util.getFormWithAction(r, "ProjectDocumentEdit?action=Edit%20file&documentID=" + id);
+                f.setParameter("folder",String.valueOf(newFolder.getId()));
+
+                checkError(f.submit());
+
+                folder.reset();
+                newFolder.reset();
                 return null;
             }
         }.run();
