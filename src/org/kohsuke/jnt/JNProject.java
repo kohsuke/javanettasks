@@ -125,7 +125,8 @@ public final class JNProject extends JNObject implements Comparable {
                     parentProject = null;
                 }
 
-                if( dom.selectSingleNode("//TABLE[@class='axial']/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null )
+                if(( dom.selectSingleNode("//TABLE[@class='axial']/TR[normalize-space(TH)='Project group'][normalize-space(TD)='communities']")!=null ) ||
+                    ( projectName.equalsIgnoreCase("glassfish")) )  // hack for glassfish community
                     isCommunity=Boolean.TRUE;
                 else
                     isCommunity=Boolean.FALSE;
@@ -141,7 +142,7 @@ public final class JNProject extends JNObject implements Comparable {
                 JNProject.this.owners = Collections.unmodifiableSet(owners);
 
                 // parse sub-projects
-                Set<JNProject> subProjects = new TreeSet<JNProject>();
+                Set<JNProject> subProjects = new TreeSet<JNProject>();  
                 List<Element> sps = dom.selectNodes("//H2[text()='Subprojects']/following::*[1]/TR/TD/A");
                 for (Element sp : sps)
                     subProjects.add(root.getProject(sp.getTextTrim()));
