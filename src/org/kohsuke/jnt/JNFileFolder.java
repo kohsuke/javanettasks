@@ -225,6 +225,44 @@ public final class JNFileFolder extends JNObject {
 
                 WebResponse r = getCurrentPage();
 
+                WebLink fileLink = r.getLinkWith(fileName);
+                if (fileLink != null) {
+                    String[] parts = fileLink.getURLString().split("/");
+                    String id = parts[4];
+                    WebLink[] links = r.getLinks();
+                    WebLink editFileLink = null;
+                    for (WebLink link : links) {
+                        if (link.getURLString().contains("ProjectDocumentEdit?documentID="+id)) {
+                            editFileLink = link;
+                            break;
+                        }
+                    }
+                    if (editFileLink != null) {
+                        r = editFileLink.click();
+                        WebForm[] forms = r.getForms();
+                        for (WebForm form : forms) {
+                            String action = form.getAction(); 
+                            if ((action != null) && (action.contains("ProjectDocumentEdit?action=Edit%20file"))) {
+                                form.setParameter("name",fileName);
+                                actor.act(form);
+                                r = checkError(form.submit());
+
+                                if( r.getImageWithAltText("Alert notification")!=null )
+                                    // TODO: obtain the error message
+                                    throw new ProcessingException(errorMessage);
+
+                                reset();
+                                parse();
+                                JNFile file = getFile(fileName);
+                                if(file==null)
+                                    throw new ProcessingException("Unable to find the file "+fileName);
+                                return file;
+                            }
+                        }
+                        throw new ProcessingException("error uploading a file:  unable to find the edit form");
+                    }
+                }
+
                 WebLink addFileLink = r.getLinkWith("Add new file");
                 if(addFileLink==null) {
                     throw new ProcessingException("Unable to find 'add new file' link. Does this account have a permission to post a file?");
@@ -266,7 +304,9 @@ public final class JNFileFolder extends JNObject {
                 if(!fileToUpload.exists() || !fileToUpload.isFile())
                     throw new IOException(fileToUpload+" is not a file");
 
-                form.setParameter("type","file");
+		if (form.hasParameterNamed("type")) {
+                    form.setParameter("type","file");
+		}
                 form.setParameter("file",new UploadFileSpec[]{
                     new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
                     // this version somehow posts the full file name to the server, which often confuses it.

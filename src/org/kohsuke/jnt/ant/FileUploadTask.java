@@ -71,16 +71,13 @@ public class FileUploadTask extends AbstractJavaNetTaskForProject {
         JNFile file = folder.getFiles().get(getTargetFileName());
 
         if( file!=null ) {
-            if( overwrite ) {
-                log("deleting existing file '"+toFileName+"' first", Project.MSG_INFO);
-                file.delete();
-            } else {
+            if( !overwrite ) {
                 log("file '"+toFileName+"' already exists",Project.MSG_ERR);
                 throw new BuildException();
             }
         }
         
-        log("uploading file",Project.MSG_VERBOSE);
+        log("uploading file: " + toFileName,Project.MSG_VERBOSE);
         folder.uploadFile(getTargetFileName(),fileDescription,fileStatus,fromFile);
         
         log("done",Project.MSG_VERBOSE);
