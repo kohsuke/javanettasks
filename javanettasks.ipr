@@ -1,48 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4" relativePaths="false">
+<project version="4" relativePaths="true">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
   </component>
-  <component name="BSFConsole">
-    <sendcommandbycontrolenter>false</sendcommandbycontrolenter>
-    <restoresystemstreams>false</restoresystemstreams>
-    <outwaitsforerr>false</outwaitsforerr>
-    <errwaitsforout>false</errwaitsforout>
-    <storedupsinrecentcommands>false</storedupsinrecentcommands>
-    <moduleforclasspath />
-    <includeoutputpath>false</includeoutputpath>
-    <includetestsoutputpath>false</includetestsoutputpath>
-    <languages>
-      <language name="ant" engine="org.kos.bsfconsoleplugin.languages.AntConsoleBSFEngine" />
-      <language name="beanshell" engine="bsh.util.BeanShellBSFEngine" />
-      <language name="netrexx" engine="org.apache.bsf.engines.netrexx.NetRexxEngine" />
-      <language name="xslt" engine="org.apache.bsf.engines.xslt.XSLTEngine" />
-      <language name="beanbasic" engine="org.apache.bsf.engines.beanbasic.BeanBasicEngine" />
-      <language name="bml" engine="org.apache.bml.ext.BMLEngine" />
-      <language name="groovy" engine="org.codehaus.groovy.bsf.GroovyEngine" />
-      <language name="jacl" engine="org.apache.bsf.engines.jacl.JaclEngine" />
-      <language name="java" engine="org.apache.bsf.engines.java.JavaEngine" />
-      <language name="javaclass" engine="org.apache.bsf.engines.javaclass.JavaClassEngine" />
-      <language name="javascript" engine="org.apache.bsf.engines.javascript.JavaScriptEngine" />
-      <language name="jpython" engine="org.apache.bsf.engines.jpython.JPythonEngine" />
-      <language name="jruby" engine="org.jruby.javasupport.bsf.JRubyEngine" />
-      <language name="jscript" engine="org.apache.bsf.engines.activescript.ActiveScriptEngine" />
-      <language name="judoscript" engine="com.judoscript.BSFJudoEngine" />
-      <language name="jython" engine="org.apache.bsf.engines.jython.JythonEngine" />
-      <language name="lotusscript" engine="org.apache.bsf.engines.lotusscript.LsEngine" />
-      <language name="perl" engine="org.apache.bsf.engines.perl.PerlEngine" />
-      <language name="perlscript" engine="org.apache.bsf.engines.activescript.ActiveScriptEngine" />
-      <language name="pnuts" engine="pnuts.ext.PnutsBSFEngine" />
-      <language name="vbscript" engine="org.apache.bsf.engines.activescript.ActiveScriptEngine" />
-    </languages>
-    <startupscripts />
-    <preferredrecentcommandsdividerlocations />
-    <BSFConsoleSearchOptions searchfromcursor="false">
-      <recentsearches />
-    </BSFConsoleSearchOptions>
-  </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
+  </component>
+  <component name="CodeStyleManager">
+    <option name="USE_DEFAULT_CODE_STYLE_SCHEME" value="true" />
+    <option name="CODE_STYLE_SCHEME" value="" />
   </component>
   <component name="CodeStyleProjectProfileManger">
     <option name="PROJECT_PROFILE" />
@@ -68,7 +34,7 @@
       <entry name="?*.jpeg" />
     </wildcardResourcePatterns>
   </component>
-  <component name="CvsManager" />
+  <component name="DataSourceManager" />
   <component name="DataSourceManagerImpl" />
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
@@ -103,7 +69,13 @@
     <option name="OUTPUT_DIRECTORY" />
   </component>
   <component name="GUI Designer component loader factory" />
-  <component name="IdProvider" IDEtalkID="344691566BD1524E8A664285C870E185" />
+  <component name="IdProvider" IDEtalkID="EC5E7408F69A40B377CBCC4DCD9BED92" />
+  <component name="ImportConfiguration">
+    <option name="VENDOR" />
+    <option name="RELEASE_TAG" />
+    <option name="LOG_MESSAGE" />
+    <option name="CHECKOUT_AFTER_IMPORT" value="true" />
+  </component>
   <component name="InspectionProjectProfileManager">
     <option name="PROJECT_PROFILE" value="Project Default" />
     <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
@@ -152,7 +124,7 @@
           <option name="METHOD_OPTIONS">
             <value>
               <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
-              <option name="REQUIRED_TAGS" value="" />
+              <option name="REQUIRED_TAGS" value="@return@param@throws or @exception" />
             </value>
           </option>
           <option name="FIELD_OPTIONS">
@@ -208,6 +180,32 @@
     <option name="FILTER_WARNINGS" value="false" />
     <option name="FILTER_INFO" value="true" />
     <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MavenBuildProjectComponent">
+    <option name="mavenExecutable" value="" />
+    <option name="Settings File" value="C:\Documents and Settings\kohsuke\.m2\settings.xml" />
+    <option name="mavenCommandLineParams" value="" />
+    <option name="vmOptions" value="" />
+    <option name="useMavenEmbedder" value="false" />
+    <option name="useFilter" value="false" />
+    <option name="Batch Mode" value="false" />
+    <option name="Check Plugin Updates" value="false" />
+    <option name="Debug" value="false" />
+    <option name="Errors" value="false" />
+    <option name="Fail At End" value="false" />
+    <option name="Fail Fast" value="false" />
+    <option name="Fail Never" value="false" />
+    <option name="Lax Checksums" value="false" />
+    <option name="No Plugin Registry" value="false" />
+    <option name="No Plugin Updates" value="false" />
+    <option name="Non Recursive" value="false" />
+    <option name="Offline" value="false" />
+    <option name="Reactor" value="false" />
+    <option name="Strict Checksums" value="false" />
+    <option name="Update Plugins" value="false" />
+    <option name="Update Snapshots" value="false" />
+    <option name="Skip Tests" value="false" />
+    <pom-list />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -335,7 +333,7 @@
       <module fileurl="file://$PROJECT_DIR$/javanettasks.iml" filepath="$PROJECT_DIR$/javanettasks.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="JDK1.5" />
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" />
   <component name="ProjectRunConfigurationManager" />
   <component name="RmicSettings">
     <option name="IS_EANABLED" value="false" />

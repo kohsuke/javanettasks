@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module version="4" relativePaths="false" type="JAVA_MODULE">
+<module version="4" relativePaths="true" type="JAVA_MODULE">
   <component name="ModuleRootManager" />
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
+    <exclude-output />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="JDK1.5" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library>
+      <library name="nekohtml">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/httpunit/jars/httpunit-1.5.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/nekohtml/jars/nekohtml-0.9.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="httpunit">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/httpunit/jars/httpunit-1.5.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -23,85 +32,69 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="xml-apis">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/xml-apis/jars/xml-apis-2.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/xml-apis/jars/xml-apis-2.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="xerces">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/xerces/jars/xerces-2.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/xerces/jars/xerces-2.2.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="jtidy">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/jtidy/jars/jtidy-4aug2000r7-dev.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/jtidy/jars/jtidy-4aug2000r7-dev.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="ant">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/ant/jars/ant-1.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/ant/jars/ant-1.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="dom4j">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/dom4j/jars/dom4j-1.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/dom4j/jars/dom4j-1.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="jaxen">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/jaxen/jars/jaxen-1.0-FCS-full.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/jaxen/jars/jaxen-1.0-FCS-full.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library>
+      <library name="junit">
         <CLASSES>
-          <root url="jar://C:/Documents and Settings/kohsuke/.maven/repository/junit/jars/junit-3.8.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/nekohtml/jars/nekohtml-0.9.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../unixHome/.maven/repository/junit/jars/junit-3.8.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntryProperties />
-  </component>
-  <component name="org.mevenide.idea.module.ModuleSettings">
-    <favoriteGoals>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="jar:install" />
-      </list>
-    </favoriteGoals>
   </component>
 </module>
 
