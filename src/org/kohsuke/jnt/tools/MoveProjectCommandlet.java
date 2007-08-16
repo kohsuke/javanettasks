@@ -14,22 +14,25 @@ public class MoveProjectCommandlet extends Commandlet {
     }
 
     public void printUsage(PrintStream out) {
-        out.println("Usage: moveProject <project> <newParent>");
+        out.println("Usage: moveProject <project> ... <newParent>");
         out.println("'project' becomes a child project of 'newParent'");
     }
 
     public int run(ConnectionFactory connection, String[] args) throws Exception {
-        if(args.length!=2) {
+        if(args.length>2) {
             printUsage(System.err);
             return -1;
         }
 
         JavaNet conn = connection.connect();
 
-        JNProject child = conn.getProject(args[0]);
-        JNProject parent = conn.getProject(args[1]);
+        JNProject parent = conn.getProject(args[args.length-1]);
 
-        child.setParent(parent);
+        for( int i=0; i<args.length-1; i++ ) {
+            System.out.println("Moving "+args[i]);
+            JNProject child = conn.getProject(args[i]);
+            child.setParent(parent);
+        }
 
         return 0;
     }
