@@ -43,4 +43,8 @@ public class JNRole extends JNObject implements Comparable {
         JNRole that = (JNRole)obj;
         return this.name.equals(that.name);
     }
+
+    public String toString() {
+        return name;
+    }
 }
