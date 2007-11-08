@@ -15,7 +15,7 @@ proxyPort=8080
 	<p>
 		<tt>proxyServer</tt> and <tt>proxyPort</tt> are optional (but you have to have both if you want to use a proxy.) All the tools and Ant tasks will try to read this file.
 	</p><p>
-		On Windows, try running a tool without this file and see the error message to find out where you should place this file.
+		On Windows, this file should be located under <tt>new File(System.getProperty("user.home"))</tt>, which is normally <tt>c:\Documents and Settings\USERNAME</tt>. If that didn't work for you, try running a tool without a <tt>.java.net</tt> file and see the error message to find out where you should place this file.
 	</p><p>
 		Make sure to set the permission to 600 to protect your information.
 	</p>
