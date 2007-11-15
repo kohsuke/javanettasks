@@ -14,6 +14,7 @@ abstract class JNObject {
 
 
     protected JNObject(JavaNet root) {
+        if(this instanceof JavaNet) root = (JavaNet)this; // because we can't do "super(this)" 
         this.root = root;
     }
 

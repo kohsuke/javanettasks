@@ -3,17 +3,21 @@
  */
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.cookies.CookieProperties;
+import org.dom4j.Document;
+import org.dom4j.Element;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -251,4 +255,36 @@ public class JavaNet extends JNObject {
         }
         return r;
     }
+
+    /**
+     * Runs ad-hoc query against java.net database.
+     * Requires domain admin privilege.
+     */
+    public String[][] runAdHocQuery(final String sql) throws ProcessingException {
+        return new Scraper<String[][]>("unable to run ad-hoc query") {
+            protected String[][] scrape() throws IOException, SAXException, ProcessingException {
+                Document dom = Util.getDom4j(goTo(
+                        "https://www.dev.java.net/servlets/AdHocQuery?query="
+                                + URLEncoder.encode(sql, "UTF-8") + "&Button=Run+query"));
+                List<Element> trs = (List<Element>) dom.selectNodes("//DIV[@id='adhocqueryresults']//TR");
+                if(trs.size()<=1)   // no data
+                    return new String[0][];
+
+                trs = trs.subList(1,trs.size()); // skip the first header row
+                String[][] data = new String[trs.size()][];
+
+                for (int i=0; i < trs.size(); i++) {
+                    List<Element> tds = trs.get(i).elements("TD");
+                    data[i] = new String[tds.size()];
+                    for (int j = 0; j < tds.size(); j++) {
+                        Element td = tds.get(j);
+                        data[i][j] = td.getText();
+                    }
+                }
+
+                return data;
+            }
+        }.run();
+    }
+
 }

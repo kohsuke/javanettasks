@@ -25,7 +25,8 @@ public abstract class Commandlet {
         new MoveProjectCommandlet(),
         new InstallAutoResponderCommandlet(),
         new UnsubscribeAllCommandlet(),
-        new AnnounceCommandlet()
+        new AnnounceCommandlet(),
+        new AdhocQueryCommandlet()
     };
 
 
