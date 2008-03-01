@@ -53,6 +53,16 @@ public final class JNIssue extends JNObject {
         public JNIssue getParent() {
             return JNIssue.this;
         }
+
+        /**
+         * Gets the user who created this item.
+         */
+        public abstract JNUser getAuthor();
+
+        /**
+         * Gets the timestamp when this item was created.
+         */
+        public abstract Calendar getTimestamp();
     }
 
     /**
@@ -139,7 +149,6 @@ public final class JNIssue extends JNObject {
         public String getNewValue() {
             return e.elementText("new_value");
         }
-
     }
 
     JNIssue(JNProject project, int id) throws ProcessingException {
