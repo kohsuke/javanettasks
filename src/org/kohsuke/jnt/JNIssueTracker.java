@@ -83,6 +83,22 @@ public final class JNIssueTracker extends JNObject {
         return get(createRange(start,end));
     }
 
+    /**
+     * Gets all the issues in this issue tracker.
+     */
+    public Map<Integer,JNIssue> getAll() throws ProcessingException {
+        Map<Integer,JNIssue> allIssues = new TreeMap<Integer,JNIssue>();
+
+        for( int i=0; ; i+= BULK_SIZE) {
+            Map<Integer,JNIssue> batch = get(createRange(i, i + BULK_SIZE));
+            allIssues.putAll(batch);
+            if(batch.isEmpty())
+                return allIssues;
+        }
+    }
+
+    private static final int BULK_SIZE = 100;
+
     private int[] createRange(int start,int end) {
         int[] ids = new int[end-start];
         for( int x=0; x<ids.length; x++ )

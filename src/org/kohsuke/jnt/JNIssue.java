@@ -39,7 +39,7 @@ public final class JNIssue extends JNObject {
      */
     private List<Activity> activities;
 
-    public abstract class Item<T extends Item> {
+    public abstract class Item<T extends Item> implements Comparable<Item<T>> {
         T prev,next;
 
         public T getPrev() {
@@ -63,6 +63,13 @@ public final class JNIssue extends JNObject {
          * Gets the timestamp when this item was created.
          */
         public abstract Calendar getTimestamp();
+
+        /**
+         * Compare its timestamps, in ascending order.
+         */
+        public int compareTo(Item<T> that) {
+            return this.getTimestamp().compareTo(that.getTimestamp());
+        }
     }
 
     /**
@@ -100,54 +107,91 @@ public final class JNIssue extends JNObject {
         }
     }
 
-    public final class Activity extends Item<Activity> {
+    public abstract class Activity extends Item<Activity> {
         /**
-         * The 'activity' element.
+         * Gets the user who performed this activity.
          */
-        private final Element e;
+        public abstract JNUser getAuthor();
 
-        Activity(Element e) {
-            this.e = e;
-        }
-
-        /**
-         * Gets the user who added this comment.
-         */
-        public JNUser getAuthor() {
-            return root.getUser(e.elementText("user"));
-        }
-
-        /**
-         * Gets the timestamp when this comment was added.
-         */
-        public Calendar getTimestamp() {
-            return formatDate(creationDateFormat, e.elementText("when"));
-        }
+        public abstract Calendar getTimestamp();
 
         /**
          * Gets the field that has changed.
          *
          * @return
-         *      Nver null.
+         *      Null if this is the creation activity.
          */
+        public abstract JNIssueField getField();
+
+        /**
+         * Old value before the change.
+         *
+         * @return
+         *      Can be empty string but never null for update activity.
+         *      For creation activity, null.
+         */
+        public abstract String getOldValue();
+
+        /**
+         * New value after the change.
+         *
+         * @return
+         *      Can be empty string but never null for update activity.
+         *      For creation activity, null.
+         */
+        public abstract String getNewValue();
+    }
+
+    public final class UpdateActivity extends Activity {
+        /**
+         * The 'activity' element.
+         */
+        private final Element e;
+
+        UpdateActivity(Element e) {
+            this.e = e;
+        }
+
+        public JNUser getAuthor() {
+            return root.getUser(e.elementText("user"));
+        }
+
+        public Calendar getTimestamp() {
+            return formatDate(creationDateFormat, e.elementText("when"));
+        }
+
         public JNIssueField getField() {
             return JNIssueField.find(e.elementText("field_name"));
         }
 
-        /**
-         * Old value before the change.
-         * Can be empty string but never null.
-         */
         public String getOldValue() {
             return e.elementText("old_value");
         }
 
-        /**
-         * New value after the change.
-         * Can be empty string but never null.
-         */
         public String getNewValue() {
             return e.elementText("new_value");
+        }
+    }
+
+    public final class CreationActivity extends Activity {
+        public JNUser getAuthor() {
+            return getReporter();
+        }
+
+        public Calendar getTimestamp() {
+            return getCreationDate();
+        }
+
+        public JNIssueField getField() {
+            return null;
+        }
+
+        public String getOldValue() {
+            return null;
+        }
+
+        public String getNewValue() {
+            return null;
         }
     }
 
@@ -294,14 +338,19 @@ public final class JNIssue extends JNObject {
      * Gets the activities of issues.
      * This list represents status changes made to the issue.
      *
+     * <p>
+     * The first activity is always {@link CreationActivity}
+     * indicating the creation of this issue.
+     *
      * @return
-     *      can be an empty list but never null. Older changes first.
+     *      always non-empty list. Older changes first.
      */
     public List<Activity> getActivities() {
         if(activities==null) {
             activities = new ArrayList<Activity>();
+            activities.add(new CreationActivity());
             for( Element e : (List<Element>)rawData.elements("activity") )
-                activities.add(new Activity(e));
+                activities.add(new UpdateActivity(e));
             makeDoubeLinkedList(activities);
         }
         return activities;
