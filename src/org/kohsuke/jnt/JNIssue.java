@@ -135,6 +135,10 @@ public final class JNIssue extends JNObject {
         /**
          * New value after the change.
          *
+         * Value can be parsed with methods like {@link IssueStatus#valueOf(String)},
+         * {@link IssueResolution#valueOf(String)}, {@link IssueType#valueOf(String)},
+         * and {@link Priority#valueOf(String)}.
+         *
          * @return
          *      Can be empty string but never null for update activity.
          *      For creation activity, null.
