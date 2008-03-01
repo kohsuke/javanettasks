@@ -140,6 +140,14 @@ public final class JNIssue extends JNObject {
          *      For creation activity, null.
          */
         public abstract String getNewValue();
+
+        /**
+         * Returns true if this activity is an update activity
+         * and not the creation activity.
+         */
+        public boolean isUpdate() {
+            return getField()!=null;
+        }
     }
 
     public final class UpdateActivity extends Activity {
