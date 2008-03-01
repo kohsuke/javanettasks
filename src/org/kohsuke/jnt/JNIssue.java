@@ -35,6 +35,11 @@ public final class JNIssue extends JNObject {
     private List<Description> descriptions;
 
     /**
+     * Lazily created list of {@link Activity}s.
+     */
+    private List<Activity> activities;
+
+    /**
      * A comment added to an issue.
      */
     public final class Description {
@@ -67,6 +72,58 @@ public final class JNIssue extends JNObject {
         public String getText() {
             return e.elementText("thetext");
         }
+    }
+
+    public final class Activity {
+        /**
+         * The 'activity' element.
+         */
+        private final Element e;
+
+        Activity(Element e) {
+            this.e = e;
+        }
+
+        /**
+         * Gets the user who added this comment.
+         */
+        public JNUser getAuthor() {
+            return root.getUser(e.elementText("user"));
+        }
+
+        /**
+         * Gets the timestamp when this comment was added.
+         */
+        public Calendar getTimestamp() {
+            return formatDate(creationDateFormat, e.elementText("when"));
+        }
+
+        /**
+         * Gets the field that has changed.
+         *
+         * @return
+         *      Nver null.
+         */
+        public JNIssueField getField() {
+            return JNIssueField.find(e.elementText("field_name"));
+        }
+
+        /**
+         * Old value before the change.
+         * Can be empty string but never null.
+         */
+        public String getOldValue() {
+            return e.elementText("old_value");
+        }
+
+        /**
+         * New value after the change.
+         * Can be empty string but never null.
+         */
+        public String getNewValue() {
+            return e.elementText("new_value");
+        }
+
     }
 
     JNIssue(JNProject project, int id) throws ProcessingException {
@@ -196,7 +253,7 @@ public final class JNIssue extends JNObject {
      * Gets the description of issues (AKA "additional comments")
      *
      * @return
-     *      can be an empty list but never null.
+     *      can be an empty list but never null. Older changes first.
      */
     public List<Description> getDescriptions() {
         if(descriptions==null) {
@@ -205,6 +262,22 @@ public final class JNIssue extends JNObject {
                 descriptions.add(new Description(e));
         }
         return descriptions;
+    }
+
+    /**
+     * Gets the activities of issues.
+     * This list represents status changes made to the issue.
+     *
+     * @return
+     *      can be an empty list but never null. Older changes first.
+     */
+    public List<Activity> getActivities() {
+        if(activities==null) {
+            activities = new ArrayList<Activity>();
+            for( Element e : (List<Element>)rawData.elements("activity") )
+                activities.add(new Activity(e));
+        }
+        return activities;
     }
 
     private Calendar formatDate(SimpleDateFormat f, String text) {
