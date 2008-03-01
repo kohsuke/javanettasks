@@ -53,7 +53,9 @@ public final class JNIssueTracker extends JNObject {
      *
      * @return
      *      the map is from the id to {@link JNIssue}. It contains entries for
-     *      all the specified IDs.
+     *      all the specified IDs that actually exist. Non-existent issue ID
+     *      in the argument will not be an error, but the returned map won't have
+     *      entries for such IDs.
      */
     public Map<Integer,JNIssue> get(int... ids) throws ProcessingException {
         // list of IDs to fetch

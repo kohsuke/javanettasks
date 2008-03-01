@@ -228,7 +228,10 @@ public final class JNIssue extends JNObject {
         for( Element issue : (List<Element>)doc.getRootElement().elements("issue") ) {
             // make sure that the issue id is correct
             int id = Integer.parseInt(issue.elementTextTrim("issue_id"));
-            if(!issue.attributeValue("status_code").equals("200"))
+            String status = issue.attributeValue("status_code");
+            if(status.equals("404"))
+                continue;   // not found
+            if(!status.equals("200"))
                 throw new ProcessingException("bad status code for "+id+" : "+issue.attributeValue("status_message"));
             r.put(id,project.getIssueTracker().getOrCreate(id,issue));
         }
