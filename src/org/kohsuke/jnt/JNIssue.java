@@ -39,10 +39,26 @@ public final class JNIssue extends JNObject {
      */
     private List<Activity> activities;
 
+    public abstract class Item<T extends Item> {
+        T prev,next;
+
+        public T getPrev() {
+            return prev;
+        }
+
+        public T getNext() {
+            return next;
+        }
+
+        public JNIssue getParent() {
+            return JNIssue.this;
+        }
+    }
+
     /**
      * A comment added to an issue.
      */
-    public final class Description {
+    public final class Description extends Item<Description> {
         /**
          * The 'long_desc' element.
          */
@@ -74,7 +90,7 @@ public final class JNIssue extends JNObject {
         }
     }
 
-    public final class Activity {
+    public final class Activity extends Item<Activity> {
         /**
          * The 'activity' element.
          */
@@ -260,6 +276,7 @@ public final class JNIssue extends JNObject {
             descriptions = new ArrayList<Description>();
             for( Element e : (List<Element>)rawData.elements("long_desc") )
                 descriptions.add(new Description(e));
+            makeDoubeLinkedList(descriptions);
         }
         return descriptions;
     }
@@ -276,8 +293,21 @@ public final class JNIssue extends JNObject {
             activities = new ArrayList<Activity>();
             for( Element e : (List<Element>)rawData.elements("activity") )
                 activities.add(new Activity(e));
+            makeDoubeLinkedList(activities);
         }
         return activities;
+    }
+
+    private <T extends Item<T>> void makeDoubeLinkedList(List<T> items) {
+        T prev = null;
+        for (T t : items) {
+            t.prev = prev;
+            if(prev!=null)
+                prev.next = t;
+            prev = t;
+        }
+        if(prev!=null)
+            prev.next = null;
     }
 
     private Calendar formatDate(SimpleDateFormat f, String text) {
