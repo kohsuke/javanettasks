@@ -76,6 +76,20 @@ public final class JNIssueTracker extends JNObject {
         return r;
     }
 
+    /**
+     * Gets multiple issues at once, by spcifying a range [start,end)
+     */
+    public Map<Integer,JNIssue> getRange(int start, int end) throws ProcessingException {
+        return get(createRange(start,end));
+    }
+
+    private int[] createRange(int start,int end) {
+        int[] ids = new int[end-start];
+        for( int x=0; x<ids.length; x++ )
+            ids[x] = start+x;
+        return ids;
+    }
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
 
     /**
