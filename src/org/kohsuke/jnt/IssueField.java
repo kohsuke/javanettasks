@@ -25,7 +25,17 @@ public enum IssueField {
     ATTACHMENT("attachments.ispatch"),
     ASSIGNED("assigned_to"),
     QA_CONTACT("qa_contact"),
-    KEYWORDS("keywords")
+    KEYWORDS("keywords"),
+    // ???
+    CONFIRMED("everconfirmed"),
+    /**
+     * It's not clearly exactly when this happens,
+     * but I noticed this in https://jax-ws.dev.java.net/issues/xml.cgi?id=30
+     *
+     * Most likely this is a bug in IssueZilla, and should be ignored
+     * by any applications.
+     */
+    COMMENT("longdesc")
     ;
 
     /**
