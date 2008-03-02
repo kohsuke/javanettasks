@@ -18,7 +18,11 @@ public enum IssueField {
     VERSION("version"),
     DEPENDS_ON("dependson"),
     BLOCKED_BY("blocked"),
-    TYPE("issue_type")
+    TYPE("issue_type"),
+    /**
+     * old value is null, and the new value is the description of the attachment.
+     */
+    ATTACHMENT("attachments.ispatch")
     ;
 
     /**
