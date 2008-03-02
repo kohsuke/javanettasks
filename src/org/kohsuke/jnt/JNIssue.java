@@ -177,11 +177,11 @@ public final class JNIssue extends JNObject {
         }
 
         public String getOldValue() {
-            return e.elementText("old_value");
+            return e.elementText("oldvalue");
         }
 
         public String getNewValue() {
-            return e.elementText("new_value");
+            return e.elementText("newvalue");
         }
     }
 

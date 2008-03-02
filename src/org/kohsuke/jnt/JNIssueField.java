@@ -12,7 +12,7 @@ public enum JNIssueField {
     URL("issue_file_loc"),
     OS("op_sys"),
     PRIORITY("priority"),
-    PLATFORM("platform"),
+    PLATFORM("rep_platform"),
     SUMMARY("short_desc"),
     STATUS_WHITEBOARD("status_whiteboard"),
     VERSION("version"),
