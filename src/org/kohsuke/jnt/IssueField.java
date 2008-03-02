@@ -22,7 +22,8 @@ public enum IssueField {
     /**
      * old value is null, and the new value is the description of the attachment.
      */
-    ATTACHMENT("attachments.ispatch")
+    ATTACHMENT("attachments.ispatch"),
+    ASSIGNED("assigned_to")
     ;
 
     /**
