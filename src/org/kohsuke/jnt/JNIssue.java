@@ -160,6 +160,21 @@ public final class JNIssue extends JNObject {
         public boolean isUpdate() {
             return getField()!=null;
         }
+
+        /**
+         * Gets the status of the issue right after this activity.
+         * <p>
+         * That is, if this activity updates the status, this method
+         * returns that value, and otherwise it returns the status
+         * of the issue when the activity happened.
+         */
+        public IssueStatus getCurrentStatus() {
+            Activity a=this;
+            for(; a!=null; a=a.getPrev())
+                if(a.getField()== IssueField.STATUS)
+                    return IssueStatus.valueOf(a.getNewValue());
+            return getParent().getStatus();
+        }
     }
 
     public final class UpdateActivity extends Activity {
