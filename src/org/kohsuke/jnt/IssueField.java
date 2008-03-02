@@ -3,7 +3,7 @@ package org.kohsuke.jnt;
 /**
  * @author Kohsuke Kawaguchi
  */
-public enum JNIssueField {
+public enum IssueField {
     STATUS("issue_status"),
     SUBCOMPONENT("subcomponent"),
     RESOLUTION("resolution"),
@@ -26,12 +26,12 @@ public enum JNIssueField {
      */
     public final String value;
 
-    JNIssueField(String value) {
+    IssueField(String value) {
         this.value = value;
     }
 
-    public static JNIssueField find(String value) {
-        for( JNIssueField v : values() )
+    public static IssueField find(String value) {
+        for( IssueField v : values() )
             if(v.value.equals(value))
                 return v;
         throw new IllegalArgumentException("Unexpected issue field name: "+value);

@@ -121,7 +121,7 @@ public final class JNIssue extends JNObject {
          * @return
          *      Null if this is the creation activity.
          */
-        public abstract JNIssueField getField();
+        public abstract IssueField getField();
 
         /**
          * Old value before the change.
@@ -172,8 +172,8 @@ public final class JNIssue extends JNObject {
             return formatDate(creationDateFormat, e.elementText("when"));
         }
 
-        public JNIssueField getField() {
-            return JNIssueField.find(e.elementText("field_name"));
+        public IssueField getField() {
+            return IssueField.find(e.elementText("field_name"));
         }
 
         public String getOldValue() {
@@ -194,7 +194,7 @@ public final class JNIssue extends JNObject {
             return getCreationDate();
         }
 
-        public JNIssueField getField() {
+        public IssueField getField() {
             return null;
         }
 
