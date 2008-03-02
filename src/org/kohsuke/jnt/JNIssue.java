@@ -65,6 +65,14 @@ public final class JNIssue extends JNObject {
         public abstract Calendar getTimestamp();
 
         /**
+         * <tt>(date of this event)-(date of the original issue report)</tt>
+         * in milliseconds.
+         */
+        public long getAge() {
+            return getTimestamp().getTimeInMillis()-getParent().getCreationDate().getTimeInMillis();
+        }
+
+        /**
          * Compare its timestamps, in ascending order.
          */
         public int compareTo(Item<T> that) {
