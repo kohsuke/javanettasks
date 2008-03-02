@@ -426,7 +426,7 @@ public final class JNIssue extends JNObject {
 
         return new Scraper<Document>("fetching the details of the issue "+idList) {
             public Document scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse rsp = project.goTo(project.getURL()+"issues/xml.cgi?id="+idList);
+                WebResponse rsp = project.goTo(project.getURL()+"issues/xml.cgiinclude_empty_issues=false&id="+idList);
                 return new DOMReader().read(rsp.getDOM());
             }
         }.run();
