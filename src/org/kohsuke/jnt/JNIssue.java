@@ -170,9 +170,9 @@ public final class JNIssue extends JNObject {
          */
         public IssueStatus getCurrentStatus() {
             Activity a=this;
-            for(; a!=null; a=a.getPrev())
+            for(; a!=null; a=a.getNext())
                 if(a.getField()== IssueField.STATUS)
-                    return IssueStatus.valueOf(a.getNewValue());
+                    return IssueStatus.valueOf(a.getOldValue());
             return getParent().getStatus();
         }
     }
