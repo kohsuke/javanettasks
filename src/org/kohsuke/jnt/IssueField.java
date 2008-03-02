@@ -35,7 +35,11 @@ public enum IssueField {
      * Most likely this is a bug in IssueZilla, and should be ignored
      * by any applications.
      */
-    COMMENT("longdesc")
+    COMMENT("longdesc"),
+    /**
+     * Same as {@link #COMMENT}.
+     */
+    COMPONENT("component")
     ;
 
     /**
