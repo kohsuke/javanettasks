@@ -24,7 +24,8 @@ public enum IssueField {
      */
     ATTACHMENT("attachments.ispatch"),
     ASSIGNED("assigned_to"),
-    QA_CONTACT("qa_contact")
+    QA_CONTACT("qa_contact"),
+    KEYWORDS("keywords")
     ;
 
     /**
