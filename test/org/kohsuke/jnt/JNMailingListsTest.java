@@ -4,6 +4,7 @@ import static org.kohsuke.jnt.SubscriptionMode.NORMAL;
 import junit.textui.TestRunner;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -45,7 +46,10 @@ public class JNMailingListsTest extends TestCaseBase {
         l.massSubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
         assertEquals(3,l.getSubscribers(NORMAL).size());
         l.massUnsubscribe(new String[]{"foo@bar.com","bar@foo.com"},NORMAL,null);
-        assertEquals(1,l.getSubscribers(NORMAL).size());
+        List<String> subscribers = l.getSubscribers(NORMAL);
+        // java.net has broken this. try this manually for yourself
+        System.out.println("After deletion: "+subscribers);
+        assertEquals(1, subscribers.size());
 
         l.delete();
     }
