@@ -4,3 +4,5 @@ maven.log
 velocity.log
 build.properties
 javanettasks.iws
+*.iml
+*.ipr
