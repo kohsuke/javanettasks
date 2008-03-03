@@ -105,14 +105,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
@@ -231,4 +223,32 @@
       <url>java-net:/maven2-repository/trunk/www/repository/</url>
     </repository>
   </distributionManagement>
+
+  <profiles>
+    <profile>
+      <!-- run tests -->
+      <id>test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+              </includes>
+              <forkMode>never</forkMode>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+  </profiles>
+
+  <properties>
+    <!-- skip tests by default, unless in the test profile -->
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
 </project>
