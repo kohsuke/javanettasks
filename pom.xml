@@ -214,10 +214,10 @@
   </reporting>
 
   <distributionManagement>
-    <site>
+    <!--site> javanettasks is still in CVS
       <id>javanettasks-www</id>
       <url>java-net:/javanettasks/trunk/www/</url>
-    </site>
+    </site-->
     <repository>
       <uniqueVersion>false</uniqueVersion>
       <id>java.net-maven2-repository</id>
