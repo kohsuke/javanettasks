@@ -44,9 +44,9 @@
   </developers>
 
   <scm>
-    <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks</connection>
-    <developerConnection>scm:cvs:pserver:kohsuke@cvs.dev.java.net:/cvs:javanettasks</developerConnection>
-    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/</url>
+    <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks/javanettasks</connection>
+    <developerConnection>scm:cvs:pserver:kohsuke@cvs.dev.java.net:/cvs:javanettasks/javanettasks</developerConnection>
+    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/javanettasks/</url>
   </scm>
 
   <organization>
