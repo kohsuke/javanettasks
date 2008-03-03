@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project relativePaths="true" version="4">
   <component name="AntConfiguration">
-    <defaultAnt bundledAnt="true" />
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
@@ -25,14 +26,6 @@
       <entry name=".+\.(properties|xml|html)" />
       <entry name=".+\.(gif|png|jpeg)" />
     </resourceExtensions>
-    <wildcardResourcePatterns>
-      <entry name="?*.properties" />
-      <entry name="?*.xml" />
-      <entry name="?*.html" />
-      <entry name="?*.gif" />
-      <entry name="?*.png" />
-      <entry name="?*.jpeg" />
-    </wildcardResourcePatterns>
   </component>
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
@@ -68,7 +61,7 @@
     <option name="OPEN_IN_BROWSER" value="false" />
     <option name="OUTPUT_DIRECTORY" />
   </component>
-  <component name="IdProvider" IDEtalkID="EC5E7408F69A40B377CBCC4DCD9BED92" />
+  <component name="IdProvider" IDEtalkID="42D684111A57A2C9EB54A074AF1B9CCE" />
   <component name="ImportConfiguration">
     <option name="VENDOR" />
     <option name="RELEASE_TAG" />
@@ -157,38 +150,6 @@
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="IS_EMACS_ERRORS_MODE" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-  </component>
-  <component name="LogConsolePreferences">
-    <option name="FILTER_ERRORS" value="false" />
-    <option name="FILTER_WARNINGS" value="false" />
-    <option name="FILTER_INFO" value="true" />
-    <option name="CUSTOM_FILTER" />
-  </component>
-  <component name="MavenBuildProjectComponent">
-    <option name="mavenExecutable" value="" />
-    <option name="Settings File" value="C:\Documents and Settings\kohsuke\.m2\settings.xml" />
-    <option name="mavenCommandLineParams" value="" />
-    <option name="vmOptions" value="" />
-    <option name="useMavenEmbedder" value="false" />
-    <option name="useFilter" value="false" />
-    <option name="Batch Mode" value="false" />
-    <option name="Check Plugin Updates" value="false" />
-    <option name="Debug" value="false" />
-    <option name="Errors" value="false" />
-    <option name="Fail At End" value="false" />
-    <option name="Fail Fast" value="false" />
-    <option name="Fail Never" value="false" />
-    <option name="Lax Checksums" value="false" />
-    <option name="No Plugin Registry" value="false" />
-    <option name="No Plugin Updates" value="false" />
-    <option name="Non Recursive" value="false" />
-    <option name="Offline" value="false" />
-    <option name="Reactor" value="false" />
-    <option name="Strict Checksums" value="false" />
-    <option name="Update Plugins" value="false" />
-    <option name="Update Snapshots" value="false" />
-    <option name="Skip Tests" value="false" />
-    <pom-list />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -317,7 +278,7 @@
       <module fileurl="file://$PROJECT_DIR$/javanettasks.iml" filepath="$PROJECT_DIR$/javanettasks.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" />
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK" />
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
       <value>
@@ -339,12 +300,5 @@
     <OPTION enabled="false" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
-  <component name="com.intellij.jsf.UserDefinedFacesConfigs">
-    <option name="USER_DEFINED_CONFIGS">
-      <value>
-        <list size="0" />
-      </value>
-    </option>
-  </component>
 </project>
 
