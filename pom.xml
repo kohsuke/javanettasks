@@ -50,7 +50,7 @@
   </developers>
   <scm>
     <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.dev.java.net:/cvs:javanettasks</developerConnection>
+    <developerConnection>scm:cvs:ext:${user.name}@cvs.dev.java.net:/cvs:javanettasks</developerConnection>
     <url>https://javanettasks.dev.java.net/source/browse/javanettasks/</url>
   </scm>
   <organization>
