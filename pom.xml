@@ -4,7 +4,7 @@
   <groupId>javanettasks</groupId>
   <artifactId>javanettasks</artifactId>
   <name>java.net tasks</name>
-  <version>1.0.15-SNAPSHOT</version>
+  <version>1.0.14-SNAPSHOT</version>
   <description>java.net tasks : java.net automation library/tools</description>
   <url>http://javanettasks.dev.java.net/</url>
 
@@ -99,7 +99,9 @@
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <links>http://java.sun.com/j2se/1.3/docs/api/, http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</links>
+          <links>
+            <link>http://java.sun.com/j2se/5.0/docs/api/</link>
+          </links>
           <show>public</show>
         </configuration>
       </plugin>
