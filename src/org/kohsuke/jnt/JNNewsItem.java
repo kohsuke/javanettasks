@@ -82,6 +82,38 @@ public final class JNNewsItem extends JNObject {
     }
 
     /**
+     * Approves this announcement.
+     */
+    public void approve() throws ProcessingException {
+        moderate("Approve");
+    }
+
+    /**
+     * Rejects this announcement.
+     */
+    public void disapprove() throws ProcessingException {
+        moderate("Disapprove");
+    }
+
+    private void moderate(final String action) throws ProcessingException {
+        new Scraper("Unable to moderate the announcement") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                String url = project._getURL() + "/servlets/ProjectNewsApproval";
+                WebResponse response = goTo(url);
+                WebForm form = Util.getFormWithAction(response, url);
+                if(form==null)
+                    throw new ProcessingException("missing form");
+                form.setParameter("operation "+id, action);
+                checkError(form.submit());
+
+                return null;
+            }
+        }.run();
+
+        project.getNewsItems().resetNewsItems();
+    }
+
+    /**
      * Gets the URL to thew news item page
      */
     public URL getURL() {

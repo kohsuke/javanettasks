@@ -1,5 +1,5 @@
 /*
- * $Id: JNNewsItems.java 671 2006-11-08 19:25:27Z kohsuke $
+ * $Id: JNNewsItems.java 789 2008-03-10 01:54:58Z kohsuke $
  * 
  */
 package org.kohsuke.jnt;
@@ -27,7 +27,7 @@ import java.util.Locale;
  * 
  * @author Ryan Shoemaker
  * @author Bruno Souza
- * @version $Revision: 671 $
+ * @version $Revision: 789 $
  */
 public final class JNNewsItems extends JNObject {
 
@@ -39,6 +39,12 @@ public final class JNNewsItems extends JNObject {
      * Lazily parsed.
      */
     private List<JNNewsItem> newsItems;
+
+    /**
+     * List of {@link JNNewsItem}s
+     * that are pending approval. Lazily parsed.
+     */
+    private List<JNNewsItem> pendingApprovals;
 
     // constants for the form field names
     private static final String FORM_NAME = "ProjectNewsAddForm";
@@ -173,8 +179,43 @@ public final class JNNewsItems extends JNObject {
         return Collections.unmodifiableList(newsItems);
     }
 
+    public List<JNNewsItem> getPendingApprovals() throws ProcessingException {
+        if(pendingApprovals==null) {
+            pendingApprovals = new ArrayList<JNNewsItem>();
+            new Scraper("Unable to parse announcements that are pending approvals") {
+                protected Object scrape() throws IOException, SAXException, ParseException, ProcessingException {
+                    WebResponse response = goTo(project._getURL()+"/servlets/ProjectNewsApproval");
+                    Document dom = Util.getDom4j(response);
 
-    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.ENGLISH);
+                    
+                    Element table = (Element)dom.selectSingleNode("//DIV[@id='projectnewsapproval']//TABLE");
+
+                    if (table== null)
+                        // theres no news table, meaning there's nothing to approve.
+                        return null;
+
+                    // the format is subtly different from below.
+                    List rows = table.selectNodes(".//TR");
+
+                    // we start from row 1, since row 0 is the header row.
+                    for (int r=1; r<rows.size(); r++) {
+                        Element row = (Element) rows.get(r);
+                        String date =  ((Element)row.elements("TD").get(1)).getTextTrim();
+
+                        Element link = (Element) row.selectSingleNode("TD[1]/A");
+                        String summary = link.getText();
+                        String href = link.attributeValue("href");
+                        int idx = href.lastIndexOf('=')+1;
+
+                        pendingApprovals.add(new JNNewsItem(project, Integer.parseInt(href.substring(idx)),
+                            dateFormat.parse(date), summary));
+                    }
+                    return null;
+                }
+            }.run();
+        }
+        return Collections.unmodifiableList(pendingApprovals);
+    }
 
     private void loadNewsInfo() throws ProcessingException {
         // load all information that is on the membership pages
@@ -222,11 +263,14 @@ public final class JNNewsItems extends JNObject {
         }.run();
     }
 
+    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.ENGLISH);
+
     /**
      * Resest the list of news items and force reloading.
      */
     void resetNewsItems() {
         newsItems = null;
+        pendingApprovals = null;
     }
 
     private String pad(String s,int width) {
