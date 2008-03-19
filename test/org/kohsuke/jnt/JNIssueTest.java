@@ -39,6 +39,13 @@ public class JNIssueTest  extends TestCaseBase {
         calendarTest(2005,1,10,15,16,49,d.get(1).getTimestamp());
     }
 
+    public void testUpdate() throws ProcessingException {
+        JNProject project = con.getProject("javanettasks-test");
+        JNIssueTracker it = project.getIssueTracker();
+        JNIssue i = it.get(2);
+        i.update("Automated test");
+    }
+
     private void calendarTest(int yy, int mm, int dd, int HH, int MM, int SS, Calendar cal) {
         assertEquals(yy,cal.get(Calendar.YEAR));
         assertEquals(mm,cal.get(Calendar.MONTH)+1);
