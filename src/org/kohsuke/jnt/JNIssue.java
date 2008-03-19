@@ -245,7 +245,7 @@ public final class JNIssue extends JNObject {
             Document doc = bulkFetch(project,Collections.singletonList(id) );
             rawData = doc.getRootElement().element("issue");
             if(rawData==null)
-                throw new IllegalArgumentException("No such issue. Id="+id);
+                throw new ProcessingException("No such issue. Id="+id);
         }
 
         this.rawData = rawData;
