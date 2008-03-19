@@ -4,7 +4,7 @@
   <groupId>javanettasks</groupId>
   <artifactId>javanettasks</artifactId>
   <name>java.net tasks</name>
-  <version>1.0.15-SNAPSHOT</version>
+  <version>1.0.15</version>
   <description>java.net tasks : java.net automation library/tools</description>
   <url>http://javanettasks.dev.java.net/</url>
 
@@ -47,6 +47,7 @@
     <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks/javanettasks</connection>
     <developerConnection>scm:cvs:pserver:kohsuke@cvs.dev.java.net:/cvs:javanettasks/javanettasks</developerConnection>
     <url>https://javanettasks.dev.java.net/source/browse/javanettasks/javanettasks/</url>
+    <tag>javanettasks-1_0_15</tag>
   </scm>
 
   <organization>
