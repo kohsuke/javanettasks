@@ -19,7 +19,7 @@ public class AnnounceCommandlet extends Commandlet {
     }
 
     public void printUsage(PrintStream out) {
-        out.println("Usage : announce <project> <headline>");
+        out.println("Usage : announce <project> <headline> [<url>]");
         out.print("Post a new announcement to a project.");
         out.print("Stdin is read as announcement body text");
     }
@@ -27,7 +27,7 @@ public class AnnounceCommandlet extends Commandlet {
     public int run(ConnectionFactory connection, String[] args) throws Exception {
         JavaNet conn = connection.connect();
 
-        if(args.length!=2) {
+        if(args.length<2 || 3<args.length) {
             printUsage(System.err);
             return -1;
         }
@@ -40,7 +40,7 @@ public class AnnounceCommandlet extends Commandlet {
 
         JNProject project = conn.getProject(args[0]);
         project.getNewsItems().createNewsItem(new GregorianCalendar(),
-            args[1], text.toString(), null, null);
+            args[1], text.toString(), null, args.length<3?null:args[2]);
         return 0;
     }
 }
