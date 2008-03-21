@@ -93,6 +93,19 @@ public final class IssueEditor extends JNObject {
         return knob("close");
     }
 
+    /**
+     * Marks this issue as a duplicate of another issue.
+     */
+    public IssueEditor duplicateOf(final JNIssue issue) {
+        actions.add(new Action() {
+            public void update(WebForm form) {
+                form.setParameter("knob","duplicate");
+                form.setParameter("dup_id",String.valueOf(issue.getId()));
+            }
+        });
+        return this;
+    }
+
     private IssueEditor knob(final String state) {
         actions.add(new Action() {
             public void update(WebForm form) {
