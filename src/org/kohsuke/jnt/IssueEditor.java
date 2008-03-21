@@ -69,9 +69,58 @@ public final class IssueEditor extends JNObject {
      * Accepts an issue
      */
     public IssueEditor accept() {
+        return knob("accept");
+    }
+
+    /**
+     * Reopens an issue
+     */
+    public IssueEditor reopen() {
+        return knob("reopen");
+    }
+
+    /**
+     * Marks the issue as verified.
+     */
+    public IssueEditor verify() {
+        return knob("verify");
+    }
+
+    /**
+     * Marks the issue as closed.
+     */
+    public IssueEditor close() {
+        return knob("close");
+    }
+
+    private IssueEditor knob(final String state) {
         actions.add(new Action() {
             public void update(WebForm form) {
-                form.setParameter("knob","accept");
+                form.setParameter("knob", state);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Sets the priority.
+     */
+    public IssueEditor setPriority(final Priority p) {
+        actions.add(new Action() {
+            public void update(WebForm form) {
+                form.setParameter("priority",p.name());
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Sets the issue type.
+     */
+    public IssueEditor setType(final IssueType type) {
+        actions.add(new Action() {
+            public void update(WebForm form) {
+                form.setParameter("issue_type",type.name());
             }
         });
         return this;
