@@ -83,7 +83,7 @@ public final class IssueEditor extends JNObject {
      * @param comment
      *      Description of this update. This is a mandatory field.
      */
-    public void update(final String comment) throws ProcessingException {
+    public void commit(final String comment) throws ProcessingException {
         new Scraper<Void>("Failed to post comment to "+project.getName()+" issue #"+id) {
             protected Void scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(project._getURL()+"/issues/show_bug.cgi?id="+id);

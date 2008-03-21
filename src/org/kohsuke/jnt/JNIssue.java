@@ -427,7 +427,7 @@ public final class JNIssue extends JNObject {
      * Update the issue by just posting a comment.
      */
     public void update(final String comment) throws ProcessingException {
-        beginEdit().update(comment);
+        beginEdit().commit(comment);
     }
 
     public IssueEditor beginEdit() {
