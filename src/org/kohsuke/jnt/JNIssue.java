@@ -1,7 +1,6 @@
 package org.kohsuke.jnt;
 
 import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebForm;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.DOMReader;
@@ -272,6 +271,13 @@ public final class JNIssue extends JNObject {
     }
 
     /**
+     * Gets the project that this issue is filed for.
+     */
+    public JNProject getProject() {
+        return project;
+    }
+
+    /**
      * Gets the priority of this issue.
      */
     public Priority getPriority() {
@@ -421,20 +427,11 @@ public final class JNIssue extends JNObject {
      * Update the issue by just posting a comment.
      */
     public void update(final String comment) throws ProcessingException {
-        new Scraper<Void>("Failed to post comment to "+project.getName()+" issue #"+id) {
-            protected Void scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse response = goTo(project._getURL()+"/issues/show_bug.cgi?id="+id);
+        beginEdit().update(comment);
+    }
 
-                WebForm form = Util.getFormWithAction(response, "process_bug.cgi");
-                form.setParameter("comment",comment);
-                response = checkError(form.submit());
-
-                // TODO: how do we check if there was an error?
-                // the response code is 200 when I submit a form without any comment.
-                // what happens with a collision?
-                return null;
-            }
-        }.run();
+    public IssueEditor beginEdit() {
+        return new IssueEditor(this);
     }
 
     static Map<Integer,JNIssue> bulkCreate(JNProject project, Document doc) throws ProcessingException {
