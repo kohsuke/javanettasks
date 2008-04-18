@@ -304,9 +304,9 @@ public final class JNFileFolder extends JNObject {
                 if(!fileToUpload.exists() || !fileToUpload.isFile())
                     throw new IOException(fileToUpload+" is not a file");
 
-		if (form.hasParameterNamed("type")) {
-                    form.setParameter("type","file");
-		}
+                if (form.hasParameterNamed("type"))
+                    form.setParameter("type", "file");
+                
                 form.setParameter("file",new UploadFileSpec[]{
                     new UploadFileSpec(fileToUpload.getName(),new FileInputStream(fileToUpload),guessContentType(fileToUpload))});
                     // this version somehow posts the full file name to the server, which often confuses it.
@@ -327,7 +327,9 @@ public final class JNFileFolder extends JNObject {
     public JNFile uploadFile( final String fileName, String description, FileStatus fileStatus, final InputStream data, final String contentType ) throws ProcessingException {
         return _upload("error uploading a file "+fileName,fileName,description,fileStatus,new DocumentAddFormActor() {
             public void act(WebForm form) throws IOException {
-                form.setParameter("type","file");
+                if (form.hasParameterNamed("type"))
+                    form.setParameter("type", "file");
+
                 form.setParameter("file",new UploadFileSpec[]{
                     new UploadFileSpec(fileName,data,contentType)});
                     // this version somehow posts the full file name to the server, which often confuses it.
