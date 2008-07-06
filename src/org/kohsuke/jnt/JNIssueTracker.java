@@ -124,6 +124,9 @@ public final class JNIssueTracker extends JNObject {
                 "ts="+dateFormat.format(start.getTime())+"&ts_end="+dateFormat.format(end.getTime())));
     }
 
+    // this seems like another way to get updates.
+    // TODO: to query updates https://hudson.dev.java.net/issues/buglist.cgi?field0-0-0=delta_ts&type0-0-0=greaterthan&value0-0-0=2008-07-04&format=xml
+
 //    private static String zeroPad(int value,int width) {
 //        // efficiency? what's that?
 //        String r = Integer.toString(value);
