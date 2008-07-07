@@ -1,14 +1,19 @@
 package org.kohsuke.jnt;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Calendar;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
@@ -104,6 +109,20 @@ public final class JNIssueTracker extends JNObject {
         for( int x=0; x<ids.length; x++ )
             ids[x] = start+x;
         return ids;
+    }
+
+    /**
+     * Loads the issue persisted by {@link JNIssue#save(OutputStream)}.
+     */
+    public JNIssue load(int id, InputStream in) throws ProcessingException {
+        try {
+            Document dom = new SAXReader().read(in);
+            Element root = dom.getRootElement();
+
+            return new JNIssue(project, id, root);
+        } catch (DocumentException e) {
+            throw new ProcessingException(e);
+        }
     }
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");

@@ -4,9 +4,12 @@ import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.DOMReader;
+import org.dom4j.io.XMLWriter;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -396,6 +399,15 @@ public final class JNIssue extends JNObject {
             makeDoubeLinkedList(activities);
         }
         return activities;
+    }
+
+    /**
+     * Persists this issue to the disk.
+     *
+     * @see JNIssueTracker#load(InputStream) 
+     */
+    public void save(OutputStream out) throws IOException {
+        new XMLWriter(out).write(rawData);
     }
 
     private <T extends Item<T>> void makeDoubeLinkedList(List<T> items) {
