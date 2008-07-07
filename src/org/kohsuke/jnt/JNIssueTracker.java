@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
+import java.util.Date;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
@@ -139,8 +140,20 @@ public final class JNIssueTracker extends JNObject {
      *      all the specified IDs.
      */
     public Map<Integer,JNIssue> getUpdatedIssues(Calendar start,Calendar end) throws ProcessingException {
+        return getUpdatedIssues(start.getTime(), end.getTime());
+    }
+
+    public Map<Integer,JNIssue> getUpdatedIssues(Date start,Date end) throws ProcessingException {
         return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
-                "ts="+dateFormat.format(start.getTime())+"&ts_end="+dateFormat.format(end.getTime())));
+                "ts="+dateFormat.format(start)+"&ts_end="+dateFormat.format(end)));
+    }
+
+    /**
+     * Gets all the issues updated since the given time stamp.
+     */
+    public Map<Integer,JNIssue> getUpdatedIssues(Date start) throws ProcessingException {
+        return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
+                "ts="+dateFormat.format(start)));
     }
 
     // this seems like another way to get updates.
