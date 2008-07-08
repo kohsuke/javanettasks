@@ -317,7 +317,9 @@ public final class JNIssue extends JNObject {
      * Gets the resolution of this issue.
      */
     public IssueResolution getResolution() {
-        return IssueResolution.valueOf(rawData.elementText("resolution"));
+        String s = rawData.elementText("resolution");
+        if(s.length()==0) return null;
+        return IssueResolution.valueOf(s);
     }
 
     /**
