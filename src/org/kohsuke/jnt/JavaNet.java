@@ -82,7 +82,7 @@ public class JavaNet extends JNObject {
     /**
      * Logs in to the java.net. This method has to be called first.
      */
-    private void login( final String userName, final String password ) throws ProcessingException {
+    public void login( final String userName, final String password ) throws ProcessingException {
         new Scraper("unable to log in as user "+userName) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse r = wc.getResponse("https://www.dev.java.net/servlets/TLogin");
@@ -160,6 +160,13 @@ public class JavaNet extends JNObject {
         // otherwise default to ~/.java.net
         File homeDir = new File(System.getProperty("user.home"));
         return new File(homeDir,".java.net");
+    }
+
+    /**
+     * Connects anonymously.
+     */
+    public static JavaNet connectAnonymously() {
+        return new JavaNet();
     }
 
     /**
