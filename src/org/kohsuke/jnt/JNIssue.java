@@ -307,10 +307,30 @@ public final class JNIssue extends JNObject {
     }
 
     /**
+     * Gets the current person assigned to the issue.
+     *
+     * <p>
+     * This can be an user name or an alias name, like "issues@hudson".
+     * It's not clear exactly what's allowed and what's not.
+     */
+    public String getAssignedTo() {
+        return rawData.elementText("assigned_to");
+    }
+
+    /**
      * Gets the current status of this issue.
      */
     public IssueStatus getStatus() {
         return IssueStatus.valueOf(rawData.elementText("issue_status"));
+    }
+
+    /**
+     * Gets the 'status whiteboard' text, or null if not set.
+     */
+    public String getStatusWhiteboard() {
+        String s = rawData.elementText("status_whiteboard");
+        if(s.length()==0)   return null;
+        return s;
     }
 
     /**
@@ -409,7 +429,7 @@ public final class JNIssue extends JNObject {
     /**
      * Persists this issue to the disk.
      *
-     * @see JNIssueTracker#load(InputStream) 
+     * @see JNIssueTracker#load(int, InputStream)  
      */
     public void save(OutputStream out) throws IOException {
         new XMLWriter(out).write(rawData);
