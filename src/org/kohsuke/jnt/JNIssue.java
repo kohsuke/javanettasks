@@ -27,6 +27,7 @@ import java.util.TreeMap;
  * @author Kohsuke Kawaguchi
  */
 public final class JNIssue extends JNObject {
+    // TODO: do attachments. see https://hudson.dev.java.net/issues/xml.cgi?id=1120&include_attachments=false
     private final JNProject project;
     private final int id;
 
