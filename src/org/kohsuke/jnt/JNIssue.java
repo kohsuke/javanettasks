@@ -353,6 +353,25 @@ public final class JNIssue extends JNObject {
         return rawData.elementText("rep_platform");
     }
 
+    public String getComponent() {
+        return rawData.elementText("component");
+    }
+
+    public String getSubComponent() {
+        return rawData.elementText("sub_component");
+    }
+
+    /**
+     * Gets the number of votes on this issue.
+     */
+    public int getVotes() {
+        try {
+            return Integer.parseInt(rawData.elementText("votes"));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     /**
      * Gets the type of the issue.
      */
