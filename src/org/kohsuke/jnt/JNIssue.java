@@ -366,8 +366,11 @@ public final class JNIssue extends JNObject {
     /**
      * Gets the description of issues (AKA "additional comments")
      *
+     * <p>
+     * This also includes the initial bug report, which is the first element.
+     *
      * @return
-     *      can be an empty list but never null. Older changes first.
+     *      Never empty, never null. Older changes first.
      */
     public List<Description> getDescriptions() {
         if(descriptions==null) {
