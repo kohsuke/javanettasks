@@ -359,7 +359,7 @@ public final class JNIssue extends JNObject {
     }
 
     public String getSubComponent() {
-        return rawData.elementText("sub_component");
+        return rawData.elementText("subcomponent");
     }
 
     /**
