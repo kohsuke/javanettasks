@@ -55,6 +55,7 @@
   </organization>
 
   <build>
+    <defaultGoal>install</defaultGoal>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
@@ -219,10 +220,10 @@
   </reporting>
 
   <distributionManagement>
-    <!--site> javanettasks is still in CVS
+    <site>
       <id>javanettasks-www</id>
-      <url>java-net:/javanettasks/trunk/www/</url>
-    </site-->
+      <url>file:../www</url>
+    </site>
     <repository>
       <uniqueVersion>false</uniqueVersion>
       <id>java.net-maven2-repository</id>
