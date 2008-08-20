@@ -140,6 +140,21 @@ public final class IssueEditor extends JNObject {
     }
 
     /**
+     * Append new words to the status whiteboard
+     */
+    public IssueEditor appendToWhiteBoard(final String words) {
+        actions.add(new Action() {
+            public void update(WebForm form) {
+                final String field = "status_whiteboard";
+                String value = form.getParameterValue(field);
+                form.setParameter(field,
+                    (value == null ? words : value + " " + words));
+            }
+        });
+        return this;
+    }
+
+    /**
      * Commits the change.
      *
      * @param comment
