@@ -132,7 +132,9 @@ public final class JNProject extends JNObject implements Comparable {
                     isCommunity=Boolean.FALSE;
 
                 // parse summary
-                summmary = dom.selectSingleNode("//TABLE[@class='axial']/TR[TH/text()='Summary']/TD").getText();
+                Node summaryNode = dom.selectSingleNode("//TABLE[@class='axial']/TR[TH/text()='Summary']/TD");
+                if(summaryNode!=null)
+                    summmary = summaryNode.getText();
 
                 // parse owners
                 Set<JNUser> owners = new TreeSet<JNUser>();
