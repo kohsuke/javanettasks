@@ -164,6 +164,10 @@ public final class JNIssueTracker extends JNObject {
                 "ts="+dateFormat.format(start)));
     }
 
+    public JNIssueComponent getComponent(String name) throws ProcessingException {
+        return getComponents().get(name);
+    }
+
     /**
      * Gets the issue tracker components.
      *

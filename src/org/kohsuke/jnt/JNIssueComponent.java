@@ -3,6 +3,7 @@ package org.kohsuke.jnt;
 import org.xml.sax.SAXException;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,6 +33,10 @@ public final class JNIssueComponent extends JNObject {
         return name;
     }
 
+    public JNIssueSubcomponent getSubcomponent(String name) throws ProcessingException {
+        return getSubcomponents().get(name);
+    }
+
     /**
      * Gets subcomponents in this component.
      *
@@ -47,9 +52,11 @@ public final class JNIssueComponent extends JNObject {
         new Scraper("unable to parse the list of subcomponents for "+name) {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 Document dom = Util.getDom4j(goTo(project._getURL()+"/issues/editcomponents.cgi?component="+name));
-                List<Element> trs = dom.elementByID("issuezilla").selectNodes(".//TR");
+                List<Element> trs = dom.selectNodes(".//DIV[@id='issuezilla']//TR");
                 for (Element tr : trs) {
-                    String name = tr.selectSingleNode("./TD/A").getText();
+                    Node a = tr.selectSingleNode("./TD/A");
+                    if(a==null) continue;   // not a component line
+                    String name = a.getText();
                     subcomponents.put(name,new JNIssueSubcomponent(JNIssueComponent.this,name));
                 }
                 return null;
