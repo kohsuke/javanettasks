@@ -26,6 +26,7 @@ public abstract class Commandlet {
         new InstallAutoResponderCommandlet(),
         new UnsubscribeAllCommandlet(),
         new AnnounceCommandlet(),
+        new AddIssueComponentCommandlet(),
         new AdhocQueryCommandlet()
     };
 

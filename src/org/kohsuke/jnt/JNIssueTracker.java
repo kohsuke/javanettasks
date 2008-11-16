@@ -7,20 +7,17 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Collections;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
@@ -182,9 +179,11 @@ public final class JNIssueTracker extends JNObject {
         new Scraper("unable to parse the list of components") {
             protected Object scrape() throws IOException, SAXException, ProcessingException {
                 Document dom = Util.getDom4j(goTo(project._getURL()+"/issues/editproducts.cgi"));
-                List<Element> trs = dom.elementByID("issuezilla").selectNodes(".//TR");
+                List<Element> trs = dom.selectNodes(".//DIV[@id='issuezilla']//TR");
                 for (Element tr : trs) {
-                    String name = tr.selectSingleNode("./TD/A").getText();
+                    Node a = tr.selectSingleNode("./TD/A");
+                    if(a==null) continue;
+                    String name = a.getText();
                     components.put(name,new JNIssueComponent(project,name));
                 }
                 return null;
