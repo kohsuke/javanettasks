@@ -3,10 +3,13 @@ package org.kohsuke.jnt;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,6 +18,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Collections;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
@@ -29,6 +35,11 @@ public final class JNIssueTracker extends JNObject {
      * Cached instance of issues.
      */
     private final Map<Integer,JNIssue> issues = new WeakHashMap<Integer, JNIssue>();
+
+    /**
+     * Lazily parsed list of components, by their {@link JNIssueComponent#getName() names}.
+     */
+    private Map<String,JNIssueComponent> components;
 
     JNIssueTracker(JNProject project) {
         super(project);
@@ -154,6 +165,33 @@ public final class JNIssueTracker extends JNObject {
     public Map<Integer,JNIssue> getUpdatedIssues(Date start) throws ProcessingException {
         return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
                 "ts="+dateFormat.format(start)));
+    }
+
+    /**
+     * Gets the issue tracker components.
+     *
+     * <p>
+     * This requires project admin provilege.
+     */
+    public Map<String,JNIssueComponent> getComponents() throws ProcessingException {
+        if(components!=null)
+            return components;
+
+        components = new TreeMap<String,JNIssueComponent>();
+
+        new Scraper("unable to parse the list of components") {
+            protected Object scrape() throws IOException, SAXException, ProcessingException {
+                Document dom = Util.getDom4j(goTo(project._getURL()+"/issues/editproducts.cgi"));
+                List<Element> trs = dom.elementByID("issuezilla").selectNodes(".//TR");
+                for (Element tr : trs) {
+                    String name = tr.selectSingleNode("./TD/A").getText();
+                    components.put(name,new JNIssueComponent(project,name));
+                }
+                return null;
+            }
+        }.run();
+
+        return components;
     }
 
     // this seems like another way to get updates.
