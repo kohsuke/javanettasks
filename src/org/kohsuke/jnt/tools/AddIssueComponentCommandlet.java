@@ -1,8 +1,8 @@
 package org.kohsuke.jnt.tools;
 
-import org.kohsuke.jnt.JNIssueComponent;
 import org.kohsuke.jnt.JNProject;
 import org.kohsuke.jnt.JavaNet;
+import org.kohsuke.jnt.JNIssueComponent;
 
 import java.io.PrintStream;
 

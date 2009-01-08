@@ -1,17 +1,13 @@
 package org.kohsuke.jnt;
 
-import org.xml.sax.SAXException;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
-
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.List;
-import java.io.IOException;
-
-import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebResponse;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Component in the java.net issue tracker.
@@ -21,18 +17,38 @@ import com.meterware.httpunit.WebForm;
 public final class JNIssueComponent extends JNObject {
     private final JNProject project;
     private final String name;
-    private Map<String,JNIssueSubcomponent> subcomponents;
+    private final List<String> targetMilestones;
+    private final List<String> versions;
+    private final Map<String,JNIssueSubcomponent> subcomponents = new HashMap<String, JNIssueSubcomponent>();
 
-    protected JNIssueComponent(JNProject project, String name) {
+    protected JNIssueComponent(JNProject project, String name, List<String> subcomponentNames, List<String> targetMilestones, List<String> versions) {
         super(project);
         this.name = name;
         this.project = project;
+        this.targetMilestones = targetMilestones;
+        this.versions = versions;
+        for (String sn : subcomponentNames)
+            subcomponents.put(sn,new JNIssueSubcomponent(this,sn));
     }
 
     public String getName() {
         return name;
     }
 
+    /**
+     * Versions defined on this component.
+     */
+    public List<String> getVersions() {
+        return versions;
+    }
+
+    /**
+     * Target milestones defined on this component.
+     */
+    public List<String> getTargetMilestones() {
+        return targetMilestones;
+    }
+    
     public JNIssueSubcomponent getSubcomponent(String name) throws ProcessingException {
         return getSubcomponents().get(name);
     }
@@ -44,25 +60,6 @@ public final class JNIssueComponent extends JNObject {
      * This requires project admin provilege.
      */
     public Map<String,JNIssueSubcomponent> getSubcomponents() throws ProcessingException {
-        if(subcomponents!=null)
-            return subcomponents;
-
-        subcomponents = new TreeMap<String,JNIssueSubcomponent>();
-
-        new Scraper("unable to parse the list of subcomponents for "+name) {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                Document dom = Util.getDom4j(goTo(project._getURL()+"/issues/editcomponents.cgi?component="+name));
-                List<Element> trs = dom.selectNodes(".//DIV[@id='issuezilla']//TR");
-                for (Element tr : trs) {
-                    Node a = tr.selectSingleNode("./TD/A");
-                    if(a==null) continue;   // not a component line
-                    String name = a.getText();
-                    subcomponents.put(name,new JNIssueSubcomponent(JNIssueComponent.this,name));
-                }
-                return null;
-            }
-        }.run();
-
         return subcomponents;
     }
 

@@ -540,4 +540,19 @@ public final class JNIssue extends JNObject {
             }
         }.run();
     }
+
+     /**
+     * Fetches the XML for issues by running stored query, runs default query if the
+      * queryName parameter is null
+     */
+    static Document bulkQueryFetch(final JNProject project,final String queryName) throws ProcessingException {
+        return new Scraper<Document>("fetching the details of the issue buglist.cgi "+queryName) {
+            public Document scrape() throws IOException, SAXException, ProcessingException {
+                String query = (queryName == null ? "runuserdefault" : "runnamed&namedcmd="+queryName);
+                WebResponse rsp = project.goTo(project.getURL()+"issues/buglist.cgi?&cmdtype="+query+"&format=xml");
+                return new DOMReader().read(rsp.getDOM());
+            }
+        }.run();
+    }
+
 }

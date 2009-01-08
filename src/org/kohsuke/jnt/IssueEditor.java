@@ -140,6 +140,18 @@ public final class IssueEditor extends JNObject {
     }
 
     /**
+     * Generic method to set arbitrary field.
+     */
+    public IssueEditor setField(final IssueField field, final String value) {
+        actions.add(new Action() {
+            public void update(WebForm form) {
+                form.setParameter(field.value, value);
+            }
+        });
+        return this;
+    }
+
+    /**
      * Append new words to the status whiteboard
      */
     public IssueEditor appendToWhiteBoard(final String words) {

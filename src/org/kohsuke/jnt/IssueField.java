@@ -29,13 +29,14 @@ public enum IssueField {
     // ???
     CONFIRMED("everconfirmed"),
     /**
-     * It's not clearly exactly when this happens,
+     * It's not clear exactly when this happens,
      * but I noticed this in https://jax-ws.dev.java.net/issues/xml.cgi?id=30
      *
      * Most likely this is a bug in IssueZilla, and should be ignored
      * by any applications.
      */
     COMMENT("longdesc"),
+    COMMENT_INPUT("comment"),
     /**
      * Same as {@link #COMMENT}.
      */

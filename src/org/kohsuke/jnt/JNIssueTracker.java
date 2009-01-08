@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -164,37 +165,58 @@ public final class JNIssueTracker extends JNObject {
                 "ts="+dateFormat.format(start)));
     }
 
-    public JNIssueComponent getComponent(String name) throws ProcessingException {
-        return getComponents().get(name);
+    /**
+     * Gets the issue tracker metadata
+     *
+     * @return
+     * @throws org.kohsuke.jnt.ProcessingException
+     */
+    public JNIssueTrackerMetadata getMetadata() throws ProcessingException {
+        return new JNIssueTrackerMetadata(project);
     }
 
     /**
-     * Gets the issue tracker components.
+     * Returns the components in this issue tracker.
      *
-     * <p>
-     * This requires project admin provilege.
+     * @return
+     *      can be empty but never null.
      */
     public Map<String,JNIssueComponent> getComponents() throws ProcessingException {
-        if(components!=null)
-            return components;
+        Map<String,JNIssueComponent> r = new HashMap<String, JNIssueComponent>();
+        for (JNIssueComponent c : getMetadata().getComponents())
+            r.put(c.getName(),c);
+        return r;
+    }
 
-        components = new TreeMap<String,JNIssueComponent>();
+    /**
+    * Gets the {@link IssueCreator} object for creating new issue
+     */
+    public IssueCreator createIssue() throws ProcessingException {
+        return new IssueCreator(project);
+    }
+    
+    /**
+     * Runs the requested stored query
+     */
+    public Map<Integer,JNIssue> getIssuesByQuery(String queryName) throws ProcessingException {
+        return JNIssue.bulkCreate(project,JNIssue.bulkQueryFetch(project,queryName));
+    }
 
-        new Scraper("unable to parse the list of components") {
-            protected Object scrape() throws IOException, SAXException, ProcessingException {
-                Document dom = Util.getDom4j(goTo(project._getURL()+"/issues/editproducts.cgi"));
-                List<Element> trs = dom.selectNodes(".//DIV[@id='issuezilla']//TR");
-                for (Element tr : trs) {
-                    Node a = tr.selectSingleNode("./TD/A");
-                    if(a==null) continue;
-                    String name = a.getText();
-                    components.put(name,new JNIssueComponent(project,name));
-                }
-                return null;
-            }
-        }.run();
+    /**
+     * Runs the default query - My issues
+     */
+    public Map<Integer,JNIssue> getMyIssues() throws ProcessingException {
+        return getIssuesByQuery(null);
+    }
 
-        return components;
+    /**
+     * Gets an issue tracker component by its name.
+     *
+     * @return
+     *      null if not found.
+     */
+    public JNIssueComponent getComponent(String name) throws ProcessingException {
+        return getComponents().get(name);
     }
 
     // this seems like another way to get updates.
