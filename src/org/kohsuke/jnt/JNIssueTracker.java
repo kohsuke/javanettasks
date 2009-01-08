@@ -1,9 +1,9 @@
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.WebResponse;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
 
@@ -18,12 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.WeakHashMap;
 
 /**
  * java&#x2E;net issue tracker (IssueZilla) in one project.
  *
  * @author Kohsuke Kawaguchi
+ * @author Tomas Knappek
  */
 public final class JNIssueTracker extends JNObject {
 
@@ -38,6 +40,21 @@ public final class JNIssueTracker extends JNObject {
      * Lazily parsed list of components, by their {@link JNIssueComponent#getName() names}.
      */
     private Map<String,JNIssueComponent> components;
+
+//
+// metadata parsed from "issues/xml.cgi?metadata=xml" lazily.
+//
+    /**
+     * Metadata XML root element.
+     */
+    private Element rawMetadata;
+    private List<String> issueTypes;
+    private List<String> priorities;
+    private List<String> status;
+    private List<String> resolutions;
+    private List<String> platforms;
+    private List<String> opSystems;
+    private List<String> keywords;
 
     JNIssueTracker(JNProject project) {
         super(project);
@@ -171,8 +188,102 @@ public final class JNIssueTracker extends JNObject {
      * @return
      * @throws org.kohsuke.jnt.ProcessingException
      */
-    public JNIssueTrackerMetadata getMetadata() throws ProcessingException {
-        return new JNIssueTrackerMetadata(project);
+    public Element getMetadata() throws ProcessingException {
+        if (rawMetadata == null) {
+            // fetch now
+            rawMetadata = new Scraper<Element>("fetching the metadata info") {
+                public Element scrape() throws IOException, SAXException, ProcessingException {
+                    WebResponse rsp = project.goTo(project.getURL() + "issues/xml.cgi?metadata=xml");
+                    return Util.getDom4j(rsp).getRootElement().element("HEAD").element("ISSUEZILLA_METADATA");
+                }
+            }.run();
+
+            if (rawMetadata == null)
+                throw new ProcessingException("No metadata available!");
+        }
+        return rawMetadata;
+    }
+
+    public List<String> getIssueTypes() throws ProcessingException {
+        if (issueTypes == null) {
+            Element types = getMetadata().element("ATTRIBUTES").element("ISSUE_TYPE");
+            issueTypes = getValuesAsList(types);
+        }
+        return issueTypes;
+    }
+
+    public List<String> getPriorities() throws ProcessingException {
+        if (priorities == null) {
+            Element prios = getMetadata().element("ATTRIBUTES").element("PRIORITIES");
+            priorities = getValuesAsList(prios);
+        }
+        return priorities;
+    }
+
+    public List<String> getStatus() throws ProcessingException {
+        if (status == null) {
+            Element st = getMetadata().element("ATTRIBUTES").element("ISSUE_STATUS").element("STATUS_ALL");
+            status = getValuesAsList(st);
+        }
+        return status;
+    }
+
+    public List<String> getResolutions() throws ProcessingException {
+        if (resolutions == null) {
+            Element res = getMetadata().element("ATTRIBUTES").element("RESOLUTIONS");
+            resolutions = getValuesAsList(res);
+        }
+        return resolutions;
+    }
+
+    public List<String> getOpSystems() throws ProcessingException {
+        if (opSystems == null) {
+            Element os = getMetadata().element("AFFECT").element("OP_SYS");
+            opSystems = getValuesAsList(os);
+        }
+        return opSystems;
+    }
+
+    public List<String> getPlatforms() throws ProcessingException {
+        if (platforms == null) {
+            Element plafs = getMetadata().element("AFFECT").element("REP_PLATFORM");
+            platforms = getValuesAsList(plafs);
+        }
+        return platforms;
+    }
+
+    public List<String> getKeywords() throws ProcessingException {
+        if (keywords == null) {
+            Element keys = getMetadata().element("AFFECT").element("KEYWORDS");
+            keywords = getValuesAsList(keys);
+        }
+        return keywords;
+    }
+
+    private List<String> getValuesAsList(Element element) {
+        List<String> list = new Vector<String>();
+        if (element != null) {
+            for (Element e : children(element)) {
+                list.add(e.getTextTrim());
+            }
+        }
+        return list;
+    }
+
+    public List<Action> getActions(String fromState) throws ProcessingException {
+        Element actions = getMetadata().element("STATE_TRANSITIONS");
+        List<Action> actionList = new Vector<Action>();
+        for (Element state : children(actions)) {
+            if (state.attributeValue("from_status").equals(fromState)) {
+                for (Element action : children(state)) {
+                    String label = action.attributeValue("label");
+                    String value = action.attributeValue("value");
+                    actionList.add(new Action(label, value));
+                }
+                break;
+            }
+        }
+        return actionList;
     }
 
     /**
@@ -182,10 +293,18 @@ public final class JNIssueTracker extends JNObject {
      *      can be empty but never null.
      */
     public Map<String,JNIssueComponent> getComponents() throws ProcessingException {
-        Map<String,JNIssueComponent> r = new HashMap<String, JNIssueComponent>();
-        for (JNIssueComponent c : getMetadata().getComponents())
-            r.put(c.getName(),c);
-        return r;
+        if (components == null) {
+            components = new HashMap<String, JNIssueComponent>();
+            Element coms = getMetadata().element("AFFECT").element("COMPONENTS");
+            for (Element com : children(coms)) {
+                String name = com.element("COMPONENT_NAME").getTextTrim();
+                List<String> subs = getValuesAsList(com.element("SUBCOMPONENTS"));
+                List<String> mils = getValuesAsList(com.element("TARGET_MILESTONES"));
+                List<String> vers = getValuesAsList(com.element("VERSIONS"));
+                components.put(name,new JNIssueComponent(project, name, subs, mils, vers));
+            }
+        }
+        return components;
     }
 
     /**
@@ -219,6 +338,27 @@ public final class JNIssueTracker extends JNObject {
         return getComponents().get(name);
     }
 
+    /**
+     * Action metadata
+     */
+    public class Action {
+        private final String label;
+        private final String value;
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        Action(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
+    }
+
     // this seems like another way to get updates.
     // TODO: to query updates https://hudson.dev.java.net/issues/buglist.cgi?field0-0-0=delta_ts&type0-0-0=greaterthan&value0-0-0=2008-07-04&format=xml
 
@@ -230,4 +370,5 @@ public final class JNIssueTracker extends JNObject {
 //        }
 //        return r;
 //    }
+
 }

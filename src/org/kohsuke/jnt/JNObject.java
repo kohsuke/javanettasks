@@ -3,8 +3,10 @@ package org.kohsuke.jnt;
 import com.meterware.httpunit.WebResponse;
 import org.xml.sax.SAXException;
 import org.dom4j.Document;
+import org.dom4j.Element;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -48,5 +50,13 @@ abstract class JNObject {
         }
 
         return resp;
+    }
+
+    /**
+     * Helper method for page scraping. Return child elements.
+     */
+    @SuppressWarnings({"unchecked"})
+    protected final List<Element> children(Element e) {
+        return (List<Element>)e.elements();
     }
 }
