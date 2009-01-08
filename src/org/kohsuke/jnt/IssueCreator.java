@@ -2,10 +2,9 @@ package org.kohsuke.jnt;
 
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 /**
  * Very simple issue creator (doesn't check any field requirements... etc)
@@ -34,27 +33,9 @@ import org.xml.sax.SAXException;
  *
  * @author Tomas Knappek
  */
-public class IssueCreator extends JNObject {
-    private JNProject project;
-    private final List<Action> actions = new ArrayList<Action>();
-
-    private static interface Action {
-        void update(WebForm form);
-    }
-
+public class IssueCreator extends AbstractIssueEditor<IssueCreator> {
     IssueCreator(JNProject project) throws ProcessingException {
         super(project);
-        this.project = project;
-    }
-
-    public IssueCreator setField(final IssueField field, final String value) {
-        actions.add(new Action() {
-            public void update(WebForm form) {
-                form.setParameter(field.value, value);
-            }
-        });
-
-        return this;
     }
 
     public void commit() throws ProcessingException {

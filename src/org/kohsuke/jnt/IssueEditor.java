@@ -1,13 +1,10 @@
 package org.kohsuke.jnt;
 
+import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebResponse;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebForm;
 
 /**
  * Object for making updates to an issue.
@@ -35,20 +32,13 @@ import com.meterware.httpunit.WebForm;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class IssueEditor extends JNObject {
+public final class IssueEditor extends AbstractIssueEditor<IssueEditor> {
     private final JNIssue issue;
-    private final JNProject project;
     private final int id;
-    private final List<Action> actions = new ArrayList<Action>();
-
-    private static interface Action {
-        void update(WebForm form);
-    }
 
     protected IssueEditor(JNIssue issue) {
-        super(issue);
+        super(issue.getProject());
         this.issue = issue;
-        this.project = issue.getProject();
         this.id = issue.getId();
     }
 
@@ -110,57 +100,6 @@ public final class IssueEditor extends JNObject {
         actions.add(new Action() {
             public void update(WebForm form) {
                 form.setParameter("knob", state);
-            }
-        });
-        return this;
-    }
-
-    /**
-     * Sets the priority.
-     */
-    public IssueEditor setPriority(final Priority p) {
-        actions.add(new Action() {
-            public void update(WebForm form) {
-                form.setParameter("priority",p.name());
-            }
-        });
-        return this;
-    }
-
-    /**
-     * Sets the issue type.
-     */
-    public IssueEditor setType(final IssueType type) {
-        actions.add(new Action() {
-            public void update(WebForm form) {
-                form.setParameter("issue_type",type.name());
-            }
-        });
-        return this;
-    }
-
-    /**
-     * Generic method to set arbitrary field.
-     */
-    public IssueEditor setField(final IssueField field, final String value) {
-        actions.add(new Action() {
-            public void update(WebForm form) {
-                form.setParameter(field.value, value);
-            }
-        });
-        return this;
-    }
-
-    /**
-     * Append new words to the status whiteboard
-     */
-    public IssueEditor appendToWhiteBoard(final String words) {
-        actions.add(new Action() {
-            public void update(WebForm form) {
-                final String field = "status_whiteboard";
-                String value = form.getParameterValue(field);
-                form.setParameter(field,
-                    (value == null ? words : value + " " + words));
             }
         });
         return this;
