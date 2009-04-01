@@ -87,7 +87,12 @@ public class JNMembership extends JNObject {
 
                     // when there are more then one role for a single user, the
                     // roleList are separated by commas. This is new layout
-                    String cell = users.getCellAsText(r, 2);
+                    String cell = users.getCellAsText(r, 2);                    
+                    // There are some java.net projects, such as open-esb, where
+                    // the role lists are not comma-delimited, but are instead
+                    // delimited by \n chars. For consistency, replace \n with 
+                    // the comma delimiter
+                    cell = cell.replace('\n', ',');                    
                     StringTokenizer roleList = new StringTokenizer(cell,",");
                     Set<JNRole> ra = new TreeSet<JNRole>();
                     while(roleList.hasMoreTokens()) {
