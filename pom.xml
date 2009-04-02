@@ -4,7 +4,7 @@
   <groupId>javanettasks</groupId>
   <artifactId>javanettasks</artifactId>
   <name>java.net tasks</name>
-  <version>1.0.20-SNAPSHOT</version>
+  <version>1.0.19-SNAPSHOT</version>
   <description>java.net tasks : java.net automation library/tools</description>
   <url>http://javanettasks.dev.java.net/</url>
 
