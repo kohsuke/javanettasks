@@ -171,15 +171,24 @@ public final class JNIssueTracker extends JNObject {
 
     public Map<Integer,JNIssue> getUpdatedIssues(Date start,Date end) throws ProcessingException {
         return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
-                "ts="+dateFormat.format(start)+"&ts_end="+dateFormat.format(end)));
+                "include_attachments=false&ts="+dateFormat.format(start)+"&ts_end="+dateFormat.format(end)));
     }
 
     /**
      * Gets all the issues updated since the given time stamp.
      */
     public Map<Integer,JNIssue> getUpdatedIssues(Date start) throws ProcessingException {
-        return JNIssue.bulkCreate(project,JNIssue.bulkUpdateFetch(project,
-                "ts="+dateFormat.format(start)));
+        // if the time span is too long, fetch them in a group to avoid facing OutOfMemoryError
+        long sec = 1000;
+        long min = 60*sec;
+        long hour = 60*min;
+        long day = 24*hour;
+        long month = 30*day;
+
+        Map<Integer,JNIssue> r = new TreeMap<Integer, JNIssue>();
+        for( long t=start.getTime(); t<System.currentTimeMillis(); t+=month)
+            r.putAll(getUpdatedIssues(new Date(t),new Date(t+month)));
+        return r;
     }
 
     /**

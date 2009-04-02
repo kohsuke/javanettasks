@@ -44,9 +44,9 @@
   </developers>
 
   <scm>
-    <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:javanettasks/javanettasks</connection>
-    <developerConnection>scm:cvs:pserver:kohsuke@cvs.dev.java.net:/cvs:javanettasks/javanettasks</developerConnection>
-    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/javanettasks/</url>
+    <connection>scm:svn:https://svn.dev.java.net/svn/javanettasks/trunk/javanettasks</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/javanettasks/trunk/javanettasks</developerConnection>
+    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/trunk/javanettasks/</url>
   </scm>
 
   <organization>
@@ -221,8 +221,8 @@
 
   <distributionManagement>
     <site>
-      <id>javanettasks-www</id>
-      <url>file:../www</url>
+      <id>akuma-www</id>
+      <url>java-net:/javanettasks/trunk/www/</url>
     </site>
     <repository>
       <uniqueVersion>false</uniqueVersion>
