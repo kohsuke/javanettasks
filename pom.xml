@@ -4,7 +4,7 @@
   <groupId>javanettasks</groupId>
   <artifactId>javanettasks</artifactId>
   <name>java.net tasks</name>
-  <version>1.0.19</version>
+  <version>1.0.20-SNAPSHOT</version>
   <description>java.net tasks : java.net automation library/tools</description>
   <url>http://javanettasks.dev.java.net/</url>
 
@@ -44,9 +44,9 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:https://svn.dev.java.net/svn/javanettasks/tags/javanettasks-1.0.19</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/javanettasks/tags/javanettasks-1.0.19</developerConnection>
-    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/tags/javanettasks-1.0.19</url>
+    <connection>scm:svn:https://svn.dev.java.net/svn/javanettasks/trunk/javanettasks</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/javanettasks/trunk/javanettasks</developerConnection>
+    <url>https://javanettasks.dev.java.net/source/browse/javanettasks/trunk/javanettasks/</url>
   </scm>
 
   <organization>
