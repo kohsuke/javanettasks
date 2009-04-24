@@ -124,7 +124,7 @@ public class JavaNet extends JNObject {
         try {
             accountInfo.load( new FileInputStream(accountFile) );
         } catch( IOException e ) {
-            throw new ProcessingException("Unable to locate "+accountFile.getPath(),e);
+            throw new ProcessingException("Unable to locate "+accountFile.getPath()+" : See https://javanettasks.dev.java.net/nonav/maven/config.html",e);
         }
             
         JavaNet session = new JavaNet();
