@@ -487,6 +487,12 @@ public final class JNIssue extends JNObject {
         beginEdit().commit(comment);
     }
 
+    /**
+     * Begins updating an issue.
+     *
+     * See {@link IssueEditor} for more details. You make a bunch of edits through
+     * {@link IssueEditor}, then submit it via {@link IssueEditor#commit(String)}.
+     */
     public IssueEditor beginEdit() {
         return new IssueEditor(this);
     }
