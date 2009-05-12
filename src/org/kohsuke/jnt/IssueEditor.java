@@ -84,6 +84,13 @@ public final class IssueEditor extends AbstractIssueEditor<IssueEditor> {
     }
 
     /**
+     * Assigns this issue to the given user.
+     */
+    public IssueEditor assignTo(JNUser u) {
+        return setField(IssueField.ASSIGNED, u.getName());
+    }
+
+    /**
      * Marks this issue as a duplicate of another issue.
      */
     public IssueEditor duplicateOf(final JNIssue issue) {
