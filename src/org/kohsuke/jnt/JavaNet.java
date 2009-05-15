@@ -42,12 +42,9 @@ public class JavaNet extends JNObject {
      * A special {@link JNUser} object that represents the current user.
      */
     private JNMyself myself;
-    
+
     private JavaNet() {
         this(new WebConversation());
-
-        // disable scripting support
-        HttpUnitOptions.setScriptingEnabled(false);
     }
 
     private JavaNet(WebConversation wc) {
@@ -294,4 +291,8 @@ public class JavaNet extends JNObject {
         }.run();
     }
 
+    static {
+        // disable scripting support
+        HttpUnitOptions.setScriptingEnabled(false);
+    }
 }
