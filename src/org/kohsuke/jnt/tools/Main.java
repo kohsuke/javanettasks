@@ -10,6 +10,7 @@ import org.kohsuke.jnt.JavaNet;
 import org.kohsuke.jnt.ProcessingException;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Command line interface to the java.net automation tool.
@@ -25,29 +26,34 @@ public class Main {
     }
 
 
-    public static int run(String[] args) throws Exception {
+    public static int run(String[] _args) throws Exception {
         try {
             System.setProperty("java.net.useSystemProxies","true");
         } catch (SecurityException e) {
             // failing to set this property isn't fatal
         }
 
+        List<String> args = Arrays.asList(_args);
 
-        if(args.length==0) {
+
+        if(args.size()==0) {
             usage();
             return -1;
         }
 
-        Commandlet command = Commandlet.find(args[0]);
+        if(args.get(0).equals("-c")) {
+            System.setProperty(".java.net",args.get(1));
+            args = args.subList(2,args.size());
+        }
+
+        Commandlet command = Commandlet.find(args.get(0));
         if(command==null) {
-            System.err.println("No such command: "+args[0]);
+            System.err.println("No such command: "+args.get(0));
             usage();
             return -1;
         }
 
-        args = Arrays.asList(args).subList(1,args.length).toArray(new String[0]);
-
-        return command.run(new ConnectoinFactoryImpl(),args);
+        return command.run(new ConnectoinFactoryImpl(),args.subList(1,args.size()).toArray(new String[0]));
     }
 
     private static void usage() {
