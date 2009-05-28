@@ -528,7 +528,7 @@ public final class JNIssue extends JNObject {
 
         return new Scraper<Document>("fetching the details of the issue "+idList) {
             public Document scrape() throws IOException, SAXException, ProcessingException {
-                WebResponse rsp = project.goTo(project.getURL()+"issues/xml.cgi?include_empty_issues=false&include_attachments=false&id="+idList);
+                WebResponse rsp = project.goTo(project.getURL()+"issues/"+ XML_CGI +"?include_empty_issues=false&include_attachments=false&id="+idList);
                 return new DOMReader().read(rsp.getDOM());
             }
         }.run();
@@ -561,4 +561,5 @@ public final class JNIssue extends JNObject {
         }.run();
     }
 
+    private static final String XML_CGI = System.getProperty("java.net.xml.cgi","xml.cgi");
 }
