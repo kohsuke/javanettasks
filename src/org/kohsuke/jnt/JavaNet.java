@@ -44,7 +44,12 @@ public class JavaNet extends JNObject {
     private JNMyself myself;
 
     private JavaNet() {
-        this(new WebConversation());
+        this(createWebConversation());
+    }
+
+    private static WebConversation createWebConversation() {
+        HttpUnitOptions.setScriptingEnabled(false);
+        return new WebConversation();
     }
 
     private JavaNet(WebConversation wc) {

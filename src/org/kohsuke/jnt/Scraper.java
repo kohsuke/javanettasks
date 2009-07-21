@@ -27,13 +27,15 @@ abstract class Scraper<T> {
     public final T run() throws ProcessingException {
         try {
             return scrape();
-        } catch( RuntimeException e ) {
+        } catch (RuntimeException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
-        } catch( SAXException e ) {
+        } catch (SAXException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
-        } catch( IOException e ) {
+        } catch (IOException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
         } catch (ParseException e) {
+            throw new ProcessingException(errorSummary+e.getMessage(),e);
+        } catch (ProcessingException e) {
             throw new ProcessingException(errorSummary+e.getMessage(),e);
         }
     }
