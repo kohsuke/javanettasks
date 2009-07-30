@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.Comparator;
 
 /**
  * folder in the java&#x2E;net file sharing section.
@@ -100,7 +101,7 @@ public final class JNFileFolder extends JNObject {
                 Element current = (Element)dom.selectSingleNode("//DIV[@id='projectdocumentlist']//LI[@class='selection']");
 
                 // parse sub folders
-                subFolders = new TreeMap<String,JNFileFolder>();
+                subFolders = new TreeMap<String,JNFileFolder>(CASE_INSENSITIVE_COMPARATOR);
                 for( Element anchor : (List<Element>)current.selectNodes("UL/LI/A[SPAN]") ) {
                     // https://jaxb.dev.java.net/servlets/ProjectDocumentList?folderID=1747&expandFolder=1747
                     String name = anchor.getTextTrim();
@@ -119,7 +120,7 @@ public final class JNFileFolder extends JNObject {
 
                 // find the current folder
 
-                files = new TreeMap<String,JNFile>();
+                files = new TreeMap<String,JNFile>(CASE_INSENSITIVE_COMPARATOR);
 
 
                 List trs = dom.selectNodes("//DIV[@id='projectdocumentlist']//TD[@class='filebrowse']/DIV/TABLE/TR");
@@ -472,4 +473,14 @@ public final class JNFileFolder extends JNObject {
     public int hashCode() {
         return id + project.hashCode()*29;
     }
+
+    /**
+     * According to http://www.nabble.com/Re%3A-Trouble-releasing-configuration-slicing-plugin-%28resolved%29-td24738586.html,
+     * java.net subfolder names are case preserving but case insensitive. 
+     */
+    private static final Comparator<String> CASE_INSENSITIVE_COMPARATOR = new Comparator<String>() {
+        public int compare(String l, String r) {
+            return l.toLowerCase().compareTo(r.toLowerCase());
+        }
+    };
 }
