@@ -202,7 +202,7 @@ public final class JNIssueTracker extends JNObject {
             // fetch now
             rawMetadata = new Scraper<Element>("fetching the metadata info") {
                 public Element scrape() throws IOException, SAXException, ProcessingException {
-                    WebResponse rsp = project.goTo(project.getURL() + "issues/xml.cgi?metadata=xml");
+                    WebResponse rsp = project.goTo(project.getURL() + "issues/"+JNIssue.XML_CGI+"?metadata=xml");
                     return Util.getDom4j(rsp).getRootElement().element("HEAD").element("ISSUEZILLA_METADATA");
                 }
             }.run();

@@ -561,5 +561,5 @@ public final class JNIssue extends JNObject {
         }.run();
     }
 
-    private static final String XML_CGI = System.getProperty("java.net.xml.cgi","xml.cgi");
+    /*package*/ static final String XML_CGI = System.getProperty("java.net.xml.cgi","xml.cgi");
 }
