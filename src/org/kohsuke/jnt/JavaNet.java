@@ -106,6 +106,19 @@ public class JavaNet extends JNObject {
             }
         }.run();
     }
+
+    /**
+     * Checks if the user is logged in. This is useful for making sure that the HTTP session is still effective.
+     */
+    public boolean isLoggedIn() throws ProcessingException {
+        return new Scraper<Boolean>("unable to access start page") {
+            protected Boolean scrape() throws IOException, SAXException, ProcessingException {
+                WebResponse r = goTo("https://www.dev.java.net/servlets/StartPage");
+                Document dom = Util.getDom4j(r);
+                return dom.selectSingleNode("//DIV[@id='loginbox']//STRONG[@class='username']")!=null;
+            }
+        }.run();
+    }
     
     /**
      * obtains the connection info from ~/.java.net and returns the connected {@link JavaNet} object.
