@@ -10,16 +10,23 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.cookies.CookieProperties;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Root of java&#x2E;net.
@@ -111,20 +118,87 @@ public class JavaNet extends JNObject {
      * Checks if the user is logged in. This is useful for making sure that the HTTP session is still effective.
      */
     public boolean isLoggedIn() throws ProcessingException {
-        return new Scraper<Boolean>("unable to access start page") {
-            protected Boolean scrape() throws IOException, SAXException, ProcessingException {
+        return getCurrentUser()!=null;
+    }
+
+    /**
+     * Gets the user name of the current session.
+     */
+    /*package*/ String getCurrentUser() throws ProcessingException {
+        return new Scraper<String>("unable to access start page") {
+            protected String scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse r = goTo("https://www.dev.java.net/servlets/StartPage");
                 Document dom = Util.getDom4j(r);
-                return dom.selectSingleNode("//DIV[@id='loginbox']//STRONG[@class='username']")!=null;
+                Node e = dom.selectSingleNode("//DIV[@id='loginbox']//STRONG[@class='username']");
+                return e!=null ? ((Element)e).getTextTrim() : null;
             }
         }.run();
+    }
+
+    /**
+     * Gets the session cookie that the server uses to track us.
+     */
+    public String getSessionID() {
+        return wc.getCookieValue("JSESSIONID");
     }
     
     /**
      * obtains the connection info from ~/.java.net and returns the connected {@link JavaNet} object.
      */
     public static JavaNet connect() throws ProcessingException {
-        return connect(getDefaultAccountFile());
+        File af = getDefaultAccountFile();
+        File session = new File(af.getPath()+".session");
+
+        // see if we can reuse the persisted session
+        if (System.currentTimeMillis()-session.lastModified() < 90*60*1000L) {
+            try {
+                InputStream in = new FileInputStream(session);
+                try {
+                    Properties props = new Properties();
+                    props.load(in);
+
+                    // also load the .java.net file to make sure that the user name matches
+                    Properties accountInfo = new Properties();
+                    accountInfo.load( new FileInputStream(af) );
+
+                    // try logging in and see if it works
+                    JavaNet jn = connectByClone(props.getProperty("JSESSIONID"));
+                    if (jn.getMyself()!=null &&  jn.getMyself().getName().equals(accountInfo.get("userName")))
+                        return jn;
+                } finally {
+                    in.close();
+                }
+            } catch (IOException e) {
+                // failed to reuse. delete the file and move on to the normal login.
+                LOGGER.log(Level.FINE, "Failed to retrieve the existing session",e);
+                session.delete();
+            }
+        }
+
+        JavaNet jn = connect(af);
+
+        // try to save the session, if we can create a file read-only to the owner
+        try {
+            FileOutputStream w = new FileOutputStream(session);
+            try {
+                if (session.setReadable(false,false) && session.setReadable(true,true)) {
+                    // unless we can create a protected file, we won't write a session
+                    Properties props = new Properties();
+                    props.put("JSESSIONID",jn.getSessionID());
+                    props.put("user",jn.getMyself().getName());
+                    props.store(w,"persisted session");
+                } else {
+                    w.close();
+                    session.delete();
+                }
+            } finally {
+                w.close();
+            }
+        } catch (IOException e) {
+            // if we can't save it, so be it
+            LOGGER.log(Level.FINE, "Failed to save the persisted session",e);
+        }
+        return jn;
     }
 
     /**
@@ -182,6 +256,29 @@ public class JavaNet extends JNObject {
      */
     public static JavaNet connectAnonymously() {
         return new JavaNet();
+    }
+
+    /**
+     * Connects by just reusing an earlier session established by another {@link JavaNet} instance.
+     */
+    public static JavaNet connectByClone(JavaNet base) throws ProcessingException {
+        return connectByClone(base.getSessionID());
+    }
+
+    private static JavaNet connectByClone(String sessionID) throws ProcessingException {
+        JavaNet jn = new JavaNet();
+        jn.wc.addCookie("JSESSIONID",sessionID);
+        String user = jn.getCurrentUser();
+        if (user!=null)
+            jn.myself = new JNMyself(jn,user);
+        return jn;
+    }
+
+    /**
+     * A bit more object-oriented way of calling {@link #connectByClone(JavaNet)} .
+     */
+    public JavaNet copy() throws ProcessingException {
+        return connectByClone(this);
     }
 
     /**
@@ -313,4 +410,6 @@ public class JavaNet extends JNObject {
         // disable scripting support
         HttpUnitOptions.setScriptingEnabled(false);
     }
+
+    private static final Logger LOGGER = Logger.getLogger(JavaNet.class.getName());
 }
