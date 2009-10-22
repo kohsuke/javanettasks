@@ -168,7 +168,7 @@ public final class JNProject extends JNObject implements Comparable {
                 Node vcslink = dom.selectSingleNode("//DL[@id='projecttools']//A[@href='https://" + projectName + ".dev.java.net/source/browse/" + projectName + "/']");
                 if(vcslink==null)
                     throw new ProcessingException("Version control link not found");
-                if(vcslink.getText().indexOf("CVS")>0)
+                if(vcslink.getText().indexOf("CVS")>=0)
                     vcs = JNVCS.CVS;
                 else
                     vcs = JNVCS.SVN;
