@@ -14,6 +14,7 @@ public abstract class Commandlet {
         new GrantRoleCommandlet(),
         new CopySubscribersCommandlet(),
         new DeclineRoleCommandlet(),
+        new DumpVotesCommandlet(),
         new ProcessRoleCommandlet(),
         new ListMyProjectsCommandlet(),
         new ListSubProjectsCommandlet(),
