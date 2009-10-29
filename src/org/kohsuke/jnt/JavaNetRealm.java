@@ -22,10 +22,11 @@ import java.util.AbstractList;
  * @author Kohsuke Kawaguchi
  */
 public class JavaNetRealm {
-    private File root;
+    private final File root;
 
     public JavaNetRealm(File root) {
         this.root = root;
+        root.mkdirs();
     }
 
     /**
