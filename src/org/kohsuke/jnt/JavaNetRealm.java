@@ -19,6 +19,9 @@ import java.util.AbstractList;
 /**
  * Cached authentication for java.net users.
  *
+ * <p>
+ * A directory on a disk is used to cache users and their passwords.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class JavaNetRealm {
