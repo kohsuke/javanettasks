@@ -142,7 +142,7 @@ public final class JNMailingList extends JNObject {
             protected Void scrape() throws IOException, SAXException, ProcessingException {
                 WebResponse response = goTo(project._getURL()+"/servlets/ProjectMailingListList");
                 for (WebForm form : response.getForms()) {
-                    if(!form.getName().equals("ProjectMailingListListForm"))
+                    if(!form.getAction().equals("ProjectMailingListList"))
                         continue;
                     if(!form.getParameterValue("listName").equals(name))
                         continue;
