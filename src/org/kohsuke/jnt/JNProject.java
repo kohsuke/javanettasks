@@ -379,6 +379,9 @@ public final class JNProject extends JNObject implements Comparable {
      */
     public Set<JNUser> getOwners() throws ProcessingException {
         parseProjectInfo();
+        if (owners.isEmpty())
+            // do it the slow way, since projects can now delete the default summary table
+            owners = getMembership().getUserOf(root.getRole("Project Owner"));
         return owners;
     }
 

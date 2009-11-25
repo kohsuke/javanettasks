@@ -197,6 +197,9 @@ public class JavaNet extends JNObject {
         } catch (IOException e) {
             // if we can't save it, so be it
             LOGGER.log(Level.FINE, "Failed to save the persisted session",e);
+        } catch (LinkageError e) {
+            // probably not running on JDK6
+            LOGGER.log(Level.FINE, "Failed to save the persisted session",e);
         }
         return jn;
     }
