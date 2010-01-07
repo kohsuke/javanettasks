@@ -17,8 +17,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -146,7 +144,7 @@ public class JavaNet extends JNObject {
      * obtains the connection info from ~/.java.net and returns the connected {@link JavaNet} object.
      */
     public static JavaNet connect() throws ProcessingException {
-        File af = getDefaultAccountFile();
+        File af = ConnectionInfo.getDefaultAccountFile();
         File session = new File(af.getPath()+".session");
 
         // see if we can reuse the persisted session
@@ -211,47 +209,18 @@ public class JavaNet extends JNObject {
      *      The property file that stores the connection information.
      */
     public static JavaNet connect(File accountFile) throws ProcessingException {
-        Properties accountInfo = new Properties();
-        
-        try {
-            accountInfo.load( new FileInputStream(accountFile) );
-        } catch( IOException e ) {
-            throw new ProcessingException("Unable to locate "+accountFile.getPath()+" : See https://javanettasks.dev.java.net/nonav/maven/config.html",e);
-        }
-            
-        JavaNet session = new JavaNet();
-        
-        if(accountInfo.containsKey("proxyServer")) {
-            String host = accountInfo.getProperty("proxyServer");
-            String port = accountInfo.getProperty("proxyPort");
-//            System.out.println("Using the proxy server "+host+":"+port);
-            session.setProxyServer( host, Integer.parseInt(port) );
-        }
-        
-        String userName = accountInfo.getProperty("userName");
-        if(userName==null)
-            throw new ProcessingException("userName property is missing");
-        String password = accountInfo.getProperty("password");
-        if(password==null)
-            throw new ProcessingException("password property is missing");
-        
-        session.login(userName,password);
-        
-        return session;
+        return connect(new ConnectionInfo(accountFile));
     }
 
-    /**
-     * Gets the default ".java.net" config property file.
-     */
-    private static File getDefaultAccountFile() {
-        // look for the system property that points to the file first
-        String p = System.getProperty(".java.net");
-        if(p!=null)
-            return new File(p);
+    public static JavaNet connect(ConnectionInfo con) throws ProcessingException {
+        JavaNet session = new JavaNet();
+        
+        if(con.proxyServer!=null)
+            session.setProxyServer( con.proxyServer, con.proxyPort );
 
-        // otherwise default to ~/.java.net
-        File homeDir = new File(System.getProperty("user.home"));
-        return new File(homeDir,".java.net");
+        session.login(con.userName,con.password);
+        
+        return session;
     }
 
     /**
