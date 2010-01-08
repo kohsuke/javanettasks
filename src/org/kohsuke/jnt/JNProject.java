@@ -115,7 +115,7 @@ public final class JNProject extends JNObject implements Comparable {
 
                 List as = dom.selectNodes("//DIV[@id='breadcrumbs']//A");
                 if(as.size()==0)
-                    throw new ProcessingException("failed to parse "+getURL());
+                    throw new ProcessingException("failed to obtain the breadcrumb in "+getURL());
 
                 if(as.size()>2) {
                     topLevelName = ((Element)as.get(1)).getTextTrim();
