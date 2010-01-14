@@ -13,6 +13,8 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -69,6 +71,16 @@ public class JavaNet extends JNObject {
 
         // we need this to work around the broken cookies in java.net
         CookieProperties.setDomainMatchingStrict(false);
+
+        // IssueZilla always have a DTD but for a restricted access project, it fails to resolve.
+        // so just stop looking at DTD altogether.
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+            wc.setDocumentBuilderFactory(dbf);
+        } catch (ParserConfigurationException e) {
+            throw new Error(e);
+        }
     }
 
     private void setProxyServer( String hostName, int port ) {
