@@ -1,9 +1,9 @@
 package org.kohsuke.jnt;
 
-import com.meterware.httpunit.UploadFileSpec;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.protocol.UploadFileSpec;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.xml.sax.SAXException;

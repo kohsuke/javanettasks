@@ -12,10 +12,6 @@ import java.io.ByteArrayInputStream;
  */
 public class Foo {
     public static void main(String[] args) throws Exception {
-        JNProject p = JavaNet.connect("vijayj","java.net").getProject("javafx-sdk");
-        JNFileFolder f = p.getFolder("/continuous_builds");
-
-        f.uploadFile("test","description", FileStatus.STABLE,
-            new ByteArrayInputStream("test".getBytes()),"text/plain");
+        JavaNet.connect().getProject("esb-console").getSummary();
     }
 }
