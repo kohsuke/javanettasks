@@ -276,6 +276,32 @@ public final class JNFileFolder extends JNObject {
                     form.setParameter("status",fileStatus.toString());
                 form.setParameter("description",description);
 
+                /*
+                    Working around NPE:
+
+                        Caused by: java.lang.NullPointerException
+                            at com.meterware.httpunit.protocol.MimeEncodedMessageBody$MimeEncoding.fixLineEndings(MimeEncodedMessageBody.java:113)
+                            at com.meterware.httpunit.protocol.MimeEncodedMessageBody$MimeEncoding.addParameter(MimeEncodedMessageBody.java:104)
+                            at com.meterware.httpunit.TextFormControl.addValues(FormControl.java:745)
+                            at com.meterware.httpunit.WebForm.recordParameters(WebForm.java:604)
+                            at com.meterware.httpunit.protocol.MimeEncodedMessageBody.writeTo(MimeEncodedMessageBody.java:51)
+                            at com.meterware.httpunit.MessageBodyWebRequest.writeMessageBody(MessageBodyWebRequest.java:107)
+                            at com.meterware.httpunit.MessageBodyWebRequest.completeRequest(MessageBodyWebRequest.java:120)
+                            at com.meterware.httpunit.WebConversation.newResponse(WebConversation.java:82)
+                            at com.meterware.httpunit.WebClient.createResponse(WebClient.java:667)
+                            at com.meterware.httpunit.WebWindow.getResource(WebWindow.java:220)
+                            at com.meterware.httpunit.WebWindow.getSubframeResponse(WebWindow.java:181)
+                            at com.meterware.httpunit.WebWindow.getResponse(WebWindow.java:158)
+                            at com.meterware.httpunit.WebWindow.sendRequest(WebWindow.java:134)
+                            at com.meterware.httpunit.WebRequestSource.submitRequest(WebRequestSource.java:297)
+                            at com.meterware.httpunit.WebRequestSource.submitRequest(WebRequestSource.java:253)
+                            at com.meterware.httpunit.WebForm.submitRequest(WebForm.java:127)
+                            at com.meterware.httpunit.WebForm.doFormSubmit(WebForm.java:143)
+                            at com.meterware.httpunit.SubmitButton.doButtonAction(SubmitButton.java:69)
+                            at com.meterware.httpunit.Button.doOnClickSequence(Button.java:91)
+                 */
+                form.setParameter("text","");
+
                 actor.act(form);
                 r = checkError(form.submit());
 
