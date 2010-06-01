@@ -76,7 +76,12 @@ public class JavaNet extends JNObject {
         // so just stop looking at DTD altogether.
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+            try {
+                dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+            } catch (AbstractMethodError e) {
+                // running very old version of parser, but don't make it fatal
+                LOGGER.log(Level.WARNING,"Failed to configure parser",e);
+            }
             wc.setDocumentBuilderFactory(dbf);
         } catch (ParserConfigurationException e) {
             throw new Error(e);
