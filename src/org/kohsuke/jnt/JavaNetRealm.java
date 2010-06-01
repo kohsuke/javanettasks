@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.security.MessageDigest;
 import java.security.DigestInputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.List;
@@ -49,27 +50,42 @@ public class JavaNetRealm {
     }
 
     /**
+     * Returns true if the given user has successfully logged in in the past.
+     */
+    public boolean hasUser(String userName) {
+        return new File(root,userName).exists();
+    }
+
+    /**
      * Authenticates the user.
      */
     public boolean authenticate(String userName, String password) throws IOException {
         LOGGER.finer("Authenticating "+userName);
 
-        String digest = getDigestOf(password);
         File auth = new File(root,userName);
 
         // check the local cache first.
-        if (auth.exists()) {
+        if (auth.exists() && auth.lastModified()+7*DAY>System.currentTimeMillis()) {
             BufferedReader r = new BufferedReader(new FileReader(auth));
             try {
-                if (digest.equals(r.readLine()))
-                    return true;
+                String l = r.readLine();
+                int idx = l.indexOf(':');
+                if (idx>0) {
+                    String salt = l.substring(0,idx);
+                    String digest = l.substring(idx+1);
+
+                    if (getDigestOf(salt+password).equals(digest))
+                        return true;
+                }
             } finally {
                 r.close();
             }
         }
 
         try {
-            JavaNet.connect(userName,password);
+            JavaNet con = JavaNet.connect(userName, password);
+            if (!authenticateConnection(con))
+                return false;
         } catch (ProcessingException e) {
             LOGGER.log(Level.FINE, "Failed to authenticate "+userName,e);
             return false;
@@ -77,10 +93,21 @@ public class JavaNetRealm {
 
         BufferedWriter w = new BufferedWriter(new FileWriter(auth));
         try {
-            w.write(digest);
+            String salt = generateSalt();
+            w.write(salt +':'+getDigestOf(salt+password));
         } finally {
             w.close();
         }
+        return true;
+    }
+
+    /**
+     * Performs additional authentication check on the established connection and
+     * returns false if the authentication should fail.
+     *
+     * This can be useful for example to make sure the user belongs to a particular project.
+     */
+    protected boolean authenticateConnection(JavaNet con) throws ProcessingException {
         return true;
     }
 
@@ -136,5 +163,14 @@ public class JavaNetRealm {
         return toHexString(bytes,0,bytes.length);
     }
 
+    private static synchronized String generateSalt() {
+        char[] buf = new char[8];
+        for (int i=0; i<buf.length; i++)
+            buf[i] = (char) ('A'+RANDOM.nextInt(26));
+        return new String(buf);
+    }
+
+    private static final Random RANDOM = new Random();
+    private static final int DAY = 24*60*60*1000;
     private static final Logger LOGGER = Logger.getLogger(JavaNetRealm.class.getName());
 }
